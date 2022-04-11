@@ -1,0 +1,34 @@
+---
+order: 1900
+label: "News"
+icon: star
+---
+
+# News
+
+## What we are working on?
+*Update: 2022-02-18*
+
+**We released new version 1.1.0 which gives more flexibility and performance.
+We have also added new features, blow:**
+
+- [X] add a price parameter to all fields and use the value in the formula,
+- [X] apply fieldsets to categories,
+- [X] mass assignment of fieldsets to products,
+- [X] customizable field's template
+- [X] add priority for fieldsets
+- [X] assign to all products/categories, except ...
+- [X] some bug fixes reported by users
+
+*Update: 2022-01-21*
+
+**We are working on new features:**
+- [ ] a new field: file upload,
+- [ ] add a price parameter to all fields and use the value in the formula,
+- [ ] allow editing fields in the user's cart,
+- [ ] stock management for numeric fields,
+- [ ] apply fieldsets to categories,
+- [ ] mass assignment of fieldsets to products,
+- [ ] add global fields, so the product could have a one fieldset with calculations and global fields.
+
+Apply for a new feature by clicking the link at the top.

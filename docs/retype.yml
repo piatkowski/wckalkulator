@@ -1,0 +1,23 @@
+input: .
+output: .retype
+url: https://wckalkulator.com
+meta:
+  title: " | WC Kalkulator Woocommerce Plugin"
+branding:
+  title: WC Kalkulator
+  label: v1.1.0
+links:
+- text: Get the Plugin
+  link: https://wordpress.org/plugins/wc-kalkulator/
+  icon: download
+- text: Report Issue
+  link: https://wordpress.org/support/plugin/wc-kalkulator/
+  icon: issue-opened
+- text: Request Feature
+  link: https://wordpress.org/support/plugin/wc-kalkulator/
+  icon: star
+- text: Donate
+  link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
+  icon: heart
+footer:
+  copyright: "&copy; Copyright {{ year }}. All rights reserved."

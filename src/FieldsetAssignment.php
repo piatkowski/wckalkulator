@@ -1,0 +1,212 @@
+<?php
+
+namespace WCKalkulator;
+
+/**
+ * Class FieldsetAssignment
+ *
+ * @package WCKalkulator
+ * @author Krzysztof Piątkowski
+ * @license GPLv2
+ * @since 1.1.0
+ */
+class FieldsetAssignment
+{
+    
+    const TYPE_ALL = 1;
+    const TYPE_ALL_EXCEPT = 2;
+    const TYPE_ONLY_SELECTED = 3;
+    
+    /**
+     * All defined assign types
+     *
+     * @var array
+     * @since 1.1.0
+     */
+    private static $type;
+    
+    /**
+     * Initialize value of properties ($type)
+     *
+     * @since 1.1.0
+     */
+    public static function init()
+    {
+        self::$type = array(
+            self::TYPE_ALL => __('All Products', 'wc-kalkulator'),
+            self::TYPE_ALL_EXCEPT => __('All Products, except below:', 'wc-kalkulator'),
+            self::TYPE_ONLY_SELECTED => __('Only selected below:', 'wc-kalkulator')
+        );
+    }
+    
+    /**
+     * Return all assignment types as an array
+     *
+     * @return array
+     * @since 1.1.0
+     */
+    public static function all()
+    {
+        return self::$type;
+    }
+    
+    /**
+     * Return title by the type's $id
+     *
+     * @param int $id
+     * @return string|null
+     * @since 1.1.0
+     */
+    public static function get($id)
+    {
+        return self::has($id) ? self::$type[$id] : null;
+    }
+    
+    /**
+     * Check if $id exists in the $type array
+     *
+     * @param $id
+     * @return bool
+     * @since 1.1.0
+     */
+    public static function has($id)
+    {
+        return isset(self::$type[$id]);
+    }
+    
+    /**
+     * This method returns Fieldset Post ID assigned to the Product
+     * Returns ID with the highest priority if multiple Posts are found.
+     *
+     * @param $product_id
+     * @return int
+     * @since 1.1.0
+     */
+    public static function match($product_id)
+    {
+        if((int)$product_id === 0)
+            return 0;
+        
+        $cached = Cache::get('FieldsetAssignment_match_' . $product_id);
+        if ($cached)
+            return $cached;
+        $category_id = array();
+
+        $terms = get_the_terms($product_id, 'product_cat');
+        foreach ($terms as $term) {
+            $category_id[] = $term->term_id;
+        }
+        
+        $posts = get_posts(array(
+            'post_type' => FieldsetPostType::POST_TYPE,
+            'per_page' => -1,
+            'post_status' => 'publish'
+        ));
+        
+        $matching = null;
+        $max_priority = -INF;
+        
+        foreach ($posts as $post) {
+            
+            $assign = array(
+                'type' => get_post_meta($post->ID, '_wck_assign_type', true),
+                'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
+                'categories' => (array)get_post_meta($post->ID, '_wck_assign_categories', true),
+                'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
+            );
+            
+            $has_match = false;
+            switch ($assign['type']) {
+                
+                case FieldsetAssignment::TYPE_ALL:
+                    $has_match = true;
+                    break;
+                
+                case FieldsetAssignment::TYPE_ALL_EXCEPT:
+                    if (!in_array($product_id, $assign['products']) && count(array_intersect($category_id, $assign['categories'])) === 0) {
+                        $has_match = true;
+                    }
+                    break;
+                
+                case FieldsetAssignment::TYPE_ONLY_SELECTED:
+                    if (in_array($product_id, $assign['products']) || count(array_intersect($category_id, $assign['categories'])) > 0) {
+                        $has_match = true;
+                    }
+                    break;
+            }
+            
+            if ($has_match && $assign['priority'] > $max_priority) {
+                $matching = $post->ID;
+                $max_priority = $assign['priority'];
+            }
+            
+        }
+  
+        Cache::store('FieldsetAssignment_match_' . $product_id, $matching);
+        return $matching;
+    }
+    
+    /**
+     * Product ids as input. Method outputs array of readable products titles, example: [16] => 'Product Title (#16)'
+     *
+     * @param $products
+     * @return array
+     * @since 1.1.0
+     */
+    public static function products_readable($products)
+    {
+        $result = array();
+        if (is_array($products)) {
+            $products = wc_get_products(array(
+                'include' => $products
+            ));
+            
+            foreach ($products as $product) {
+                $id = $product->get_id();
+                $result[$id] = $product->get_title() . ' (#' . $id . ')';
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Category ids as input. Method outputs array of readable category titles, example: [16] => 'Category Title (2)'
+     *
+     * @param $categories
+     * @return array
+     * @since 1.1.0
+     */
+    public static function categories_readable($categories)
+    {
+        $result = array();
+        if (is_array($categories)) {
+            $terms = get_terms(array(
+                'taxonomy' => array('product_cat'),
+                'orderby' => 'id',
+                'order' => 'ASC',
+                'hide_empty' => false,
+                'fields' => 'all',
+                'include' => $categories
+            ));
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $term->formatted_name = '';
+                    if ($term->parent) {
+                        $ancestors = array_reverse(get_ancestors($term->term_id, 'product_cat'));
+                        foreach ($ancestors as $ancestor) {
+                            $ancestor_term = get_term($ancestor, 'product_cat');
+                            if ($ancestor_term) {
+                                $term->formatted_name .= $ancestor_term->name . ' > ';
+                            }
+                        }
+                    }
+                    
+                    $term->formatted_name .= $term->name . ' (' . $term->count . ')';
+                    $result[$term->term_id] = $term->formatted_name;
+                }
+            }
+        }
+        return $result;
+    }
+    
+}

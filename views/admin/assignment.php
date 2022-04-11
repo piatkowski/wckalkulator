@@ -1,0 +1,68 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+use WCKalkulator\Helper;
+use WCKalkulator\FieldsetAssignment;
+
+wp_nonce_field(\WCKalkulator\FieldsetPostType::POST_TYPE, '_wck_nonce');
+
+/**
+ * _wck_assign_type
+ * _wck_assign_products
+ * _wck_assign_categories
+ */
+
+global $post;
+
+$type = (int)get_post_meta($post->ID, '_wck_assign_type', true);
+$priority = (int)get_post_meta($post->ID, '_wck_assign_priority', true);
+$products = get_post_meta($post->ID, '_wck_assign_products', true);
+$categories = get_post_meta($post->ID, '_wck_assign_categories', true);
+
+?>
+<p class="post-attributes-label-wrapper">
+    <label for="assign_type" class="post-attributes-label">
+        <?php _e('Assign to', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('You can choose several types of assignment', 'wc-kalkulator')); ?>
+    </label>
+</p>
+<select name="_wck_assign_type" id="assign_type" class="wc-enhanced-select">
+    <?php foreach (FieldsetAssignment::all() as $id => $title): ?>
+        <option value="<?php echo esc_html($id); ?>" <?php selected($type, $id); ?>><?php echo esc_html($title); ?></option>
+    <?php endforeach; ?>
+</select>
+
+<p class="post-attributes-label-wrapper">
+    <label for="assign_products" class="post-attributes-label">
+        <?php _e('Choose Products', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('Search a product by title. You can choose multiple products.', 'wc-kalkulator')); ?>
+    </label>
+</p>
+<select class="wc-product-search" multiple="multiple" id="assign_products" name="_wck_assign_products[]"
+        data-action="woocommerce_json_search_products">
+    <?php foreach (FieldsetAssignment::products_readable($products) as $id => $title): ?>
+        <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
+    <?php endforeach; ?>
+</select>
+
+<p class="post-attributes-label-wrapper">
+    <label for="assign_categories" class="post-attributes-label">
+        <?php _e('Choose Categories', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('Search a category by title. You can choose multiple categories.', 'wc-kalkulator')); ?>
+    </label>
+</p>
+<select class="wc-category-search" multiple="multiple" id="assign_categories" name="_wck_assign_categories[]">
+    <?php foreach (FieldsetAssignment::categories_readable($categories) as $id => $title): ?>
+        <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
+    <?php endforeach; ?>
+</select>
+
+<p class="post-attributes-label-wrapper">
+    <label for="assign_priority" class="post-attributes-label">
+        <?php _e('Priority (number)', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('If the product has many groups assigned to it, the one with the highest priority (the highest number) will be used. ', 'wc-kalkulator')); ?>
+    </label>
+</p>
+<input type="number" step="1" name="_wck_assign_priority" id="assign_priority" value="<?php echo esc_html($priority); ?>">

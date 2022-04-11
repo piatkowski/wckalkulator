@@ -1,0 +1,503 @@
+<?php
+
+namespace WCKalkulator;
+
+/**
+ * Class FieldsetPostType
+ *
+ * This Class handles all backend actions for the new Post Type
+ *
+ * @package WCKalkulator
+ * @author Krzysztof Piątkowski
+ * @license GPLv2
+ * @since 1.1.0
+ */
+class FieldsetPostType
+{
+    const POST_TYPE = "wck_fieldset";
+    
+    
+    /**
+     * Allowed meta keys and sanitization mode used for WCKalkulator\Sanitizer class
+     *
+     * @var array
+     * @since 1.1.0
+     */
+    public static $meta_keys = array(
+        '_wck_assign_type' => array('1', '2', '3'),
+        '_wck_assign_products' => 'absint_array',
+        '_wck_assign_categories' => 'absint_array',
+        '_wck_assign_priority' => 'absint',
+        '_wck_filter_price_enabled' => 'bool',
+        '_wck_filter_price_prefix' => 'text',
+        '_wck_filter_price_value' => 'text',
+        '_wck_filter_price_sufix' => 'text',
+        '_wck_fieldset' => 'json', //will be stored as array
+        '_wck_expression' => 'json', //will be stored as array
+        '_wck_choose_expression_type' => array('oneline', 'conditional', 'off'),
+        '_wck_version_hash' => 'text',
+        '_wck_priority' => 'int'
+    );
+    
+    /**
+     * Initialize properties, add WP actions and filters.
+     *
+     * This method is called in Plugin::run()
+     *
+     * @since 1.1.0
+     */
+    public static function init()
+    {
+        FieldsetAssignment::init();
+        
+        add_action('init', array(__CLASS__, 'register_post_type'));
+        add_filter('manage_' . self::POST_TYPE . '_posts_columns', array(__CLASS__, 'manage_posts_columns'));
+        add_action('manage_' . self::POST_TYPE . '_posts_custom_column', array(__CLASS__, 'manage_posts_custom_column'), 10, 2);
+        add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'));
+        add_filter('woocommerce_screen_ids', array(__CLASS__, 'add_screen_to_woocommerce'));
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'), 11);
+        add_filter('get_user_option_meta-box-order_' . self::POST_TYPE, array(__CLASS__, 'metabox_order'));
+        add_filter('woocommerce_json_search_found_categories', array(__CLASS__, 'woocommerce_json_search_found_categories'));
+        add_filter('bulk_actions-edit-' . self::POST_TYPE, array(__CLASS__, 'bulk_actions'));
+        add_filter('post_row_actions', array(__CLASS__, 'duplicate_post_link'), 10, 2);
+        add_action('admin_action_wck_duplicate_post', array(__CLASS__, 'duplicate_post'));
+    }
+    
+    /**
+     *  Registers the new Post Type
+     *
+     * @since 1.1.0
+     */
+    public static function register_post_type()
+    {
+        if (post_type_exists(self::POST_TYPE)) {
+            return;
+        }
+        
+        register_post_type(self::POST_TYPE,
+            array(
+                'labels' => array(
+                    'name' => __('Fieldsets', 'wc-kalkulator'),
+                    'singular_name' => __('Fieldset', 'wc-kalkulator'),
+                    'menu_name' => __('Fieldset', 'wc-kalkulator'),
+                    'all_items' => __('WCK Fieldsets', 'wc-kalkulator'),
+                    'view_item' => __('View Fieldset', 'wc-kalkulator'),
+                    'add_new_item' => __('Add new Fieldset', 'wc-kalkulator'),
+                    'add_new' => __('Add new', 'wc-kalkulator'),
+                    'edit_item' => __('Edit Fieldset', 'wc-kalkulator'),
+                    'update_item' => __('Save Fieldset', 'wc-kalkulator'),
+                    'search_items' => __('Search Fieldset', 'wc-kalkulator'),
+                    'not_found' => __('Fieldset not found', 'wc-kalkulator'),
+                    'not_found_in_trash' => __('There is no Fieldset in the trash', 'wc-kalkulator')
+                ),
+                'description' => __('Fieldsets for Product Fields', 'wc-kalkulator'),
+                'public' => false,
+                'hierarchical' => false,
+                'show_ui' => true,
+                'has_archive' => false,
+                'map_meta_cap' => true,
+                'capability_type' => 'post',
+                'capabilities' => array(),
+                'publicly_queryable' => false,
+                'exclude_from_search' => true,
+                'query_var' => true,
+                'show_in_nav_menus' => false,
+                'show_in_menu' => 'edit.php?post_type=product',
+                'delete_with_user' => false,
+                'supports' => array('title'),
+                'register_meta_box_cb' => array(__CLASS__, 'meta_boxes')
+            )
+        );
+        
+    }
+    
+    /**
+     * Add columns in the Post List
+     *
+     * @param array $columns
+     * @return array
+     * @since 1.1.0
+     */
+    public static function manage_posts_columns($columns)
+    {
+        $columns['wck_assign_type_text'] = __('Assigned to', 'wc-kalkulator');
+        $columns['wck_assign_priority'] = __('Priority', 'wc-kalkulator');
+        unset($columns['date']);
+        return $columns;
+    }
+    
+    /**
+     * Set column values in the Post List
+     *
+     * @param string $column
+     * @param int $post_id
+     * @since 1.1.0
+     */
+    public static function manage_posts_custom_column($column, $post_id)
+    {
+        switch ($column) {
+            case 'wck_assign_type_text':
+                $type = (int)get_post_meta($post_id, '_wck_assign_type', true);
+                $products = get_post_meta($post_id, '_wck_assign_products', true);
+                $categories = get_post_meta($post_id, '_wck_assign_categories', true);
+                echo FieldsetAssignment::get($type) . "<br />";
+                echo join(", ", FieldsetAssignment::products_readable($products)) . " ";
+                echo join(", ", FieldsetAssignment::categories_readable($categories));
+                break;
+            case 'wck_assign_priority':
+                $value = get_post_meta($post_id, '_wck_assign_priority', true);
+                echo esc_html($value);
+                break;
+        }
+    }
+    
+    /**
+     * Add metaboxes to the new Post Type
+     * Each metabox has its own template file in the "/views/admin" directory
+     *
+     * @since 1.1.0
+     */
+    public static function meta_boxes()
+    {
+        $metaboxes = array(
+            'documentation' => array(
+                'title' => __('Documentation', 'wc-kalkulator'),
+                'position' => 'side'
+            ),
+            'assignment' => array(
+                'title' => __('Assign to', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'fields_editor' => array(
+                'title' => __('Product Fields Settings', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'fields' => array(
+                'title' => __('Add Field', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'expression' => array(
+                'title' => __('Price Calculation', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'pricefilter' => array(
+                'title' => __('Price Filtering', 'wc-kalkulator'),
+                'position' => 'side'
+            )
+        );
+        
+        foreach ($metaboxes as $id => $metabox) {
+            add_meta_box(
+                'wck_' . $id,
+                $metabox['title'],
+                function ($post, $data) {
+                    echo View::render('admin/' . $data['args']);
+                },
+                self::POST_TYPE,
+                $metabox['position'],
+                'default',
+                $id
+            );
+        }
+    }
+    
+    
+    /**
+     * Reorder the metaboxes in the Post Type edit view
+     *
+     * @param array $order
+     * @return array
+     * @since 1.1.0
+     */
+    public static function metabox_order($order)
+    {
+        return array(
+            'normal' => 'slugdiv,wck_assignment,wck_fields_editor,wck_expression',
+            'side' => 'submitdiv,wck_fields,wck_pricefilter,wck_docs'
+        );
+    }
+    
+    /**
+     * Save custom post data
+     *
+     * @param $post
+     * @since 1.1.0
+     */
+    public static function save_post($post)
+    {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            return;
+        
+        global $post;
+        
+        if (isset($_POST['_wck_nonce']) && wp_verify_nonce($_POST['_wck_nonce'], self::POST_TYPE)) {
+            
+            $post_id = $post->ID;
+            
+            $can_empty = array(
+                '_wck_assign_products',
+                '_wck_assign_categories'
+            );
+            
+            /**
+             * Update post meta if $_POST[key] parameter exists.
+             * If $_POST[key] does not exist then clear only specified meta data (defined in $can_empty)
+             */
+            foreach (self::$meta_keys as $key => $data_type) {
+                if (isset($_POST[$key])) {
+                    $value = Sanitizer::sanitize($_POST[$key], $data_type);
+                    update_post_meta($post_id, $key, $value);
+                } elseif (in_array($key, $can_empty)) {
+                    update_post_meta($post_id, $key, "");
+                }
+            }
+            
+            update_post_meta($post_id, '_wck_version_hash', wp_generate_password(32, false, false));
+            
+        }
+    }
+    
+    /**
+     * Add Post Type to Woocommerce Screen.
+     *
+     * This is needed to load all required scripts and styles from Woocommerce backend.
+     *
+     * @param array $screen_ids
+     * @return array
+     * @since 1.1.0
+     */
+    public static function add_screen_to_woocommerce($screen_ids)
+    {
+        $screen_ids[] = self::POST_TYPE;
+        return $screen_ids;
+    }
+    
+    /**
+     * Filter the result of the search categories action.
+     *
+     * Change category 'slug' to category 'id' in results.
+     *
+     * @param array $found_categories
+     * @return array
+     * @since 1.1.0
+     */
+    public static function woocommerce_json_search_found_categories($found_categories)
+    {
+        $referer = parse_url(wp_get_referer());
+        if (isset($referer['query'])) {
+            parse_str($referer['query'], $query);
+            if (isset($query['post']) && get_post_type(absint($query['post'])) === self::POST_TYPE) {
+                foreach ($found_categories as $id => $category) {
+                    $found_categories[$id]->slug = $id;
+                }
+            }
+        }
+        return $found_categories;
+    }
+    
+    /**
+     * Load scripts and styles only on the Post add/edit form.
+     *
+     * @param string $hook
+     * @since 1.1.0
+     */
+    public static function enqueue_scripts($hook)
+    {
+        global $post;
+        if (($hook === 'post.php' || $hook === 'post-new.php') && $post->post_type === self::POST_TYPE) {
+            self::add_scripts();
+            self::add_styles();
+        }
+    }
+    
+    /**
+     * Enqueue JS files
+     *
+     * Required: jQuery UI Core, jQuery UI Sortable, jQuery UI Autocomplete, assets/js/admin.js
+     * Add global vars: wck_fields_html, wck_load_fieldset, wck_load_expression
+     * wck_load_fieldset and wck_load_expression is used to load data to WCK editor
+     *
+     *
+     * @since 1.1.0
+     */
+    private static function add_scripts()
+    {
+        global $post;
+        
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-sortable');
+        wp_enqueue_script(
+            'wck-fieldset-script',
+            Plugin::url() . '/assets/js/admin.js',
+            array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete')
+        );
+        
+        /**
+         * This method sets values of $fields_html and $fields_dropdown properties
+         */
+        self::cache_fields_data();
+        
+        /**
+         * This wp_localize_script must be used after self::cache_fields_data()
+         */
+        wp_localize_script(
+            'wck-fieldset-script',
+            'wck_fields_html',
+            Cache::get_once('FieldsetPostType_fields_html')
+        );
+        
+        $constants = array(
+            'wck_load_fieldset' => '_wck_fieldset',
+            'wck_load_expression' => '_wck_expression'
+        );
+        foreach ($constants as $const => $key) {
+            $meta = get_post_meta($post->ID, $key, true);
+            if (is_array($meta)) {
+                wp_localize_script(
+                    'wck-fieldset-script',
+                    $const,
+                    $meta
+                );
+            }
+        }
+        
+    }
+    
+    /**
+     * Store Field's data in Cache Class
+     *
+     * For each class defined in Plugin::$defined_fields do:
+     *  1. crate an instance of field class
+     *  2. store HTML output from render_admin() method => $fields_html
+     *  3. build $fields_dropdown array to use in the metabox => views/admin/fields.php
+     *
+     * @since 1.1.0
+     */
+    private static function cache_fields_data()
+    {
+        $fields_html = array();
+        $fields_dropdown = array();
+        foreach (Plugin::$defined_fields as $field_class) {
+            $field_instance = new $field_class();
+            $fields_html[$field_instance->type()] = str_replace(array('  ', "\r", "\n"), array('', '', ''), $field_instance->render_for_admin());
+            $fields_dropdown[$field_instance->group_title()][$field_instance->type()] = array(
+                'title' => $field_instance->admin_title(),
+                'use_expression' => $field_instance->use_expression()
+            );
+        }
+        Cache::store('FieldsetPostType_fields_html', $fields_html);
+        Cache::store('FieldsetPostType_fields_dropdown', $fields_dropdown);
+    }
+    
+    /**
+     * Enqueue CSS files
+     *
+     * @since 1.1.0
+     */
+    private static function add_styles()
+    {
+        wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.css');
+        wp_enqueue_style('wckalkulator_admin_css');
+    }
+    
+    /**
+     * Remove "edit" option from the bulk actions dropdown
+     *
+     * @param $actions
+     * @return mixed
+     * @since 1.1.0
+     */
+    public static function bulk_actions($actions)
+    {
+        unset($actions['edit']);
+        return $actions;
+    }
+    
+    /**
+     * Duplicate fieldset (duplicate CPT)
+     *
+     * @since 1.1.0
+     */
+    public static function duplicate_post()
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(__('This action is restriced!', 'wc-kalkulator'));
+        }
+        
+        $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+        $is_valid_nonce = isset($_GET['wck_duplicate_nonce']) ? wp_verify_nonce($_GET['wck_duplicate_nonce'], 'wck_duplicate_nonce') : false;
+        
+        if ($post_id === 0 || !$is_valid_nonce) {
+            $link = ' <a href="' . admin_url() . 'edit.php?post_type=' . self::POST_TYPE . '">' . __('Go back to the Fieldset list', 'wc-kalkulator') . '</a>';
+            wp_die(__('You cannot duplicate this Fieldset!', 'wc-kalkulator') . $link);
+        }
+        
+        $post = get_post($post_id);
+        $user = wp_get_current_user();
+        
+        if (isset($post) && $post !== null) {
+            
+            $new_id = wp_insert_post(array(
+                'post_author' => $user->ID,
+                'post_name' => $post->post_name,
+                'post_status' => 'draft',
+                'post_title' => $post->post_title,
+                'post_type' => $post->post_type
+            ));
+            
+            foreach (array_keys(self::$meta_keys) as $key) {
+                $meta_value = get_post_meta($post_id, $key, true);
+                if (!empty($meta_value)) {
+                    update_post_meta($new_id, $key, $meta_value);
+                }
+            }
+        }
+        wp_redirect(admin_url() . 'edit.php?post_type=' . self::POST_TYPE);
+        exit;
+    }
+    
+    /**
+     * Adds the duplicate post link in the Post List view
+     *
+     * @param $actions
+     * @param $post
+     * @return mixed
+     * @since 1.1.0
+     */
+    public static function duplicate_post_link($actions, $post)
+    {
+        if (current_user_can('manage_woocommerce') && $post->post_type === self::POST_TYPE) {
+            $link = '<a href="';
+            $link .= wp_nonce_url('admin.php?action=wck_duplicate_post&post=' . $post->ID, 'wck_duplicate_nonce', 'wck_duplicate_nonce');
+            $link .= '" rel="permalink">';
+            $link .= __('Duplicate Fieldset', 'wc-kalkulator');
+            $link .= '</a>';
+            $actions['duplicate'] = $link;
+        }
+        return $actions;
+    }
+    
+    /**
+     * Removes all custom posts
+     *
+     * @param $actions
+     * @param $post
+     * @return mixed
+     * @since 1.1.0
+     */
+    public static function delete_all_posts()
+    {
+        $args = array(
+            'numberposts' => -1,
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any'
+        );
+        $posts = get_posts($args);
+        if ($posts) {
+            foreach ($posts as $item) {
+                wp_delete_post($item->ID, true);
+            }
+        }
+    }
+    
+}
