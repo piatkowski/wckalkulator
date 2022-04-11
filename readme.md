@@ -30,7 +30,7 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 
 # About the Plugin
 
-The plugin extends the Woocommerce store with the ability to add your own fields to the product page. 
+The plugin extends the WooCommerce store with the ability to add your own fields to the product page. 
 Almost all fields are used in formulas to calculate a custom price for a product. 
 The plugin allows full freedom to define fields and formulas for calculating the price.
 Some of fields can be used to get informations from Customer (for example: text, date, date range, color, dropdown, etc.)
