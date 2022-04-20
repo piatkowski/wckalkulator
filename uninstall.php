@@ -4,7 +4,7 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     die();
 }
 
-include 'woocommerce-kalkulator.php';
+include 'wc-kalkulator.php';
 
 use WCKalkulator\Plugin;
 
