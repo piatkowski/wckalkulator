@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 5.9.3
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -67,6 +67,10 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 Full documentation at: [wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-04-20 v.1.1.1
+
+- Bug fix
+
 2022-02-18 v.1.1.0
 
 - fieldset post type
