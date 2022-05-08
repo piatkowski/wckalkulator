@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     </td>
     <td class="value">
         <select id="<?php echo esc_html($view->id); ?>"
-                name="<?php echo esc_html($view->name); ?>"'<?php echo esc_html($view->required); ?>>
+                name="<?php echo esc_html($view->name); ?>" <?php echo esc_html($view->required); ?>>
         <?php foreach ($view->options_name as $i => $opt_name) : ?>
             <option class="attached enabled"
                     value="<?php echo esc_html($opt_name); ?>" <?php selected($view->value, $opt_name); ?>>

@@ -62,7 +62,9 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\TextareaField::class,
             Fields\ColorpickerField::class,
             Fields\DatepickerField::class,
-            Fields\RangedatepickerField::class
+            Fields\RangedatepickerField::class,
+            Fields\EmailField::class,
+            Fields\RadioField::class
         );
         
         /**

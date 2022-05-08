@@ -205,6 +205,7 @@
 
                 switch (field.type) {
                     case 'select':
+                    case 'radio':
                         field.options_name = [];
                         field.options_title = [];
                         $fs_options = $row.find(".fs-option");
@@ -271,6 +272,7 @@
                         break;
                     case 'text':
                     case 'textarea':
+                    case 'email':
                         input_frequired = $row.find('input.f-required');
                         var input_ftminlen = $row.find('input.ft-min-length');
                         var input_ftmaxlen = $row.find('input.ft-max-length');
@@ -364,16 +366,16 @@
                         $.each(options_title, function (i, option_title) {
                             if (first) {
                                 var $first = $field.find(".fs-option");
-                                $first.children("input.fs-title").val(option_title);
+                                $first.find("input.fs-title").val(option_title);
                                 if (default_value === option_title) {
-                                    $checked = $first.children("input.f-default-value");//.prop("checked", true);
+                                    $checked = $first.find("input.f-default-value");//.prop("checked", true);
                                 }
                                 first = false;
                             } else {
                                 var $clone = $field.find(".fs-option").last().clone().insertBefore($("#" + field_id + " .fs-options .action-add"));
-                                $clone.children("input.fs-title").val(option_title);
+                                $clone.find("input.fs-title").val(option_title);
                                 if (default_value === option_title) {
-                                    $checked = $clone.children("input.f-default-value");//.prop("checked", true);
+                                    $checked = $clone.find("input.f-default-value");//.prop("checked", true);
                                 }
                             }
                             if ($checked) {
@@ -381,7 +383,7 @@
                             }
                         });
 
-                    } else if (this.type === "select") {
+                    } else if (this.type === "select" || this.type === "radio") {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
@@ -389,21 +391,21 @@
                         first = true;
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
-                            console.log(option_name);
+                            //console.log(option_name);
                             if (first) {
                                 var $first = $field.find(".fs-option");
-                                $first.children("input.fs-name").val(option_name);
-                                $first.children("input.fs-title").val(options_title[i]);
+                                $first.find("input.fs-name").val(option_name);
+                                $first.find("input.fs-title").val(options_title[i]);
                                 if (default_value === option_name) {
-                                    $checked = $first.children("input.f-default-value");//.prop("checked", true);
+                                    $checked = $first.find("input.f-default-value");//.prop("checked", true);
                                 }
                                 first = false;
                             } else {
                                 var $clone = $field.find(".fs-option").last().clone().insertBefore($("#" + field_id + " .fs-options .action-add"));
-                                $clone.children("input.fs-name").val(option_name);
-                                $clone.children("input.fs-title").val(options_title[i]);
+                                $clone.find("input.fs-name").val(option_name);
+                                $clone.find("input.fs-title").val(options_title[i]);
                                 if (default_value === option_name) {
-                                    $checked = $clone.children("input.f-default-value");//.prop("checked", true);
+                                    $checked = $clone.find("input.f-default-value");//.prop("checked", true);
                                 }
                             }
                             if ($checked) {
@@ -416,7 +418,7 @@
                         $("#" + field_id + " .f-default-value").val(this.default_value);
                     } else if (this.type === "checkbox") {
                         $("#" + field_id + " .fcb-default-state").prop("checked", this.default_state);
-                    } else if (this.type === "text" || this.type === "textarea") {
+                    } else if (this.type === "text" || this.type === "textarea" || this.type === "email") {
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
