@@ -147,3 +147,33 @@ Even if you have not checked **Required** option.
 |**Min. length**|The minimum number of characters that the user can enter.|
 |**Max. length**|The maximum number of characters that the user can enter.|
 |**Placeholder**|Support text displayed inside the field. This is not the default value for the field. May be used as a guideline for the user.|
+
+## E-mail
+
+**E-mail field** is used to get e-mail address from the Customer input. This field has an e-mail validation test.
+
+```html
+<input type="email"...>
+```
+
+|Parameter|Description|
+|-|-|
+|**Required**|Select this option to make the field required.|
+|**Min. length**|The minimum number of characters that the user can enter.|
+|**Max. length**|The maximum number of characters that the user can enter.|
+|**Placeholder**|Support text displayed inside the field. This is not the default value for the field. May be used as a guideline for the user.|
+
+## Radio
+
+**Radio field** is used to display a group of radio buttons. It has similar funcationality to the **Select field**, so u can use option's values in the formula/expression.
+
+!!!
+This field is required by default.
+!!!
+
+```html
+<label for="..."><input type="radio"...>Option A</label>
+<label for="..."><input type="radio"...>Option B</label>
+<label for="..."><input type="radio"...>Option C</label>
+```
+

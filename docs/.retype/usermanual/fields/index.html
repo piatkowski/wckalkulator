@@ -24,12 +24,12 @@
     
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="/resources/css/retype.css?v=1.11.2.702815572929" rel="stylesheet" data-turbo-track="reload" />
+    <link href="/resources/css/retype.css?v=1.11.2.705361152565" rel="stylesheet" data-turbo-track="reload" />
 
-    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.702815572929" defer data-turbo-track="reload"></script>
+    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.705361152565" defer data-turbo-track="reload"></script>
     <script type="text/javascript" src="/resources/js/retype.js?v=1.11.2" defer data-turbo-track="reload"></script>
-    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.702815572929" defer></script>
-    <script id="prism-js" type="text/javascript" src="/resources/js/prism.js?v=1.11.2.702815572929" defer></script>
+    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.705361152565" defer></script>
+    <script id="prism-js" type="text/javascript" src="/resources/js/prism.js?v=1.11.2.705361152565" defer></script>
 </head>
     <body>
         <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -606,6 +606,73 @@ Even if you have not checked <strong>Required</strong> option.</p>
 </tbody>
 </table>
 </div>
+<doc-anchor-target id="e-mail">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#e-mail">#</doc-anchor-trigger>
+        <span>E-mail</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>E-mail field</strong> is used to get e-mail address from the Customer input. This field has an e-mail validation test.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre class="language-markup"><code v-pre class="language-markup">&lt;input type=&quot;email&quot;...&gt;</code></pre>
+</doc-codeblock></div>
+<div class="table-wrapper scrollbar overflow-hidden">
+<table class="comfortable">
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Required</strong></td>
+<td>Select this option to make the field required.</td>
+</tr>
+<tr>
+<td><strong>Min. length</strong></td>
+<td>The minimum number of characters that the user can enter.</td>
+</tr>
+<tr>
+<td><strong>Max. length</strong></td>
+<td>The maximum number of characters that the user can enter.</td>
+</tr>
+<tr>
+<td><strong>Placeholder</strong></td>
+<td>Support text displayed inside the field. This is not the default value for the field. May be used as a guideline for the user.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<doc-anchor-target id="radio">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#radio">#</doc-anchor-trigger>
+        <span>Radio</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>Radio field</strong> is used to display a group of radio buttons. It has similar funcationality to the <strong>Select field</strong>, so u can use option&#x27;s values in the formula/expression.</p>
+<div class="flex mb-6">
+    <div class="flex-shrink-0 w-1 rounded-tl rounded-bl bg-blue-500 dark:bg-blue-400"></div>
+    <div class="flex w-full py-4 border border-l-0 border-gray-300 rounded-tr rounded-br doc-alert bg-white dark:bg-dark-700 dark:border-dark-700" role="alert">
+        <div class="flex items-center ml-4 h-7">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px text-blue-500 dark:text-blue-400" width="22" height="22" viewBox="0 0 24 24" role="presentation">
+                <g fill="currentColor"><g>
+                    <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 20c-4.96 0-9-4.04-9-9s4.04-9 9-9 9 4.04 9 9-4.04 9-9 9z"></path>
+                    <path d="M12 11c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1s1-.45 1-1v-4c0-.55-.45-1-1-1zM12.01 7c-.56 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"></path>
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                </g></g>
+            </svg>
+        </div>
+        <div class="pr-5 ml-3">
+<p>This field is required by default.</p>
+        </div>
+    </div>
+</div>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre class="language-markup"><code v-pre class="language-markup">&lt;label for=&quot;...&quot;&gt;&lt;input type=&quot;radio&quot;...&gt;Option A&lt;/label&gt;
+&lt;label for=&quot;...&quot;&gt;&lt;input type=&quot;radio&quot;...&gt;Option B&lt;/label&gt;
+&lt;label for=&quot;...&quot;&gt;&lt;input type=&quot;radio&quot;...&gt;Option C&lt;/label&gt;</code></pre>
+</doc-codeblock></div>
 
 
 
