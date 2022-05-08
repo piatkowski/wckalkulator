@@ -70,6 +70,13 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 Full documentation at: [wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+
+2022-05-08 v.1.1.2
+
+- Added new fields: email, radio
+- fixed field builder (js script issue)
+- fixed typo in HTML code for dropdown and select fields
+
 2022-04-20 v.1.1.1
 
 - Bug fix
