@@ -14,7 +14,7 @@ namespace WCKalkulator;
  */
 final class Sanitizer
 {
-    const MAX_DEPTH = 3;
+    const MAX_DEPTH = 10;
     
     /**
      * Allowed HTML tags for wp_kses function
@@ -95,6 +95,7 @@ final class Sanitizer
      */
     private static function sanitize_json($json) {
         $array = json_decode(stripslashes($json), true);
+  
         $return = array();
         foreach($array as $key => $value) {
             if (!is_array($value))

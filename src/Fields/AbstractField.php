@@ -27,6 +27,7 @@ abstract class AbstractField
             'input' => __('Input Fields', 'wc-kalkulator'),
             'select' => __('Select Fields', 'wc-kalkulator'),
             'picker' => __('Picker Fields', 'wc-kalkulator'),
+            'upload' => __('Upload Fields', 'wc-kalkulator'),
             'other' => __('Other Fields', 'wc-kalkulator')
         );
         

@@ -61,6 +61,7 @@ class FieldsetPostType
         add_filter('bulk_actions-edit-' . self::POST_TYPE, array(__CLASS__, 'bulk_actions'));
         add_filter('post_row_actions', array(__CLASS__, 'duplicate_post_link'), 10, 2);
         add_action('admin_action_wck_duplicate_post', array(__CLASS__, 'duplicate_post'));
+        add_filter('admin_body_class', array(__CLASS__, 'add_css_class_to_body'));
     }
     
     /**
@@ -247,6 +248,8 @@ class FieldsetPostType
                 if (isset($_POST[$key])) {
                     $value = Sanitizer::sanitize($_POST[$key], $data_type);
                     update_post_meta($post_id, $key, $value);
+                    error_log(print_r($_POST[$key], true));
+                    error_log(print_r($value, true));
                 } elseif (in_array($key, $can_empty)) {
                     update_post_meta($post_id, $key, "");
                 }
@@ -331,6 +334,9 @@ class FieldsetPostType
             Plugin::url() . '/assets/js/admin.js',
             array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete')
         );
+        
+        // @since 1.2.0 - adds wp.media image selector
+        wp_enqueue_media();
         
         /**
          * This method sets values of $fields_html and $fields_dropdown properties
@@ -498,6 +504,18 @@ class FieldsetPostType
                 wp_delete_post($item->ID, true);
             }
         }
+    }
+    
+    /**
+     * Need to wrap CSS styles in .wc-kalkulator-wrapper class
+     * @param $classes
+     * @return string
+     * @since 1.2.0
+     */
+    public static function add_css_class_to_body($classes)
+    {
+        $classes .= ' wc-kalkulator-wrapper ';
+        return $classes;
     }
     
 }

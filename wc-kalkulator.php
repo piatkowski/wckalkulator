@@ -64,7 +64,9 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\DatepickerField::class,
             Fields\RangedatepickerField::class,
             Fields\EmailField::class,
-            Fields\RadioField::class
+            Fields\RadioField::class,
+            Fields\ImageselectField::class,
+            Fields\FileuploadField::class
         );
         
         /**

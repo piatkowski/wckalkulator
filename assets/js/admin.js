@@ -18,6 +18,9 @@
         });
 
         $WK.expressionLastFocusedInput = null;
+        $WK.wpMediaFrame = null;
+        $WK.wpMediaTarget = null;
+        $WK.iconPreloader = "data:image/gif;base64,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";
 
         $("body").on("focus", "#wck_expression input", function () {
             $WK.expressionLastFocusedInput = $(this);
@@ -93,6 +96,34 @@
             } else {
                 alert("You cannot remove the last condition!");
             }
+        }).on("click", ".action-add-image", function (e) {
+            e.preventDefault();
+            $WK.wpMediaTarget = $(this);
+
+            if ($WK.wpMediaFrame) {
+                $WK.wpMediaFrame.open();
+                return;
+            }
+            $WK.wpMediaFrame = wp.media({
+                multiple: false,
+                button: {
+                    text: "Select this image"
+                }
+            });
+
+            $WK.wpMediaFrame.on('select', function () {
+                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
+                if ($WK.wpMediaTarget.prop("tagName") == "A") {
+                    $WK.wpMediaTarget.next('img.wp-media-image-preview').attr('src', attachment.url);
+                    $WK.wpMediaTarget.next().next('input.wp-media-image-id').attr('value', attachment.id);
+                    $WK.wpMediaTarget.hide();
+                } else {
+                    $WK.wpMediaTarget.attr('src', attachment.url);
+                    $WK.wpMediaTarget.next('input.wp-media-image-id').attr('value', attachment.id);
+                }
+            });
+
+            $WK.wpMediaFrame.open();
         });
 
         $("form#post").submit(function (e) {
@@ -141,6 +172,12 @@
         };
         $("#assign_type").on("change", $WK.changeAssignType);
 
+        $WK.preloadMedia = function (id, callback) {
+            wp.media.attachment(id).fetch().then(function () {
+                callback(wp.media.attachment(id));
+            });
+            return;
+        }
 
         $WK.addField = function (type) {
             $WK.counter += 1;
@@ -206,8 +243,12 @@
                 switch (field.type) {
                     case 'select':
                     case 'radio':
+                    case 'imageselect':
                         field.options_name = [];
                         field.options_title = [];
+                        if (field.type === "imageselect") {
+                            field.options_image = [];
+                        }
                         $fs_options = $row.find(".fs-option");
                         $fs_options.each(function () {
                             var fs_name = $(this).find("input.fs-name");
@@ -220,6 +261,7 @@
                                 fs_title.addClass("form-required");
                                 error = true;
                             }*/
+
                             var f_default_value = $(this).find('input.f-default-value').is(":checked");
                             //alert("State: " + f_default_value);
                             if (typeof f_default_value !== "undefined" && f_default_value === true) {
@@ -227,7 +269,17 @@
                             }
                             field.options_name.push(fs_name.val());
                             field.options_title.push(fs_title.val());
+
+                            if (field.type === "imageselect") {
+                                var fs_image = $(this).find("input.fs-image");
+                                field.options_image.push(fs_image.val());
+                            }
                         });
+
+                        if (field.type === "imageselect") {
+                            input_frequired = $row.find('input.f-required');
+                            field.required = input_frequired.is(':checked');
+                        }
                         break;
                     case 'dropdown':
                         field.options_title = [];
@@ -291,7 +343,13 @@
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
-
+                    case 'fileupload':
+                        input_frequired = $row.find('input.f-required');
+                        field.required = input_frequired.is(':checked');
+                        field.max_file_count = $row.find('input.fu-max-file-count').val();
+                        field.max_file_size = $row.find('input.fu-max-file-size').val();
+                        field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
+                        break;
                     /*default:
                         error = true;
                         alert("Error! Unrecognized field type!");
@@ -355,7 +413,7 @@
                     if (fprice.length > 0) {
                         fprice.val(this.price);
                     }
-                    var options_title, options_name, default_value, first, $checked;
+                    var options_title, options_name, options_image, default_value, first, $checked;
 
                     if (this.type === "dropdown") {
                         $("#" + field_id + " .f-required").prop("checked", this.required);
@@ -383,11 +441,15 @@
                             }
                         });
 
-                    } else if (this.type === "select" || this.type === "radio") {
+                    } else if (this.type === "select" || this.type === "radio" || this.type === "imageselect") {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
-                        console.log("Dropdown: ", default_value);
+                        if (this.type === "imageselect") {
+                            options_image = this.options_image;
+                            wp.media.attachment(options_image).fetch();
+                        }
+                        //console.log("Dropdown: ", default_value);
                         first = true;
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
@@ -396,6 +458,15 @@
                                 var $first = $field.find(".fs-option");
                                 $first.find("input.fs-name").val(option_name);
                                 $first.find("input.fs-title").val(options_title[i]);
+                                var fs_image = $first.find("input.fs-image");
+                                if (fs_image.length > 0) {
+                                    fs_image.val(options_image[i]);
+                                    $first.find("a.action-add-image").hide();
+                                    $first.find(".wp-media-image-preview").attr("src", $WK.iconPreloader);
+                                    $WK.preloadMedia(options_image[i], function (attachment) {
+                                        $first.find(".wp-media-image-preview").attr("src", attachment.get('url'));
+                                    });
+                                }
                                 if (default_value === option_name) {
                                     $checked = $first.find("input.f-default-value");//.prop("checked", true);
                                 }
@@ -404,6 +475,15 @@
                                 var $clone = $field.find(".fs-option").last().clone().insertBefore($("#" + field_id + " .fs-options .action-add"));
                                 $clone.find("input.fs-name").val(option_name);
                                 $clone.find("input.fs-title").val(options_title[i]);
+                                fs_image = $clone.find("input.fs-image");
+                                if (fs_image.length > 0) {
+                                    fs_image.val(options_image[i]);
+                                    $clone.find("a.action-add-image").hide();
+                                    $clone.find(".wp-media-image-preview").attr("src", $WK.iconPreloader);
+                                    $WK.preloadMedia(options_image[i], function (attachment) {
+                                        $clone.find(".wp-media-image-preview").attr("src", attachment.get('url'));
+                                    });
+                                }
                                 if (default_value === option_name) {
                                     $checked = $clone.find("input.f-default-value");//.prop("checked", true);
                                 }
@@ -427,6 +507,11 @@
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .f-required").prop("checked", this.required);
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
+                    } else if (this.type === "fileupload") {
+                        $("#" + field_id + " .f-required").prop("checked", this.required);
+                        $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
+                        $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
+                        $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
                     }
                 });
                 $WK.saveFields();
