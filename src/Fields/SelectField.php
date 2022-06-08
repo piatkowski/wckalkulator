@@ -26,7 +26,7 @@ class SelectField extends AbstractField
     public function admin_fields($value = '')
     {
         $this->admin_title = __("Select Field", "wc-kalkulator");
-        return View::render('fields/admin/select');
+        return View::render('fields/admin/' . $this->type);
     }
     
     /**
@@ -44,7 +44,7 @@ class SelectField extends AbstractField
         $args['options_name'] = $this->data['options_name'];
         $args['options_title'] = $this->data['options_title'];
         
-        return View::render('fields/front/select', $args);
+        return View::render('fields/front/' . $this->type, $args);
     }
     
     /**

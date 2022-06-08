@@ -104,11 +104,10 @@ class Product
     public static function get_user_input()
     {
         $user_input = array();
-        
+       
         if (isset($_POST['wck']) && is_array($_POST['wck'])) {
             $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
         }
-        
         //@todo handle $_FILES
         
         return $user_input;

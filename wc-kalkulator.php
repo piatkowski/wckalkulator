@@ -72,7 +72,9 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\ParagraphField::class,
             Fields\HiddenField::class,
             Fields\LinkField::class,
-            Fields\AttachmentField::class
+            Fields\AttachmentField::class,
+            Fields\RadiogroupField::class,
+            Fields\CheckboxgroupField::class
         );
         
         /**

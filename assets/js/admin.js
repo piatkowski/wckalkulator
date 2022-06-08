@@ -267,6 +267,8 @@
                     case 'select':
                     case 'radio':
                     case 'imageselect':
+                    case 'radiogroup':
+                    case 'checkboxgroup':
                         field.options_name = [];
                         field.options_title = [];
                         if (field.type === "imageselect") {
@@ -489,7 +491,7 @@
                             }
                         });
 
-                    } else if (this.type === "select" || this.type === "radio" || this.type === "imageselect") {
+                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup'].indexOf(this.type) >= 0) {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
