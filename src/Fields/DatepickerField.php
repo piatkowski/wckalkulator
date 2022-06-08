@@ -29,7 +29,7 @@ class DatepickerField extends TextField
             'wck-date-picker',
             Plugin::url() . '/assets/js/datepicker.js',
             array('jquery-ui-datepicker'),
-            false,
+            Plugin::VERSION,
             1
         );
     }

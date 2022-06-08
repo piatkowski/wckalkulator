@@ -9,7 +9,7 @@ use WCKalkulator\View;
  * Class DatepickerField
  * @package WCKalkulator
  */
-class RangeDatepickerField extends DatepickerField
+class RangedatepickerField extends DatepickerField
 {
     protected $type = "rangedatepicker";
     protected $group = "picker";
@@ -28,7 +28,7 @@ class RangeDatepickerField extends DatepickerField
             'wck-range-date-picker',
             Plugin::url() . '/assets/js/rangedatepicker.js',
             array('jquery-ui-datepicker'),
-            false,
+            Plugin::VERSION,
             1
         );
     }

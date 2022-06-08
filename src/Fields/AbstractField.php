@@ -28,6 +28,7 @@ abstract class AbstractField
             'select' => __('Select Fields', 'wc-kalkulator'),
             'picker' => __('Picker Fields', 'wc-kalkulator'),
             'upload' => __('Upload Fields', 'wc-kalkulator'),
+            'static' => __('Static Fields', 'wc-kalkulator'),
             'other' => __('Other Fields', 'wc-kalkulator')
         );
         
@@ -152,10 +153,39 @@ abstract class AbstractField
             'title' => $this->admin_title(),
             'type' => $this->type(),
             'use_expression' => $this->use_expression() ? 'true' : 'false',
+            'group' => $this->group(),
+            'show_title' => $this->show_title()
         ));
     }
     
     abstract public function admin_fields($param = '');
+    
+    /**
+     * Checks if we need to hide "Title" field on admin page
+     *
+     * @return bool
+     */
+    public function show_title()
+    {
+        /**
+         * If property exists return its value
+         */
+        if (property_exists($this, 'show_title')) {
+            return $this->show_title;
+        }
+    
+        /**
+         * If field's group is not static, return true (Title field should be visible)
+         */
+        if ($this->group() !== 'static') {
+            return true;
+        }
+    
+        /**
+         * In other case (static group) return false (Title field should be hidden)
+         */
+        return false;
+    }
     
     /**
      * @return string

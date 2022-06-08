@@ -8,6 +8,8 @@
   border: 1px solid #aaaaaa;
   border-radius: 0;
   padding: 5px 10px; }
+.wc-kalkulator-wrapper a.button.action-add-attachment {
+  margin-bottom: 10px; }
 .wc-kalkulator-wrapper ul#f-field-list {
   width: 100%; }
   .wc-kalkulator-wrapper ul#f-field-list * {
@@ -172,3 +174,5 @@
     transform: scale(1.2);
     -moz-transform: scale(1.2);
     -webkit-transform: scale(1.2); }
+.wc-kalkulator-wrapper select.param {
+  margin-bottom: 20px; }

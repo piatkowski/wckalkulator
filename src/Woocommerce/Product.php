@@ -2,7 +2,6 @@
 
 namespace WCKalkulator\Woocommerce;
 
-use WCKalkulator\Ajax;
 use WCKalkulator\Cache;
 use WCKalkulator\FieldsetProduct;
 use WCKalkulator\Helper;
@@ -50,11 +49,11 @@ class Product
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')) {
             
-            if($fieldset->has_expression('current')) {
+            if ($fieldset->has_expression('current')) {
                 wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/frontend.css');
                 wp_enqueue_style('wckalkulator_frontend_css');
             }
-    
+            
             wp_enqueue_script('jquery-tiptip',
                 WC()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip.min.js',
                 array('jquery')
@@ -97,15 +96,34 @@ class Product
     }
     
     /**
+     * Gets user input from $_POST, $_FILES. Sanitize input
+     *
+     * @return array
+     * @since 1.2.0
+     */
+    public static function get_user_input()
+    {
+        $user_input = array();
+        
+        if (isset($_POST['wck']) && is_array($_POST['wck'])) {
+            $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
+        }
+        
+        //@todo handle $_FILES
+        
+        return $user_input;
+    }
+    
+    /**
      * Show fieldset on product page
      *
      * @since 1.0.0
      */
     public static function render_fields_on_product_page()
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return false;
-        }
+        }*/
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')) {
             $fieldset->init();
@@ -123,20 +141,16 @@ class Product
      */
     public static function validate_fields_on_product_page($validation, $product_id, $quantity)
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return false;
-        }
+        }*/
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset($product_id)) {
             $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
             $fieldset->init($product_id, $variation_id);
             
-            if(is_array($_POST['wck'])) {
-                $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
-            } else {
-                return false;
-            }
-         
+            $user_input = self::get_user_input();
+            
             $validation = $fieldset->validate($user_input);
             if (!$validation) {
                 foreach ($fieldset->validation_notices() as $notice) {
@@ -176,7 +190,7 @@ class Product
             }
         }
     }
-   
+    
     /**
      * Add item data to Cart. We add field for storing calculated price
      * !Important - do not multiply by $quantity. Price for single product.
@@ -191,20 +205,16 @@ class Product
      */
     public static function add_cart_item_data($cart_item_data, $product_id, $variation_id, $quantity)
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return false;
-        }
-    
+        }*/
+        
         if (FieldsetProduct::getInstance()->has_fieldset($product_id)) {
             
             $fieldset = FieldsetProduct::getInstance();
             $fieldset->init($product_id, $variation_id);
-    
-            if (!is_array($_POST['wck'])) {
-                wp_die('Bad request (1)!');
-            }
             
-            $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
+            $user_input = self::get_user_input();
             
             if (!$fieldset->validate($user_input)) {
                 wp_die('Bad request (2)!');
@@ -223,7 +233,7 @@ class Product
                 } catch (\Exception $e) {
                     error_log($e);
                     wp_die('Bad request (4)!');
-        
+                    
                 } catch (\Throwable $e) {
                     error_log($e);
                     wp_die('Bad request (4)!');
@@ -249,9 +259,9 @@ class Product
      */
     public static function before_calculate_totals($cart)
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return false;
-        }
+        }*/
         
         foreach ($cart->get_cart() as $key => $value) {
             if (isset($value['wckalkulator_price'])) {
@@ -271,15 +281,15 @@ class Product
      */
     public static function cart_item_name($item_name, $cart_item, $cart_item_key)
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return false;
-        }
+        }*/
         
         $product_id = absint($cart_item["product_id"]);
         $variation_id = isset($cart_item['variation_id']) ? absint($cart_item['variation_id']) : 0;
         
         if (FieldsetProduct::getInstance()->has_fieldset($product_id)) {
-    
+            
             $fieldset = FieldsetProduct::getInstance();
             $fieldset->init($product_id, $variation_id);
             
@@ -313,9 +323,9 @@ class Product
      */
     public static function checkout_create_order_line_item($item, $cart_item_key, $values, $order)
     {
-        if (Ajax::is_doing()) {
+        /*if (Ajax::is_doing()) {
             return;
-        }
+        }*/
         $values = $item->legacy_values;
         $product_id = absint($values["product_id"]);
         $variation_id = isset($values['variation_id']) ? absint($values['variation_id']) : 0;
@@ -336,11 +346,11 @@ class Product
                         }
                         $item->add_meta_data($field->data('title'), $field_value, true);
                     } else {
-                       wp_die('Corrupted data! ' . $name . ' does not exists!');
+                        wp_die('Corrupted data! ' . $name . ' does not exists!');
                     }
                 }
             } else {
-               wp_die('Corrupted data! Missing wckalkulator_fields parameter');
+                wp_die('Corrupted data! Missing wckalkulator_fields parameter');
             }
         }
         
@@ -367,17 +377,17 @@ class Product
         global $post;
         $product_id = 0;
         
-        if(is_product()) {
+        if (is_product()) {
             $product_id = $post->ID;
         } else if (!empty($post->post_content) && strstr($post->post_content, '[product_page')) {
             $product_id = absint(Helper::get_id_from_shortcode_tag($post->post_content, 'product_page'));
         }
-    
+        
         /**
          * Store value to class cache
          */
         Cache::store('Product_get_id', $product_id);
-
+        
         return $product_id;
     }
     

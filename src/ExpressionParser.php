@@ -2,8 +2,9 @@
 
 namespace WCKalkulator;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage as ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\SyntaxError as SyntaxError;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 /**
  * Class ExpressionParser
@@ -61,6 +62,13 @@ class ExpressionParser
     private $is_valid = false;
     
     /**
+     * Instance of ExpressionLanguage
+     *
+     * @var ExpressionLanguage|null
+     */
+    private $expression = null;
+    
+    /**
      * ExpressionParser constructor.
      *
      * @param string $expr
@@ -71,13 +79,14 @@ class ExpressionParser
     {
         foreach ($vars as $key => $val) {
             if (is_numeric($val)) {
-                $this->vars[$key] = $val;
+                $this->vars[str_replace(':', '__p__', $key)] = $val;
             }
         }
         if (!empty($this->vars)) {
             $this->var_names = array_keys($this->vars);
         }
-        $this->expr = $expr;
+ 
+        $this->expr = str_replace(':', '__p__', $expr);
         $this->base_expr = $this->expr;
         
         $this->detect_mode();
@@ -99,6 +108,10 @@ class ExpressionParser
         if (!is_array($this->expr)) {
             $this->error .= __("ExpressionParser: Prepared expression has incorrect type.", "wc-kalkulator") . "\n";
         }
+        
+        //Create ExpressionLanguage instance
+        $this->expression = new ExpressionLanguage();
+        $this->register_functions();
         
     }
     
@@ -163,7 +176,7 @@ class ExpressionParser
      */
     private function str_clean($str)
     {
-        return str_replace(array('{', '}', ',', 'constant('), array('', '', '.', '('), $str);
+        return str_replace(array('{', '}', ',', 'constant(', ';', ':'), array('', '', '.', '(', ',', '__p__'), $str);
     }
     
     /**
@@ -223,7 +236,7 @@ class ExpressionParser
                 $expr_string .= $expr["if"] . $expr["then"];
             }
         }
-        
+   
         preg_match_all('/{([^}]+)}/m', $expr_string, $matched_vars);
         
         if (count($matched_vars) === 2) {
@@ -273,9 +286,8 @@ class ExpressionParser
         if ($this->mode === self::MODE_CONDITIONAL) {
             foreach ($this->expr as $expr) {
                 
-                $expression = new ExpressionLanguage();
                 try {
-                    $condition_value = $expression->evaluate($expr['if'], $this->vars);
+                    $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
                     if ($condition_value === true) {
                         return $this->calc_or_fail($expr['then']);
                     }
@@ -313,9 +325,8 @@ class ExpressionParser
      */
     private function calc_or_fail($expr)
     {
-        $expression = new ExpressionLanguage();
         try {
-            $value = $expression->evaluate($expr, $this->vars);
+            $value = $this->expression->evaluate($expr, $this->vars);
             if ($value < 0) {
                 return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $value);
             } elseif ($value === 0) {
@@ -326,6 +337,19 @@ class ExpressionParser
             return $this->calc_error($e->getMessage());
         } catch (\DivisionByZeroError $e) {
             return $this->calc_error(__("Division by zero.", "wc-kalkulator"));
+        }
+    }
+    
+    /**
+     * Extend ExpressionLanguage Component to use math functions
+     *
+     * @since 1.2.0
+     */
+    private function register_functions()
+    {
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
+        foreach($functions as $function) {
+            $this->expression->addFunction(ExpressionFunction::fromPhp($function));
         }
     }
     

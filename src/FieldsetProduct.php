@@ -318,7 +318,6 @@ class FieldsetProduct
     {
         $this->user_input = $input;
         
-        
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
         } else {
@@ -330,23 +329,7 @@ class FieldsetProduct
             return false;
         }
         
-        /**
-         * Add field's static prices to $user_input
-         */
-        $field_names = array_keys($this->user_input);
-        foreach ($this->fields() as $field) {
-            $name = $field->data("name");
-            if($field->data("price") !== null && in_array($name, $field_names)) {
-                $field_static_price = Sanitizer::sanitize($field->data("price"), "price");
-                if ($field->type() === "checkbox") {
-                    $field_static_price = intval((int)$this->user_input[$name]  === 1) * $field_static_price;
-                }
-                if(empty($this->user_input[$field->data("name")])) {
-                    $field_static_price = 0;
-                }
-                $this->user_input[$field->data("name")] = $field_static_price;
-            }
-        }
+        $this->add_static_prices($input);
         
         return $this->is_valid;
     }
@@ -359,19 +342,40 @@ class FieldsetProduct
      */
     public function validate_for_expression()
     {
+        if (!is_array($this->expression())) {
+            return true;
+        }
         $field_names = array_keys($this->user_input);
         foreach ($this->fields() as $field) {
             if ($field->use_expression()) {
                 $field_name = $field->data("name");
-                if (!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') {
-                    return false;
-                }
-                if (!$field->validate($this->user_input[$field_name])) {
-                    return false;
+                if (strpos('{' . $field_name . '}', $this->expression('expr')) !== false) {
+                    if (!$field->validate($this->user_input[$field_name])) {
+                        return false;
+                    }
                 }
             }
         }
         return true;
+    }
+    
+    /**
+     * Get the expression
+     *
+     * @return mixed|null
+     * @since 1.0.0
+     */
+    public function expression($key = '')
+    {
+        if ($key === '') {
+            return $this->data->expression;
+        }
+        
+        if (is_array($this->data->expression) && isset($this->data->expression[$key])) {
+            return $this->data->expression[$key];
+        }
+        
+        return;
     }
     
     /**
@@ -441,6 +445,57 @@ class FieldsetProduct
     }
     
     /**
+     * Add field's static price to $user_input
+     *
+     * @param $input
+     * @return void
+     * @since 1.2.0
+     */
+    public function add_static_prices($input)
+    {
+        if (!is_array($this->user_input)) {
+            return;
+        }
+        $field_names = array_keys($this->user_input);
+        foreach ($this->fields() as $field) {
+            $name = $field->data("name");
+            if ($field->data("price") !== null && in_array($name, $field_names)) {
+                $static_price = Sanitizer::sanitize($field->data("price"), "price");
+                if ($field->type() === "checkbox") {
+                    $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                }
+                if (empty($this->user_input[$field->data("name")])) {
+                    $static_price = 0;
+                }
+                $this->user_input[$name] = $static_price;
+            }
+            $this->register_extra_input_parameters($field, $input[$name]);
+        }
+    }
+    
+    /**
+     * Add extra input parameters field:param to the $user_input
+     *
+     * @param $field
+     * @param $input
+     * @since 1.2.0
+     */
+    public function register_extra_input_parameters($field, $input)
+    {
+        $name = $field->data("name");
+        
+        if ($field->type() === "rangedatepicker") {
+            $date_from = strtotime($input['from']);
+            $date_to = strtotime($input['to']);
+            $this->user_input[$name . ':date_from'] = $date_from;
+            $this->user_input[$name . ':date_to'] = $date_to;
+            $this->user_input[$name . ':days'] = abs(round(($date_to - $date_from) / 86400));
+        } else if ($field->type() === "datepicker") {
+            $this->user_input[$name . ':date'] = strtotime($input);
+        }
+    }
+    
+    /**
      * Returns field names
      *
      * @return array
@@ -492,17 +547,6 @@ class FieldsetProduct
         } else {
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
-    }
-    
-    /**
-     * Get the expression
-     *
-     * @return mixed|null
-     * @since 1.0.0
-     */
-    public function expression()
-    {
-        return $this->data->expression;
     }
     
     /**

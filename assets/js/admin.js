@@ -113,7 +113,7 @@
 
             $WK.wpMediaFrame.on('select', function () {
                 var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
-                if ($WK.wpMediaTarget.prop("tagName") == "A") {
+                if ($WK.wpMediaTarget.prop("tagName") === "A") {
                     $WK.wpMediaTarget.next('img.wp-media-image-preview').attr('src', attachment.url);
                     $WK.wpMediaTarget.next().next('input.wp-media-image-id').attr('value', attachment.id);
                     $WK.wpMediaTarget.hide();
@@ -121,6 +121,29 @@
                     $WK.wpMediaTarget.attr('src', attachment.url);
                     $WK.wpMediaTarget.next('input.wp-media-image-id').attr('value', attachment.id);
                 }
+            });
+
+            $WK.wpMediaFrame.open();
+        }).on("click", ".action-add-attachment", function (e) {
+            e.preventDefault();
+            $WK.wpMediaTarget = $(this);
+
+            if ($WK.wpMediaFrame) {
+                $WK.wpMediaFrame.open();
+                return;
+            }
+            $WK.wpMediaFrame = wp.media({
+                multiple: false,
+                button: {
+                    text: "Select this file"
+                }
+            });
+
+            $WK.wpMediaFrame.on('select', function () {
+                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
+                $WK.wpMediaTarget.next('input.wp-media-attachment-id').val(attachment.id);
+                $WK.wpMediaTarget.next().next('a.wp-media-attachment-preview').attr('href', attachment.url).text(attachment.url);
+
             });
 
             $WK.wpMediaFrame.open();
@@ -177,7 +200,7 @@
                 callback(wp.media.attachment(id));
             });
             return;
-        }
+        };
 
         $WK.addField = function (type) {
             $WK.counter += 1;
@@ -350,6 +373,20 @@
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
                         break;
+                    case 'html':
+                    case 'paragraph':
+                    case 'hidden':
+                    case 'attachment':
+                        field.content = $row.find('.fst-content').val();
+                        break;
+                    case 'link':
+                        field.content = $row.find('.fst-content').val();
+                        field.target = $row.find('.fst-target').val();
+                        break;
+                    case 'heading':
+                        field.content = $row.find('.fst-content').val();
+                        field.level = $row.find('.fst-level').val();
+                        break;
                     /*default:
                         error = true;
                         alert("Error! Unrecognized field type!");
@@ -390,6 +427,17 @@
             if (field.use_expression) {
                 suggest.push(field.name);
                 $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                if (field.type === "rangedatepicker") {
+                    suggest.push(field.name + ":date_from");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
+                    suggest.push(field.name + ":date_to");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_to}</span> ');
+                    suggest.push(field.name + ":days");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':days}</span> ');
+                } else if (field.type === "datepicker") {
+                    suggest.push(field.name + ":date");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                }
             }
         };
 
@@ -512,6 +560,18 @@
                         $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
+                    } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
+                        $("#" + field_id + " .fst-content").val(this.content);
+                        if (this.type === 'heading') {
+                            $("#" + field_id + " .fst-level").val(this.level);
+                        } else if (this.type === 'link') {
+                            $("#" + field_id + " .fst-target").val(this.target);
+                        } else if (this.type === 'attachment') {
+                            $WK.preloadMedia(this.content, function (attachment) {
+                                console.log(field_id, attachment.get('url'));
+                                $("#" + field_id + " .wp-media-attachment-preview").attr("href", attachment.get('url')).text(attachment.get('url'));
+                            });
+                        }
                     }
                 });
                 $WK.saveFields();

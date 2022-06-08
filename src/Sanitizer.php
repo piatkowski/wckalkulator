@@ -37,7 +37,8 @@ final class Sanitizer
                 'min' => true,
                 'max' => true,
                 'step' => true,
-                'required' => true
+                'required' => true,
+                'readonly' => true
             ),
             'textarea' => array(
                 'name' => true,
@@ -74,100 +75,6 @@ final class Sanitizer
         );
         return array_merge($allowed, wp_kses_allowed_html('post'));
     }
-    /**
-     * Check if JSON string is valid
-     *
-     * @param string $json
-     * @return bool
-     * @since 1.1.0
-     */
-    private static function is_json_valid($json) {
-        json_decode(stripslashes($json), true);
-        return json_last_error() === JSON_ERROR_NONE;
-    }
-    
-    /**
-     * Sanitize JSON (keys and values) and return an array
-     *
-     * @param string $json
-     * @return array
-     * @since 1.1.0
-     */
-    private static function sanitize_json($json) {
-        $array = json_decode(stripslashes($json), true);
-  
-        $return = array();
-        foreach($array as $key => $value) {
-            if (!is_array($value))
-                $return[sanitize_text_field($key)] = sanitize_text_field($value);
-            else
-                $return[sanitize_text_field($key)] = self::sanitize_array($value);
-        }
-        return $return;
-    }
-    
-    /**
-     * Sanitize multidimensional array (keys and values)
-     *
-     * @param array $array
-     * @return array
-     * @since 1.1.0
-     */
-    private static function sanitize_array($array, $depth = 1) {
-        $return = array();
-        foreach($array as $key => $value) {
-            if (!is_array($value)) {
-                $return[sanitize_text_field($key)] = sanitize_text_field($value);
-            } else {
-                if($depth < self::MAX_DEPTH) {
-                    $return[sanitize_text_field($key)] = self::sanitize_array($value, ++$depth);
-                }
-            }
-        }
-        return $return;
-    }
-    
-    /**
-     * Sanitize array/list where values are text.
-     *
-     * @param array $array
-     * @return array
-     * @since
-     */
-    private static function sanitize_single_array_text($array) {
-        $return = array();
-        foreach($array as $value) {
-            if (!is_array($value))
-                $return[] = sanitize_text_field($value);
-        }
-        return $return;
-    }
-    
-    /**
-     * Sanitize array/list where values are absolute integer.
-     *
-     * @param array $array
-     * @return array
-     * @since 1.1.0
-     */
-    private static function sanitize_single_array_absint($array) {
-        $return = array();
-        foreach($array as $key => $value) {
-            if (!is_array($value))
-                $return[] = absint($value);
-        }
-        return $return;
-    }
-    
-    /**
-     * Sanitize the price as float value.
-     * @param $input
-     * @return float
-     * @since 1.1.0
-     */
-    private static function sanitize_price($input) {
-        return floatval(str_replace(',', '.', trim($input)));
-    }
     
     /**
      * This metod unifies the sanitization of different data types.
@@ -184,10 +91,10 @@ final class Sanitizer
      */
     public static function sanitize($var, $data_type)
     {
-        if(is_array($data_type) && in_array($var, $data_type)) {
+        if (is_array($data_type) && in_array($var, $data_type)) {
             return $var;
         }
-        switch($data_type) {
+        switch ($data_type) {
             case 'text':
                 return sanitize_text_field($var);
             case 'textarea':
@@ -214,5 +121,111 @@ final class Sanitizer
                 return ($var === true || $var === 1 || $var === '1');
         }
         return sanitize_text_field($var);
+    }
+    
+    /**
+     * Sanitize the price as float value.
+     * @param $input
+     * @return float
+     * @since 1.1.0
+     */
+    private static function sanitize_price($input)
+    {
+        return floatval(str_replace(',', '.', trim($input)));
+    }
+    
+    /**
+     * Check if JSON string is valid
+     *
+     * @param string $json
+     * @return bool
+     * @since 1.1.0
+     */
+    private static function is_json_valid($json)
+    {
+        json_decode(stripslashes($json), true);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
+    
+    /**
+     * Sanitize JSON (keys and values) and return an array
+     *
+     * @param string $json
+     * @return array
+     * @since 1.1.0
+     */
+    private static function sanitize_json($json)
+    {
+        $array = json_decode(stripslashes($json), true);
+        
+        $return = array();
+        foreach ($array as $key => $value) {
+            if (!is_array($value)) {
+                $return[sanitize_text_field($key)] = sanitize_text_field($value);
+            } else {
+                $return[sanitize_text_field($key)] = self::sanitize_array($value);
+            }
+        }
+        return $return;
+    }
+    
+    /**
+     * Sanitize multidimensional array (keys and values)
+     *
+     * @param array $array
+     * @return array
+     * @since 1.1.0
+     */
+    private static function sanitize_array($array, $depth = 1)
+    {
+        $return = array();
+        foreach ($array as $key => $value) {
+            if (!is_array($value)) {
+                if ($key === 'content') { //allowed HTML content
+                    $return[sanitize_text_field($key)] = wp_kses_post($value);
+                } else {
+                    $return[sanitize_text_field($key)] = sanitize_text_field($value);
+                }
+            } else {
+                if ($depth < self::MAX_DEPTH) {
+                    $return[sanitize_text_field($key)] = self::sanitize_array($value, ++$depth);
+                }
+            }
+        }
+        return $return;
+    }
+    
+    /**
+     * Sanitize array/list where values are text.
+     *
+     * @param array $array
+     * @return array
+     * @since
+     */
+    private static function sanitize_single_array_text($array)
+    {
+        $return = array();
+        foreach ($array as $value) {
+            if (!is_array($value))
+                $return[] = sanitize_text_field($value);
+        }
+        return $return;
+    }
+    
+    /**
+     * Sanitize array/list where values are absolute integer.
+     *
+     * @param array $array
+     * @return array
+     * @since 1.1.0
+     */
+    private static function sanitize_single_array_absint($array)
+    {
+        $return = array();
+        foreach ($array as $key => $value) {
+            if (!is_array($value))
+                $return[] = absint($value);
+        }
+        return $return;
     }
 }

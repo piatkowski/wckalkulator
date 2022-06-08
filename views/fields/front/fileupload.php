@@ -11,6 +11,10 @@ if (!defined('ABSPATH')) {
         </label>
     </td>
     <td class="value">
-        <input type="file" multiple>
+        <?php for($i = 0; $i < $view->max_file_count; $i++): ?>
+        <input type="file"
+               class="<?php echo esc_html($view->id); ?>"
+               name="<?php echo esc_html($view->name); ?>[]">
+        <?php endfor; ?>
     </td>
 </tr>

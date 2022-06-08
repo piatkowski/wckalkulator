@@ -248,8 +248,8 @@ class FieldsetPostType
                 if (isset($_POST[$key])) {
                     $value = Sanitizer::sanitize($_POST[$key], $data_type);
                     update_post_meta($post_id, $key, $value);
-                    error_log(print_r($_POST[$key], true));
-                    error_log(print_r($value, true));
+                    //error_log(print_r($_POST[$key], true));
+                    //error_log(print_r($value, true));
                 } elseif (in_array($key, $can_empty)) {
                     update_post_meta($post_id, $key, "");
                 }
@@ -332,7 +332,8 @@ class FieldsetPostType
         wp_enqueue_script(
             'wck-fieldset-script',
             Plugin::url() . '/assets/js/admin.js',
-            array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete')
+            array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete'),
+            Plugin::VERSION
         );
         
         // @since 1.2.0 - adds wp.media image selector

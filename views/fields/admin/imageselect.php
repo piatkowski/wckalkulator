@@ -20,7 +20,7 @@ use WCKalkulator\Helper;
             <input type="text" class="value fs-title" placeholder="Text value" required>
         </div>
         <div class="column column-2-half">
-            <a href="#" class="button action-add-image">Add image</a>
+            <a href="#" class="button action-add-image">><?php _e("Add Image", "wc-kalkulator"); ?></a>
             <img class="wp-media-image-preview action-add-image">
             <input type="hidden" class="value fs-image wp-media-image-id" placeholder="">
         </div>

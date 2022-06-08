@@ -37,6 +37,9 @@ class FileuploadField extends AbstractField
     public function render_for_product($value = "")
     {
         $args = $this->prepared_data();
+        $args['max_file_count'] = $this->data('max_file_count');
+        $args['max_file_size'] = $this->data('max_file_size');
+        $args['allowed_extensions'] = $this->data('allowed_extensions');
         return View::render('fields/front/fileupload', $args);
     }
     

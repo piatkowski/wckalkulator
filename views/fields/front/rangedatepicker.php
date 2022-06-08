@@ -11,12 +11,12 @@ if (!defined('ABSPATH')) {
         </label>
     </td>
     <td class="value">
-        <input type="text" id="<?php echo esc_html($view->id); ?>_from" class="wck-date-picker attached enabled"
+        <input type="text" id="<?php echo esc_html($view->id); ?>_from" class="wck-range-date-picker attached enabled"
                name="<?php echo esc_html($view->name); ?>[from]"
                value="<?php echo esc_html($view->value_from); ?>"<?php echo esc_html($view->required); ?>>
     </td>
     <td class="value">
-        <input type="text" id="<?php echo esc_html($view->id); ?>_to" class="wck-date-picker attached enabled"
+        <input type="text" id="<?php echo esc_html($view->id); ?>_to" class="wck-range-date-picker attached enabled"
                name="<?php echo esc_html($view->name); ?>[to]"
                value="<?php echo esc_html($view->value_to); ?>"<?php echo esc_html($view->required); ?>>
     </td>

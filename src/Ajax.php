@@ -3,6 +3,8 @@
 namespace WCKalkulator;
 
 
+use WCKalkulator\Woocommerce\Product;
+
 /**
  * Class Ajax
  *
@@ -57,7 +59,8 @@ class Ajax
             wp_enqueue_script(
                 'ajax-script',
                 Plugin::url() . '/assets/js/wookalkulator.js',
-                ['jquery']
+                ['jquery'],
+                Plugin::VERSION
             );
             
             wp_localize_script(
@@ -92,18 +95,19 @@ class Ajax
         $product_id = absint($_POST["_wck_product_id"]);
         $variation_id = isset($_POST["variation_id"]) ? absint($_POST["variation_id"]) : 0;
         $quantity = absint($_POST["quantity"]);
-        $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
+        $user_input = Product::get_user_input();
+        
         
         if ($product_id === 0 || $quantity === 0 || !is_array($user_input)) {
             Helper::message_for_manager("Unknown product or incorrect user input!");
-           wp_die("");
+            wp_die("");
         }
 
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
         if (!$fieldset->validate($user_input, true)) {
             Helper::message_for_manager("Data is invalid");
-           wp_die("");
+            wp_die("");
         }
         try {
             $calc = $fieldset->calculate();

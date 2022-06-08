@@ -93,8 +93,11 @@ class FieldsetAssignment
         $category_id = array();
 
         $terms = get_the_terms($product_id, 'product_cat');
-        foreach ($terms as $term) {
-            $category_id[] = $term->term_id;
+        
+        if (is_array($terms)) {
+            foreach ($terms as $term) {
+                $category_id[] = $term->term_id;
+            }
         }
         
         $posts = get_posts(array(

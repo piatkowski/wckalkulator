@@ -15,7 +15,7 @@ class TextField extends AbstractField
     protected $data;
     protected $type = "text";
     protected $admin_title;
-    protected $use_expression = false;
+    protected $use_expression = true;
     protected $group = "input";
     
     /**
