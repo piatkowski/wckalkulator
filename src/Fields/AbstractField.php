@@ -11,7 +11,6 @@ use WCKalkulator\View;
  */
 abstract class AbstractField
 {
-    
     protected $groups;
     
     public final function __construct()

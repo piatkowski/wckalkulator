@@ -67,7 +67,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\EmailField::class,
             Fields\RadioField::class,
             Fields\ImageselectField::class,
-            Fields\FileuploadField::class,
+            //Fields\FileuploadField::class, - turn off
             Fields\HtmlField::class,
             Fields\HeadingField::class,
             Fields\ParagraphField::class,
@@ -93,6 +93,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             FieldsetPostType::init();
             Ajax::init();
             Product::init();
+            //Settings::init(); - turned off
         }
         
         /**
