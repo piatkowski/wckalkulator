@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<tr class="<?php echo esc_html($view->css_class); ?>">
+<tr class="<?php echo esc_html($view->css_class); ?> wck-colorswatches">
     <td class="label">
         <?php echo wp_kses($view->hint, \WCKalkulator\Sanitizer::allowed_html()); ?>
         <label for="<?php echo esc_html($view->id); ?>">
@@ -18,11 +18,7 @@ if (!defined('ABSPATH')) {
                        id="<?php echo esc_html($id); ?>" <?php echo esc_html($view->required); ?>
                        class="attached enabled"
                        value="<?php echo esc_html($opt_name); ?>" <?php checked($view->value, $opt_name); ?>>
-                <?php if (!(isset($view->hide_caption) && $view->hide_caption === true)): ?>
-                    <span class="caption"><?php echo esc_html($view->options_title[$i]); ?></span>
-                <?php endif; ?>
-                <img src="<?php echo wp_get_attachment_image_url($view->options_image[$i]); ?>"
-                     alt="<?php echo esc_html($view->options_title[$i]); ?>"/>
+                <span class="colorswatch" style="background-color: <?php echo esc_html($view->options_title[$i]); ?>"></span>
             </label>
         <?php endforeach; ?>
     </td>

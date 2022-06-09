@@ -58,6 +58,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\SelectField::class,
             Fields\DropdownField::class,
             Fields\CheckboxField::class,
+            Fields\CheckboxgroupField::class,
             Fields\TextField::class,
             Fields\TextareaField::class,
             Fields\ColorpickerField::class,
@@ -73,8 +74,8 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\HiddenField::class,
             Fields\LinkField::class,
             Fields\AttachmentField::class,
-            Fields\RadiogroupField::class,
-            Fields\CheckboxgroupField::class
+            Fields\ImageswatchesField::class,
+            Fields\ColorswatchesField::class
         );
         
         /**

@@ -20,7 +20,7 @@ class TextareaField extends TextField
     public function admin_fields($value = '')
     {
         $html = parent::admin_fields($value);
-        $this->admin_title = __("Textarea Field", "wc-kalkulator");
+        $this->admin_title = __("Textarea", "wc-kalkulator");
         return $html;
     }
     

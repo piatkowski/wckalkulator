@@ -25,7 +25,7 @@ class TextField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Text Field", "wc-kalkulator");
+        $this->admin_title = __("Text", "wc-kalkulator");
         return View::render('fields/admin/text');
     }
     

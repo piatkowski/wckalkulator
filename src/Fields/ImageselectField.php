@@ -21,8 +21,8 @@ class ImageselectField extends SelectField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Image Select Field", "wc-kalkulator");
-        return View::render('fields/admin/imageselect');
+        $this->admin_title = __("Radio w/ Image", "wc-kalkulator");
+        return View::render('fields/admin/' . $this->type);
     }
     
     /**
@@ -69,6 +69,6 @@ class ImageselectField extends SelectField
         $args['options_title'] = $this->data['options_title'];
         $args['options_image'] = $this->data['options_image'];
         
-        return View::render('fields/front/imageselect', $args);
+        return View::render('fields/front/' . $this->type, $args);
     }
 }

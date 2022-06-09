@@ -16,6 +16,9 @@
             e.preventDefault();
             $WK.saveFields();
         });
+        $('<input type="hidden" class="wck-global-color-picker" />').insertBefore("#wpwrap");
+        $WK.colorpicker = $("input.wck-global-color-picker");
+        $WK.colorpicker.iris();
 
         $WK.expressionLastFocusedInput = null;
         $WK.wpMediaFrame = null;
@@ -147,6 +150,38 @@
             });
 
             $WK.wpMediaFrame.open();
+        }).on("focus", '[data-type="colorswatches"] input.fs-title', function (e) {
+            e.preventDefault();
+            var _target = $(this);
+            $WK.colorpicker.iris('show');
+            $(".iris-picker").css({
+                top: _target.offset().top + 40,
+                left: _target.offset().left
+            });
+            $WK.colorpicker.iris('option', 'change', function (event, ui) {
+                _target.val(ui.color.toString());
+                var color = ui.color.toRgb();
+                var t = (color.r + color.g + color.b) / 2;
+                var textColor = (t < 200) ? "#FFFFFF" : "#000000";
+                _target.css({
+                    "background-color": ui.color.toString(),
+                    "color": textColor
+                });
+            });
+            $WK.colorpicker.iris('color', $(this).val());
+
+        });
+
+        $(".iris-square-value").on("click", function (e) {
+            e.preventDefault();
+        });
+
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.iris-picker, [data-type="colorswatches"] input.fs-title').length) {
+                if ($('.iris-picker').is(":visible")) {
+                    $WK.colorpicker.iris('hide');
+                }
+            }
         });
 
         $("form#post").submit(function (e) {
@@ -267,11 +302,13 @@
                     case 'select':
                     case 'radio':
                     case 'imageselect':
+                    case 'imageswatches':
+                    case 'colorswatches':
                     case 'radiogroup':
                     case 'checkboxgroup':
                         field.options_name = [];
                         field.options_title = [];
-                        if (field.type === "imageselect") {
+                        if (field.type === "imageselect" || field.type === "imageswatches") {
                             field.options_image = [];
                         }
                         $fs_options = $row.find(".fs-option");
@@ -295,13 +332,13 @@
                             field.options_name.push(fs_name.val());
                             field.options_title.push(fs_title.val());
 
-                            if (field.type === "imageselect") {
+                            if (field.type === "imageselect" || field.type === "imageswatches") {
                                 var fs_image = $(this).find("input.fs-image");
                                 field.options_image.push(fs_image.val());
                             }
                         });
 
-                        if (field.type === "imageselect") {
+                        if (field.type === "imageselect" || field.type === "imageswatches") {
                             input_frequired = $row.find('input.f-required');
                             field.required = input_frequired.is(':checked');
                         }
@@ -427,8 +464,17 @@
         $WK.appendFormulaVars = function (field) {
             $WK.fields[field.name] = field;
             if (field.use_expression) {
-                suggest.push(field.name);
-                $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                if (field.type !== 'checkboxgroup') {
+                    suggest.push(field.name);
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                } else {
+                    suggest.push(field.name + ":sum");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
+                    suggest.push(field.name + ":min");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
+                    suggest.push(field.name + ":max");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
+                }
                 if (field.type === "rangedatepicker") {
                     suggest.push(field.name + ":date_from");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
@@ -491,11 +537,11 @@
                             }
                         });
 
-                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup'].indexOf(this.type) >= 0) {
+                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup', 'imageswatches', 'colorswatches'].indexOf(this.type) >= 0) {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
-                        if (this.type === "imageselect") {
+                        if (this.type === "imageselect" || this.type === "imageswatches") {
                             options_image = this.options_image;
                             wp.media.attachment(options_image).fetch();
                         }

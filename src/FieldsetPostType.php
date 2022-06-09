@@ -338,7 +338,21 @@ class FieldsetPostType
         
         // @since 1.2.0 - adds wp.media image selector
         wp_enqueue_media();
-        
+      
+        wp_enqueue_script(
+            'iris',
+            admin_url('js/iris.min.js'),
+            array('jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch'),
+            false,
+            1
+        );
+        wp_enqueue_script(
+            'wp-color-picker',
+            admin_url('js/color-picker.min.js'),
+            array('iris', 'wp-i18n'),
+            false,
+            1
+        );
         /**
          * This method sets values of $fields_html and $fields_dropdown properties
          */
@@ -405,6 +419,7 @@ class FieldsetPostType
     {
         wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.css');
         wp_enqueue_style('wckalkulator_admin_css');
+        wp_enqueue_style('wp-color-picker');
     }
     
     /**

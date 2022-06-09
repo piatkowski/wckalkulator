@@ -484,14 +484,23 @@ class FieldsetProduct
     {
         $name = $field->data("name");
         
-        if ($field->type() === "rangedatepicker") {
-            $date_from = strtotime($input['from']);
-            $date_to = strtotime($input['to']);
-            $this->user_input[$name . ':date_from'] = $date_from;
-            $this->user_input[$name . ':date_to'] = $date_to;
-            $this->user_input[$name . ':days'] = abs(round(($date_to - $date_from) / 86400));
-        } else if ($field->type() === "datepicker") {
-            $this->user_input[$name . ':date'] = strtotime($input);
+        switch ($field->type()) {
+            case 'rangedatepicker':
+                $date_from = strtotime($input['from']);
+                $date_to = strtotime($input['to']);
+                $this->user_input[$name . ':date_from'] = $date_from;
+                $this->user_input[$name . ':date_to'] = $date_to;
+                $this->user_input[$name . ':days'] = abs(round(($date_to - $date_from) / 86400));
+                break;
+            case 'datepicker':
+                $this->user_input[$name . ':date'] = strtotime($input);
+                break;
+            case 'checkboxgroup':
+                $input = array_map('floatval', $input);
+                $this->user_input[$name . ':max'] = is_null($input) ? 0 : max($input);
+                $this->user_input[$name . ':min'] = is_null($input) ? 0 : min($input);
+                $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
+                break;
         }
     }
     

@@ -176,3 +176,6 @@
     -webkit-transform: scale(1.2); }
 .wc-kalkulator-wrapper select.param {
   margin-bottom: 20px; }
+.wc-kalkulator-wrapper .iris-picker {
+  position: absolute;
+  z-index: 9999; }

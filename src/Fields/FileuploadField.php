@@ -25,7 +25,7 @@ class FileuploadField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("File Upload Field", "wc-kalkulator");
+        $this->admin_title = __("File Upload", "wc-kalkulator");
         return View::render('fields/admin/fileupload');
     }
     

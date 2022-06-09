@@ -25,7 +25,7 @@ class DropdownField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Dropdown Field", "wc-kalkulator");
+        $this->admin_title = __("Dropdown", "wc-kalkulator");
         return View::render('fields/admin/dropdown');
     }
     

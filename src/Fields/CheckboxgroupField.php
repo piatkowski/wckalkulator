@@ -8,10 +8,9 @@ use WCKalkulator\View;
  * Class CheckboxgroupField
  * @package WCKalkulator
  */
-class CheckboxgroupField extends RadiogroupField
+class CheckboxgroupField extends SelectField
 {
     protected $type = "checkboxgroup";
-    protected $use_expression = false;
     
     /**
      * Output HTML for fields at backend.
@@ -20,7 +19,7 @@ class CheckboxgroupField extends RadiogroupField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Checkbox Group", "wc-kalkulator");
+        $this->admin_title = __("Multi Checkbox", "wc-kalkulator");
         return View::render('fields/admin/select');
     }
     
