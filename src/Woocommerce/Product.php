@@ -89,7 +89,7 @@ class Product
                     $options
                 );
             }
-        } else if (is_page('cart') || is_cart()) {
+        } else if (is_page('cart') || is_cart() || is_checkout() || is_page('checkout')) {
             wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/cart.css');
             wp_enqueue_style('wckalkulator_frontend_css');
         }
@@ -334,8 +334,9 @@ class Product
                 
                 $order_fields = $values["wckalkulator_fields"];
                 $fieldset = FieldsetProduct::getInstance();
-                $fieldset->init($product_id, $variation_id);
                 
+                $fieldset->init($product_id, $variation_id);
+ 
                 foreach ($fieldset->fields() as $name => $field) {
                     
                     if (isset($order_fields[$name])) {
@@ -345,11 +346,19 @@ class Product
                         }
                         $item->add_meta_data($field->data('title'), $field_value, true);
                     } else {
-                        wp_die('Corrupted data! ' . $name . ' does not exists!');
+                        if($field->is_required()) {
+                            wp_send_json(array(
+                                'result' => 'failure',
+                                'messages' => '<div class="woocommerce-error">' . __('Product has incorrect parameters! Missing field ', 'wc-kalkulator') . '[' . $field->data("title") . '] in product #' . absint($product_id) . '</div>'
+                            ));
+                        }
                     }
                 }
             } else {
-                wp_die('Corrupted data! Missing wckalkulator_fields parameter');
+                wp_send_json(array(
+                    'result' => 'failure',
+                    'messages' => '<div class="woocommerce-error">' . __('Corrupted data! You cannot checkout.', 'wc-kalkulator') . '</div>'
+                ));
             }
         }
         

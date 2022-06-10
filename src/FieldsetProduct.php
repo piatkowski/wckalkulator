@@ -330,6 +330,10 @@ class FieldsetProduct
         }
         
         $this->add_static_prices($input);
+    
+        foreach(GlobalParameter::get_all() as $name => $value) {
+            $this->user_input['global:' . $name] = $value;
+        }
         
         return $this->is_valid;
     }
@@ -345,7 +349,6 @@ class FieldsetProduct
         if (!is_array($this->expression())) {
             return true;
         }
-        $field_names = array_keys($this->user_input);
         foreach ($this->fields() as $field) {
             if ($field->use_expression()) {
                 $field_name = $field->data("name");
@@ -469,8 +472,11 @@ class FieldsetProduct
                 }
                 $this->user_input[$name] = $static_price;
             }
-            $this->register_extra_input_parameters($field, $input[$name]);
+            if ($field->group() !== 'static') {
+                $this->register_extra_input_parameters($field, $input[$name]);
+            }
         }
+        
     }
     
     /**
@@ -501,10 +507,6 @@ class FieldsetProduct
                 $this->user_input[$name . ':min'] = is_null($input) ? 0 : min($input);
                 $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
                 break;
-        }
-        
-        foreach(GlobalParameter::get_all() as $name => $value) {
-            $this->user_input['global:' . $name] = $value;
         }
     }
     

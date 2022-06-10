@@ -261,8 +261,6 @@ class FieldsetPostType
                 if (isset($_POST[$key])) {
                     $value = Sanitizer::sanitize($_POST[$key], $data_type);
                     update_post_meta($post_id, $key, $value);
-                    //error_log(print_r($_POST[$key], true));
-                    //error_log(print_r($value, true));
                 } elseif (in_array($key, $can_empty)) {
                     update_post_meta($post_id, $key, "");
                 }

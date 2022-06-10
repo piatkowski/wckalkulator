@@ -94,6 +94,7 @@ class ExpressionParser
         
         if (is_array($this->expr) && $this->is_mode_valid()) {
             $has_required_vars = $this->check_required_variables();
+     
             if ($has_required_vars) {
                 $this->is_valid = true;
             } else {
