@@ -23,7 +23,8 @@ class Ajax
      * @var array
      */
     private static $actions = array(
-        'wckalkulator_calculate_price'
+        'wckalkulator_calculate_price',
+        'wckalkulator_json_search_tags'
     );
     
     /**
@@ -32,7 +33,8 @@ class Ajax
      * @var array
      */
     private static $actions_nopriv = array(
-        'wckalkulator_calculate_price'
+        'wckalkulator_calculate_price',
+        'wckalkulator_json_search_tags'
     );
     
     public static function init()
@@ -83,12 +85,12 @@ class Ajax
     public static function wckalkulator_calculate_price()
     {
         if (!wp_verify_nonce($_POST['_wck_ajax_nonce'], Ajax::NONCE) || !isset($_POST["_wck_product_id"]) || !isset($_POST["_wck_hash"])) {
-           wp_die ('Bad request!');
+            wp_die('Bad request!');
         }
         if (wp_hash($_POST["_wck_product_id"]) !== $_POST["_wck_hash"]) {
-           wp_die ('Bad hash!');
+            wp_die('Bad hash!');
         }
-    
+        
         /**
          * Get user input
          */
@@ -102,7 +104,7 @@ class Ajax
             Helper::message_for_manager("Unknown product or incorrect user input!");
             wp_die("");
         }
-
+        
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
         if (!$fieldset->validate($user_input, true)) {
@@ -124,18 +126,51 @@ class Ajax
                 echo apply_filters('wck_total_price_ajax', $response, $price_regular, $price_current);
             } else {
                 Helper::message_for_manager($calc["value"]);
-               wp_die("");
+                wp_die("");
             }
         } catch (\Exception $e) {
             Helper::message_for_manager("Expression fatal error.");
             error_log($e);
-           wp_die("");
+            wp_die("");
         } catch (\Throwable $e) {
             Helper::message_for_manager("Expression fatal error.");
             error_log($e);
-           wp_die("");
+            wp_die("");
         }
         wp_die();
+    }
+    
+    /**
+     * Ajax action - search tags
+     * POST request: term
+     * Output: JSON
+     *
+     * @since 1.2.0
+     */
+    public static function wckalkulator_json_search_tags()
+    {
+        check_ajax_referer('search-products', 'security');
+     
+        if (empty($term) && isset($_GET['term'])) {
+            $term = (string)wc_clean(wp_unslash($_GET['term']));
+        }
+        
+        if (empty($term)) {
+            wp_die();
+        }
+        
+        $tags = get_terms('product_tag', array(
+            'search' => $term,
+            'hide_empty' => false
+        ));
+        
+        $output = array();
+  
+        foreach ($tags as $tag) {
+            $output[$tag->term_id] = $tag->name;
+        }
+        
+        wp_send_json($output);
     }
     
     /**

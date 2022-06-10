@@ -3,8 +3,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-use WCKalkulator\Helper;
 use WCKalkulator\FieldsetAssignment;
+use WCKalkulator\Helper;
 
 wp_nonce_field(\WCKalkulator\FieldsetPostType::POST_TYPE, '_wck_nonce');
 
@@ -12,6 +12,7 @@ wp_nonce_field(\WCKalkulator\FieldsetPostType::POST_TYPE, '_wck_nonce');
  * _wck_assign_type
  * _wck_assign_products
  * _wck_assign_categories
+ * _wck_assign_tags
  */
 
 global $post;
@@ -20,6 +21,7 @@ $type = (int)get_post_meta($post->ID, '_wck_assign_type', true);
 $priority = (int)get_post_meta($post->ID, '_wck_assign_priority', true);
 $products = get_post_meta($post->ID, '_wck_assign_products', true);
 $categories = get_post_meta($post->ID, '_wck_assign_categories', true);
+$tags = get_post_meta($post->ID, '_wck_assign_tags', true);
 
 ?>
 <p class="post-attributes-label-wrapper">
@@ -60,9 +62,24 @@ $categories = get_post_meta($post->ID, '_wck_assign_categories', true);
 </select>
 
 <p class="post-attributes-label-wrapper">
+    <label for="assign_tags" class="post-attributes-label">
+        <?php _e('Choose Tags', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('Search a tag by name. You can choose multiple tags.', 'wc-kalkulator')); ?>
+    </label>
+</p>
+
+<select class="wc-product-search" multiple="multiple" id="assign_tags" name="_wck_assign_tags[]"
+        data-action="wckalkulator_json_search_tags">
+    <?php foreach (FieldsetAssignment::tags_readable($tags) as $id => $title): ?>
+        <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
+    <?php endforeach; ?>
+</select>
+
+<p class="post-attributes-label-wrapper">
     <label for="assign_priority" class="post-attributes-label">
         <?php _e('Priority (number)', 'wc-kalkulator'); ?>
         <?php echo Helper::html_help_tip(__('If the product has many groups assigned to it, the one with the highest priority (the highest number) will be used. ', 'wc-kalkulator')); ?>
     </label>
 </p>
-<input type="number" step="1" name="_wck_assign_priority" id="assign_priority" value="<?php echo esc_html($priority); ?>">
+<input type="number" step="1" name="_wck_assign_priority" id="assign_priority"
+       value="<?php echo esc_html($priority); ?>">

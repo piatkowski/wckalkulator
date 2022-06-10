@@ -27,6 +27,7 @@ class FieldsetPostType
         '_wck_assign_type' => array('1', '2', '3'),
         '_wck_assign_products' => 'absint_array',
         '_wck_assign_categories' => 'absint_array',
+        '_wck_assign_tags' => 'absint_array',
         '_wck_assign_priority' => 'absint',
         '_wck_filter_price_enabled' => 'bool',
         '_wck_filter_price_prefix' => 'text',
@@ -141,9 +142,20 @@ class FieldsetPostType
                 $type = (int)get_post_meta($post_id, '_wck_assign_type', true);
                 $products = get_post_meta($post_id, '_wck_assign_products', true);
                 $categories = get_post_meta($post_id, '_wck_assign_categories', true);
+                $tags = get_post_meta($post_id, '_wck_assign_tags', true);
                 echo FieldsetAssignment::get($type) . "<br />";
-                echo join(", ", FieldsetAssignment::products_readable($products)) . " ";
-                echo join(", ", FieldsetAssignment::categories_readable($categories));
+                if (is_array($products) && count($products) > 0) {
+                    echo __('Products: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::products_readable($products)) . " ";
+                }
+                if (is_array($categories) && count($categories) > 0) {
+                    echo __('Categories: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::categories_readable($categories)) . " ";
+                }
+                if (is_array($tags) && count($tags) > 0) {
+                    echo __('Tags: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::tags_readable($tags));
+                }
                 break;
             case 'wck_assign_priority':
                 $value = get_post_meta($post_id, '_wck_assign_priority', true);
@@ -237,7 +249,8 @@ class FieldsetPostType
             
             $can_empty = array(
                 '_wck_assign_products',
-                '_wck_assign_categories'
+                '_wck_assign_categories',
+                '_wck_assign_tags'
             );
             
             /**
@@ -338,7 +351,7 @@ class FieldsetPostType
         
         // @since 1.2.0 - adds wp.media image selector
         wp_enqueue_media();
-      
+        
         wp_enqueue_script(
             'iris',
             admin_url('js/iris.min.js'),
@@ -366,7 +379,7 @@ class FieldsetPostType
             'wck_fields_html',
             Cache::get_once('FieldsetPostType_fields_html')
         );
-    
+        
         /**
          * Add global parameters for auto-suggestion feature
          */
