@@ -91,6 +91,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             self::$path = WP_PLUGIN_DIR . '/' . Plugin::NAME;
             
             FieldsetPostType::init();
+            GlobalParametersPostType::init();
             Ajax::init();
             Product::init();
             //Settings::init(); - turned off
@@ -135,11 +136,13 @@ if (!class_exists('WCKalkulator\Plugin')) {
                     foreach ($blog_ids as $blog_id) {
                         switch_to_blog($blog_id);
                         FieldsetPostType::delete_all_posts();
+                        GlobalParametersPostType::delete_all_posts();
                     }
                     restore_current_blog();
                 }
             } else {
                 FieldsetPostType::delete_all_posts();
+                GlobalParametersPostType::delete_all_posts();
             }
         }
         

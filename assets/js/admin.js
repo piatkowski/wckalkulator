@@ -215,6 +215,7 @@
             $WK.changeAssignType();
             $("form#post").attr("novalidate", "");
             $WK.buildTooltips("");
+            $WK.appendGlobalParameters();
         };
 
         $WK.buildTooltips = function (selector) {
@@ -460,6 +461,16 @@
             $WK.saved = !error;
 
         };
+
+        $WK.appendGlobalParameters = function () {
+            if (typeof wck_global_parameters !== undefined) {
+                $.each(wck_global_parameters, function (name, value) {
+                    var name = "global:" + name;
+                    suggest.push(name);
+                    $("#formula_fields").append('<span class="formula-field">{' + name + '}</span> ');
+                });
+            }
+        }
 
         $WK.appendFormulaVars = function (field) {
             $WK.fields[field.name] = field;

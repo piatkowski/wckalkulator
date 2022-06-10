@@ -502,6 +502,10 @@ class FieldsetProduct
                 $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
                 break;
         }
+        
+        foreach(GlobalParameter::get_all() as $name => $value) {
+            $this->user_input['global:' . $name] = $value;
+        }
     }
     
     /**

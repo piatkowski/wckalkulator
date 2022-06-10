@@ -366,6 +366,15 @@ class FieldsetPostType
             'wck_fields_html',
             Cache::get_once('FieldsetPostType_fields_html')
         );
+    
+        /**
+         * Add global parameters for auto-suggestion feature
+         */
+        wp_localize_script(
+            'wck-fieldset-script',
+            'wck_global_parameters',
+            GlobalParameter::get_all()
+        );
         
         $constants = array(
             'wck_load_fieldset' => '_wck_fieldset',
