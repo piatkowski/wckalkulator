@@ -39,4 +39,18 @@ class ColorswatchesField extends SelectField
             'colorswatch' => $value
         ));
     }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        $color = $this->get_option_title($value);
+        return '<span style="display:inline-block;width:20px;height:20px;margin-right:5px">' . $color . '</span>';
+    }
+
 }

@@ -167,4 +167,15 @@ class RangedatepickerField extends DatepickerField
         return $is_valid;
     }
     
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $value["from"] . ' - ' . $value["to"];
+    }
 }

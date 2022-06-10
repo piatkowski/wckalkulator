@@ -71,4 +71,18 @@ class ImageselectField extends SelectField
         
         return View::render('fields/front/' . $this->type, $args);
     }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        $img = $this->get_option_image($value);
+        $title = $this->get_option_title($value);
+        return $title . ' <a href="'.$img.'" target="_blank"><img src="'.$img.'" style="max-width:60px" /></a>';
+    }
 }

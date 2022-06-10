@@ -50,9 +50,12 @@ class Product
         if ($fieldset->has_fieldset('current')) {
             
             if ($fieldset->has_expression('current')) {
-                wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/frontend.css');
-                wp_enqueue_style('wckalkulator_frontend_css');
+                wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.css');
+                wp_enqueue_style('wckalkulator_price_css');
             }
+    
+            wp_register_style('wckalkulator_product_css', Plugin::url() . '/assets/css/product.css');
+            wp_enqueue_style('wckalkulator_product_css');
             
             wp_enqueue_script('jquery-tiptip',
                 WC()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip.min.js',
@@ -93,24 +96,6 @@ class Product
             wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/cart.css');
             wp_enqueue_style('wckalkulator_frontend_css');
         }
-    }
-    
-    /**
-     * Gets user input from $_POST, $_FILES. Sanitize input
-     *
-     * @return array
-     * @since 1.2.0
-     */
-    public static function get_user_input()
-    {
-        $user_input = array();
-       
-        if (isset($_POST['wck']) && is_array($_POST['wck'])) {
-            $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
-        }
-        //@todo handle $_FILES
-        
-        return $user_input;
     }
     
     /**
@@ -173,6 +158,24 @@ class Product
         }
         
         return $validation;
+    }
+    
+    /**
+     * Gets user input from $_POST, $_FILES. Sanitize input
+     *
+     * @return array
+     * @since 1.2.0
+     */
+    public static function get_user_input()
+    {
+        $user_input = array();
+        
+        if (isset($_POST['wck']) && is_array($_POST['wck'])) {
+            $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
+        }
+        //@todo handle $_FILES
+        
+        return $user_input;
     }
     
     /**
@@ -336,17 +339,23 @@ class Product
                 $fieldset = FieldsetProduct::getInstance();
                 
                 $fieldset->init($product_id, $variation_id);
- 
+                
                 foreach ($fieldset->fields() as $name => $field) {
                     
                     if (isset($order_fields[$name])) {
-                        $field_value = $order_fields[$name];
-                        if ($field->is_type("select")) {
+                        $field_value = $field->order_item_value( $order_fields[$name] );
+                        
+                        /*if ($field->is_type("select")) {
                             $field_value = $field->get_option_title($field_value);
                         }
+                        
+                        if( is_array($field_value)) {
+                            $field_value = join(", ", $field_value);
+                        }*/
+                        
                         $item->add_meta_data($field->data('title'), $field_value, true);
                     } else {
-                        if($field->is_required()) {
+                        if ($field->is_required()) {
                             wp_send_json(array(
                                 'result' => 'failure',
                                 'messages' => '<div class="woocommerce-error">' . __('Product has incorrect parameters! Missing field ', 'wc-kalkulator') . '[' . $field->data("title") . '] in product #' . absint($product_id) . '</div>'

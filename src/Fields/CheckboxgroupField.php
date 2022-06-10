@@ -31,18 +31,9 @@ class CheckboxgroupField extends SelectField
      */
     public function render_for_cart($value = '')
     {
-        if (is_array($value)) {
-            foreach ($value as $key => $val) {
-                $value[$key] = $this->get_option_title($val);
-            }
-            $value = join(", ", $value);
-        } else {
-            $value = $this->get_option_title($value);
-        }
-        
         return View::render('fields/cart', array(
             'title' => $this->data['title'],
-            'value' => $value
+            'value' => $this->order_item_value($value)
         ));
     }
     
@@ -95,5 +86,26 @@ class CheckboxgroupField extends SelectField
         }
         
         return in_array($value, $this->data["options_name"]);
+    }
+    
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $val) {
+                $value[$key] = $this->get_option_title($val);
+            }
+            $value = join(", ", $value);
+        } else {
+            $value = $this->get_option_title($value);
+        }
+        return $value;
     }
 }

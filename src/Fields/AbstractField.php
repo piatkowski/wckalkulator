@@ -139,7 +139,7 @@ abstract class AbstractField
      */
     public function is_type($type)
     {
-        return $this->type === $type;
+        return is_array($type) ? in_array($this->type, $type) : $this->type === $type;
     }
     
     /**
@@ -159,6 +159,8 @@ abstract class AbstractField
     }
     
     abstract public function admin_fields($param = '');
+    
+    abstract public function order_item_value($value);
     
     /**
      * Checks if we need to hide "Title" field on admin page

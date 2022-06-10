@@ -93,4 +93,16 @@ class SelectField extends AbstractField
         $id = array_search($title, $this->data['options_title']);
         return $this->data['options_name'][$id];
     }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $this->get_option_title($value);
+    }
 }

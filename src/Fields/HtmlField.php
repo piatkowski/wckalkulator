@@ -20,6 +20,7 @@ class HtmlField extends AbstractField
 
     /**
      * Output HTML for fields at backend.
+     *
      * @param $value
      * @return string
      */
@@ -31,6 +32,7 @@ class HtmlField extends AbstractField
 
     /**
      * Output HTML for product page
+     *
      * @param $value
      * @return string
      */
@@ -43,6 +45,7 @@ class HtmlField extends AbstractField
 
     /**
      * No need to show static field in the user's cart
+     *
      * @param $value
      * @return string
      */
@@ -53,6 +56,7 @@ class HtmlField extends AbstractField
 
     /**
      * No need to validate static field
+     *
      * @param $value
      * @return bool
      */
@@ -60,5 +64,15 @@ class HtmlField extends AbstractField
     {
         return true;
     }
-
+    
+    /**
+     * No need to display the field in order line item
+     *
+     * @param $value
+     */
+    public function order_item_value($value)
+    {
+        return;
+    }
+    
 }

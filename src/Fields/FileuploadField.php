@@ -77,4 +77,16 @@ class FileuploadField extends AbstractField
         return $is_required_and_nonempty;
     }
     
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $value;
+    }
+    
 }
