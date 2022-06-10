@@ -285,7 +285,8 @@
                     "title": input_ftitle.val(),
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
-                    "css_class": input_css_class.val()
+                    "css_class": input_css_class.val(),
+                    "required": (($row.find('input.f-required').length > 0) ? $row.find('input.f-required').is(':checked') : true)
                 };
 
                 var input_fprice = $row.find('input.f-price');
@@ -311,6 +312,9 @@
                         field.options_title = [];
                         if (field.type === "imageselect" || field.type === "imageswatches") {
                             field.options_image = [];
+                        }
+                        if (field.type === "checkboxgroup") {
+                            field.select_limit = $row.find("input.fcbg-limit").val();
                         }
                         $fs_options = $row.find(".fs-option");
                         $fs_options.each(function () {
@@ -339,10 +343,6 @@
                             }
                         });
 
-                        if (field.type === "imageselect" || field.type === "imageswatches") {
-                            input_frequired = $row.find('input.f-required');
-                            field.required = input_frequired.is(':checked');
-                        }
                         break;
                     case 'dropdown':
                         field.options_title = [];
@@ -360,10 +360,6 @@
                             }
                             field.options_title.push(fs_title.val());
                         });
-
-                        input_frequired = $row.find('input.f-required');
-                        field.required = input_frequired.is(':checked');
-
                         break;
 
                     case 'number':
@@ -388,27 +384,20 @@
                     case 'text':
                     case 'textarea':
                     case 'email':
-                        input_frequired = $row.find('input.f-required');
                         var input_ftminlen = $row.find('input.ft-min-length');
                         var input_ftmaxlen = $row.find('input.ft-max-length');
                         //var input_ftpattern = $row.find('input.ft-pattern');
                         field.min = input_ftminlen.val();
                         field.max = input_ftmaxlen.val();
                         //field.pattern = input_ftpattern.val();
-                        field.required = input_frequired.is(':checked');
                         break;
-
                     case 'colorpicker':
                     case 'datepicker':
                     case 'rangedatepicker':
-                        input_frequired = $row.find('input.f-required');
-                        field.required = input_frequired.is(':checked');
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
                     case 'fileupload':
-                        input_frequired = $row.find('input.f-required');
-                        field.required = input_frequired.is(':checked');
                         field.max_file_count = $row.find('input.fu-max-file-count').val();
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
@@ -515,6 +504,9 @@
                     $("#" + field_id + " .f-title").val(this.title);
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
+                    if( $("#" + field_id + " .f-required").length > 0) {
+                        $("#" + field_id + " .f-required").prop("checked", this.required);
+                    }
 
                     var fprice = $("#" + field_id + " .f-price");
                     if (fprice.length > 0) {
@@ -523,7 +515,7 @@
                     var options_title, options_name, options_image, default_value, first, $checked;
 
                     if (this.type === "dropdown") {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
+
                         options_title = this.options_title;
                         default_value = this.default_value;
                         first = true;
@@ -555,6 +547,9 @@
                         if (this.type === "imageselect" || this.type === "imageswatches") {
                             options_image = this.options_image;
                             wp.media.attachment(options_image).fetch();
+                        }
+                        if (this.type === "checkboxgroup") {
+                            $("#" + field_id + " .fcbg-limit").val(this.select_limit);
                         }
                         //console.log("Dropdown: ", default_value);
                         first = true;
@@ -610,12 +605,9 @@
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
                     } else if (this.type === "fileupload") {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
                         $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);

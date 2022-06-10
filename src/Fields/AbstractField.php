@@ -68,7 +68,8 @@ abstract class AbstractField
             'name' => "wck[" . $this->data("name") . "]",
             'id' => 'wck_' . $this->data("name"),
             'css_class' => $this->data("css_class"),
-            'required' => $this->is_required() ? ' required' : 'required'
+            'required' => $this->is_required() ? ' required' : '',
+            'is_required' => $this->is_required() ? '1' : '0'
         );
     }
     

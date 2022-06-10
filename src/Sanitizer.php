@@ -38,7 +38,11 @@ final class Sanitizer
                 'max' => true,
                 'step' => true,
                 'required' => true,
-                'readonly' => true
+                'readonly' => true,
+                'data-type' => true,
+                'data-group' => true,
+                'data-required' => true,
+                'data-limit' => true
             ),
             'textarea' => array(
                 'name' => true,

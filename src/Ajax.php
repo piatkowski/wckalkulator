@@ -56,7 +56,7 @@ class Ajax
     public static function enqueue_scripts()
     {
         $fieldset = FieldsetProduct::getInstance();
-        if ($fieldset->has_fieldset('current') && $fieldset->has_expression('current')) {
+        if ($fieldset->has_fieldset('current')/* && $fieldset->has_expression('current')*/) {
             
             wp_enqueue_script(
                 'ajax-script',
@@ -70,7 +70,9 @@ class Ajax
                 'ajax_object',
                 array(
                     'ajax_url' => admin_url('admin-ajax.php'),
-                    '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE)
+                    '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE),
+                    '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
+                    '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator')
                 )
             );
         }

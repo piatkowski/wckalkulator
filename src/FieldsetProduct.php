@@ -554,8 +554,7 @@ class FieldsetProduct
             
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
-                $price = $parser->execute();
-                return $price;
+                return $parser->execute();
             } else {
                 return Ajax::response('error', $parser->error);
             }

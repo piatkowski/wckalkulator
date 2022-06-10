@@ -4,6 +4,11 @@ if (!defined('ABSPATH')) {
 }
 use WCKalkulator\Helper;
 ?>
+<label>
+    <input type="checkbox" class="param f-required" step="any" value="1">
+    <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
+</label>
+
 <label>* <?php _e('Option Items', 'wc-kalkulator'); ?></label>
 <div class="pairs fs-options">
     <div class="pair fs-option">
