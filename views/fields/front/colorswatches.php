@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
                 <input type="radio" name="<?php echo esc_html($view->name); ?>"
                        id="<?php echo esc_html($id); ?>" <?php echo esc_html($view->required); ?>
                        class="attached enabled"
-                       value="<?php echo esc_html($opt_name); ?>" <?php checked($view->value, $opt_name); ?>>
+                       value="<?php echo esc_html($opt_name); ?>" <?php checked(is_array($view->value) ? in_array($opt_name, $view->value) : ($view->value === $opt_name)); ?>>
                 <span class="colorswatch" style="background-color: <?php echo esc_html($view->options_title[$i]); ?>"></span>
             </label>
         <?php endforeach; ?>

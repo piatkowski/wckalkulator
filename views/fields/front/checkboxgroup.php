@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 ?>
 <tr class="<?php echo esc_html($view->css_class); ?>">
     <td class="label">
@@ -24,7 +25,7 @@ if (!defined('ABSPATH')) {
                        name="<?php echo esc_html($view->name); ?>[]"
                        class="<?php echo esc_html($view->id); ?>"
                        value="<?php echo esc_html($opt_name); ?>"
-                    <?php selected($view->value, $opt_name); ?>>
+                    <?php checked(is_array($view->value) ? in_array($opt_name, $view->value) : ($view->value === $opt_name)); ?>>
                 <?php echo esc_html($view->options_title[$i]); ?>
             </label><br />
         <?php endforeach; ?>

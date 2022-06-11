@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
                 name="<?php echo esc_html($view->name); ?>" <?php echo esc_html($view->required); ?>>
         <?php foreach ($view->options_title as $i => $opt_title) : ?>
             <option class="attached enabled"
-                    value="<?php echo esc_html($opt_title); ?>" <?php selected($view->value, $opt_title); ?>>
+                    value="<?php echo esc_html($opt_title); ?>" <?php selected(is_array($view->value) ? in_array($opt_title, $view->value) : ($view->value === $opt_title)); ?>>
                 <?php echo esc_html($view->options_title[$i]); ?>
             </option>
         <?php endforeach; ?>

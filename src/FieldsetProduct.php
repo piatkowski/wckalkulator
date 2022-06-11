@@ -281,14 +281,13 @@ class FieldsetProduct
      * @return string|null
      * @since 1.0.0
      */
-    public function render()
+    public function render($html)
     {
-        
         return View::render('woocommerce/product', array(
             'product_id' => $this->product_id,
-            'variation_id' => $this->variation_id
+            'variation_id' => $this->variation_id,
+            'html' => $html
         ));
-        
     }
     
     /**

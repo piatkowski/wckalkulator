@@ -53,7 +53,7 @@ class Product
                 wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.css');
                 wp_enqueue_style('wckalkulator_price_css');
             }
-    
+            
             wp_register_style('wckalkulator_product_css', Plugin::url() . '/assets/css/product.css');
             wp_enqueue_style('wckalkulator_product_css');
             
@@ -101,6 +101,7 @@ class Product
     /**
      * Show fieldset on product page
      *
+     * @return void
      * @since 1.0.0
      */
     public static function render_fields_on_product_page()
@@ -109,9 +110,36 @@ class Product
             return false;
         }*/
         $fieldset = FieldsetProduct::getInstance();
+        
         if ($fieldset->has_fieldset('current')) {
+            
             $fieldset->init();
-            echo wp_kses($fieldset->render(), Sanitizer::allowed_html());
+            /*
+             * Get field's values from cart item (if in edit mode)
+             */
+            $html = '';
+            $cart_fields = null;
+            if (isset($_GET['wck_edit'])) {
+                $cart_item = WC()->cart->get_cart_item($_GET['wck_edit']);
+                if(!empty($cart_item)) {
+                    $cart_fields = isset($cart_item['wckalkulator_fields']) ? $cart_item['wckalkulator_fields'] : null;
+                    $html .= '<input type="hidden" name="_wck_edit" value="' . esc_html($cart_item['key']) . '" />' . "\n";
+                }
+            }
+            
+            
+            /*
+             * Get field's Html code
+             */
+            foreach ($fieldset->fields() as $field) {
+                //Try to get value of the field from cart item
+                $value = isset($cart_fields[$field->data('name')]) ? $cart_fields[$field->data('name')] : '';
+                $html .= wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n";
+            }
+            /*
+             * Output rendered Html
+             */
+            echo $fieldset->render($html);
         }
     }
     
@@ -248,6 +276,15 @@ class Product
                 $cart_item_data['wckalkulator_fieldset_version_hash'] = $fieldset->version_hash();
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
             }
+            /*
+             * Remove old cart item
+             */
+            if (isset($_POST['_wck_edit'])) {
+                $old_key = sanitize_text_field($_POST['_wck_edit']);
+                if (!empty(WC()->cart->get_cart_item($old_key))) {
+                    WC()->cart->remove_cart_item($old_key);
+                }
+            }
         }
         return $cart_item_data;
     }
@@ -352,7 +389,7 @@ class Product
                 foreach ($fieldset->fields() as $name => $field) {
                     
                     if (isset($order_fields[$name])) {
-                        $field_value = $field->order_item_value( $order_fields[$name] );
+                        $field_value = $field->order_item_value($order_fields[$name]);
                         $item->add_meta_data($field->data('title'), $field_value, true);
                     } else {
                         if ($field->is_required()) {
