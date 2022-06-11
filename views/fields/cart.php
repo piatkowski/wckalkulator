@@ -3,10 +3,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<?php echo esc_html($view->title); ?>:
+<strong><?php echo esc_html($view->title); ?></strong>:<br />
 
 <?php if (isset($view->value)): ?>
-    <strong><?php echo esc_html($view->value); ?></strong><br/>
+    <?php echo esc_html($view->value); ?><br/>
 <?php endif; ?>
 
 <?php if (isset($view->image)): ?>

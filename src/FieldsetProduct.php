@@ -330,8 +330,8 @@ class FieldsetProduct
         }
         
         $this->add_static_prices($input);
-    
-        foreach(GlobalParameter::get_all() as $name => $value) {
+        
+        foreach (GlobalParameter::get_all() as $name => $value) {
             $this->user_input['global:' . $name] = $value;
         }
         
@@ -472,7 +472,7 @@ class FieldsetProduct
                 }
                 $this->user_input[$name] = $static_price;
             }
-            if ($field->group() !== 'static') {
+            if ($field->group() !== 'static' && isset($input[$name])) {
                 $this->register_extra_input_parameters($field, $input[$name]);
             }
         }

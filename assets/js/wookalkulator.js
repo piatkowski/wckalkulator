@@ -43,15 +43,21 @@
             if (required && checked_count === 0) {
                 $(this).prop("checked", true);
             }
+            checked_count = $("input[type=checkbox][data-group='" + group + "']:checked").length;
+            if (checked_count > 0) {
+                $("input[type=checkbox][data-group=" + group + "]").get(0).setCustomValidity("");
+            }
         });
 
         $("form.cart").submit(function (e) {
             var lastGroup = "";
+            var _form = $(this).get(0);
             $("input[type=checkbox][data-type='checkboxgroup']").each(function () {
                 var group = $(this).data("group");
                 if (group !== lastGroup) {
                     if ($(this).data("required") === 1 && $("input[type=checkbox][data-group="+group+"]:checked").length === 0) {
                         $("input[type=checkbox][data-group="+group+"]").get(0).setCustomValidity(ajax_object._wck_i18n_required);
+                        _form.reportValidity();
                         e.preventDefault();
                         return false;
                     }

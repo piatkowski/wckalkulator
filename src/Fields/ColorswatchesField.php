@@ -50,7 +50,7 @@ class ColorswatchesField extends SelectField
     public function order_item_value($value)
     {
         $color = $this->get_option_title($value);
-        return '<span style="display:inline-block;width:20px;height:20px;margin-right:5px">' . $color . '</span>';
+        return '<span style="display:block;width:20px;height:20px;margin-right:5px">' . $color . '</span>';
     }
 
 }

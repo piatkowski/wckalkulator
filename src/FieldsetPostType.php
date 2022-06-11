@@ -393,11 +393,12 @@ class FieldsetPostType
         );
         foreach ($constants as $const => $key) {
             $meta = get_post_meta($post->ID, $key, true);
+            
             if (is_array($meta)) {
                 wp_localize_script(
                     'wck-fieldset-script',
                     $const,
-                    $meta
+                    self::decode_array($meta)
                 );
             }
         }
@@ -552,6 +553,20 @@ class FieldsetPostType
     {
         $classes .= ' wc-kalkulator-wrapper ';
         return $classes;
+    }
+    
+    /**
+     * Decode Html entities in multidimesional array
+     *
+     * @param $data
+     * @return array|string
+     */
+    private static function decode_array($data)
+    {
+        if (is_array($data)) {
+            return array_map(array(__CLASS__, 'decode_array'), $data);
+        }
+        return html_entity_decode($data);
     }
     
 }

@@ -2,9 +2,9 @@
 
 namespace WCKalkulator;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
-use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 /**
  * Class ExpressionParser
@@ -85,7 +85,7 @@ class ExpressionParser
         if (!empty($this->vars)) {
             $this->var_names = array_keys($this->vars);
         }
- 
+        
         $this->expr = str_replace(':', '__p__', $expr);
         $this->base_expr = $this->expr;
         
@@ -94,7 +94,7 @@ class ExpressionParser
         
         if (is_array($this->expr) && $this->is_mode_valid()) {
             $has_required_vars = $this->check_required_variables();
-     
+            
             if ($has_required_vars) {
                 $this->is_valid = true;
             } else {
@@ -177,7 +177,12 @@ class ExpressionParser
      */
     private function str_clean($str)
     {
-        return str_replace(array('{', '}', ',', 'constant(', ';', ':'), array('', '', '.', '(', ',', '__p__'), $str);
+        return
+            str_replace(
+                array('{', '}', ',', 'constant(', ';', ':'),
+                array('', '', '.', '(', ',', '__p__'),
+                html_entity_decode($str)
+            );
     }
     
     /**
@@ -237,7 +242,7 @@ class ExpressionParser
                 $expr_string .= $expr["if"] . $expr["then"];
             }
         }
-   
+        
         preg_match_all('/{([^}]+)}/m', $expr_string, $matched_vars);
         
         if (count($matched_vars) === 2) {
@@ -255,6 +260,19 @@ class ExpressionParser
             }
         }
         return false;
+    }
+    
+    /**
+     * Extend ExpressionLanguage Component to use math functions
+     *
+     * @since 1.2.0
+     */
+    private function register_functions()
+    {
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
+        foreach ($functions as $function) {
+            $this->expression->addFunction(ExpressionFunction::fromPhp($function));
+        }
     }
     
     /**
@@ -338,19 +356,6 @@ class ExpressionParser
             return $this->calc_error($e->getMessage());
         } catch (\DivisionByZeroError $e) {
             return $this->calc_error(__("Division by zero.", "wc-kalkulator"));
-        }
-    }
-    
-    /**
-     * Extend ExpressionLanguage Component to use math functions
-     *
-     * @since 1.2.0
-     */
-    private function register_functions()
-    {
-        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
-        foreach($functions as $function) {
-            $this->expression->addFunction(ExpressionFunction::fromPhp($function));
         }
     }
     

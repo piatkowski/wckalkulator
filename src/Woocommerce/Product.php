@@ -303,7 +303,13 @@ class Product
                     $html .= $field->render_for_cart($value);
                 }
             }
-            $item_name .= '<p class="wck-cart">' . $html . '</p>';
+            
+            $item_name .= View::render('woocommerce/cart', array(
+                'html' => $html,
+                'item_name' => $item_name,
+                'cart_item' => $cart_item,
+                'cart_item_key' => $cart_item_key
+            ));
             /**
              * Removed in 1.1.0
              * $item_name .= apply_filters('wck_field_html_wrapper_order_meta', $html_wrapped, $html);
@@ -340,19 +346,13 @@ class Product
                 
                 $fieldset->init($product_id, $variation_id);
                 
+                // Add hidden field with all parameters. This is for cart editing.
+                $item->add_meta_data('_wck_fields', $order_fields);
+                
                 foreach ($fieldset->fields() as $name => $field) {
                     
                     if (isset($order_fields[$name])) {
                         $field_value = $field->order_item_value( $order_fields[$name] );
-                        
-                        /*if ($field->is_type("select")) {
-                            $field_value = $field->get_option_title($field_value);
-                        }
-                        
-                        if( is_array($field_value)) {
-                            $field_value = join(", ", $field_value);
-                        }*/
-                        
                         $item->add_meta_data($field->data('title'), $field_value, true);
                     } else {
                         if ($field->is_required()) {
