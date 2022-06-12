@@ -113,7 +113,7 @@ abstract class AbstractField
      */
     public function is_required()
     {
-        return $this->data["required"];
+        return $this->group() === 'static' ? false : $this->data["required"];
     }
     
     /**

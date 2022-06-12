@@ -406,7 +406,7 @@ class FieldsetProduct
             if ((!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') && $field->is_required()) {
                 $this->validation_notices[] = sprintf(
                     __('Field %s is required.', 'wc-kalkulator'),
-                    $field->data("title")
+                    $field->data("title").$field->data("name")
                 );
                 $is_valid = false;
             }

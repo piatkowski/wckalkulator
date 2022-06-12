@@ -297,7 +297,6 @@
                     }
                 }
 
-                var input_frequired = false;
                 var $fs_options;
 
                 switch (field.type) {
@@ -318,23 +317,15 @@
                         }
                         $fs_options = $row.find(".fs-option");
                         $fs_options.each(function () {
-                            var fs_name = $(this).find("input.fs-name");
-                            /*if (fs_name.val() === "" || typeof fs_name == "undefined") {
-                                fs_name.addClass("form-required");
-                                error = true;
-                            }*/
                             var fs_title = $(this).find("input.fs-title");
-                            /*if (fs_title.val() === "" || typeof fs_title === "undefined") {
-                                fs_title.addClass("form-required");
-                                error = true;
-                            }*/
+                            var fs_name = $(this).find("input.fs-name");
 
                             var f_default_value = $(this).find('input.f-default-value').is(":checked");
                             //alert("State: " + f_default_value);
                             if (typeof f_default_value !== "undefined" && f_default_value === true) {
-                                field.default_value = fs_name.val();
+                                field.default_value = fs_name.val() + ":" + fs_title.val();
                             }
-                            field.options_name.push(fs_name.val());
+                            field.options_name.push(fs_name.val() + ":" + fs_title.val());
                             field.options_title.push(fs_title.val());
 
                             if (field.type === "imageselect" || field.type === "imageswatches") {
@@ -555,7 +546,11 @@
                         first = true;
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
-                            //console.log(option_name);
+                            //Clean option_name after ":"
+                            if( option_name.indexOf(':') >= 0) {
+                                option_name = option_name.slice(0, option_name.indexOf(':'));
+                            }
+
                             if (first) {
                                 var $first = $field.find(".fs-option");
                                 $first.find("input.fs-name").val(option_name);

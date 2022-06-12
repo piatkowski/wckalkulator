@@ -98,7 +98,7 @@ class ExpressionParser
             if ($has_required_vars) {
                 $this->is_valid = true;
             } else {
-                $this->error .= __("ExpressionParser: Missing required vars.", "wc-kalkulator") . "\n";
+                $this->error .= __("-", "wc-kalkulator") . "\n";
             }
         }
         

@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
 }
 use WCKalkulator\Helper;
 ?>
+<label>* <?php _e('Thumbnail width', 'wc-kalkulator'); ?></label>
+<input type="number" class="param fimg-width" step="1" min="0" value="0">
 <label>
     <input type="checkbox" class="param f-required" step="any" value="1">
     <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>

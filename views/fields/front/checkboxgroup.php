@@ -12,6 +12,9 @@ if (!defined('ABSPATH')) {
             <?php if (absint($view->select_limit) > 0): ?>
                 <small class="multicheckbox-limit-info"><?php echo esc_html(sprintf(__('(max. %s)', 'wc-kalkulator'), $view->select_limit)); ?></small>
             <?php endif; ?>
+            <?php if (isset($view->is_required) && $view->is_required) : ?>
+                <span class="required-asterisk">*</span>
+            <?php endif; ?>
         </label>
     </td>
     <td class="value">
@@ -27,7 +30,7 @@ if (!defined('ABSPATH')) {
                        value="<?php echo esc_html($opt_name); ?>"
                     <?php checked(is_array($view->value) ? in_array($opt_name, $view->value) : ($view->value === $opt_name)); ?>>
                 <?php echo esc_html($view->options_title[$i]); ?>
-            </label><br />
+            </label>
         <?php endforeach; ?>
     </td>
 </tr>
