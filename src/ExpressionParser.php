@@ -78,9 +78,9 @@ class ExpressionParser
     function __construct($expr, $vars)
     {
         foreach ($vars as $key => $val) {
-            if (is_numeric($val)) {
-                $this->vars[str_replace(':', '__p__', $key)] = $val;
-            }
+            //if (is_numeric($val)) {
+            $this->vars[str_replace(':', '__p__', $key)] = floatval($val);
+            //}
         }
         if (!empty($this->vars)) {
             $this->var_names = array_keys($this->vars);

@@ -202,7 +202,6 @@ class Product
             $user_input = Sanitizer::sanitize($_POST['wck'], 'array');
         }
         //@todo handle $_FILES
-        
         return $user_input;
     }
     
