@@ -5,6 +5,18 @@ icon: git-branch
 ---
 # CHANGELOG
 
+2022-06-13
+v.1.2.0
+
+- New fields: image select, image swatches, color swatches, checkbox group (multicheckbox), HTML, Heading, Paragraph, Hidden, Link, Attachment
+- Math functions to use in the expression
+- Additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
+- Global parameters can be defined and used in formula
+- Assign fieldset to product's tags
+- Customer can edit cart item
+- text field has new option: pattern (regexp)
+- bug fixes
+
 2022-05-08 
 v.1.1.2
 - Added new fields: email, radio
@@ -17,6 +29,7 @@ v.1.1.1
 
 2022-02-18
 v.1.1.0
+
 - fieldset post type
 - assign the fieldset to products/categories on the fieldset's edit page
 - added a price option to all fields
@@ -28,4 +41,5 @@ v.1.1.0
 
 2022-01-20  
 v.1.0.0
+
 - Initial release

@@ -20,9 +20,8 @@ class RadioField extends SelectField
      */
     public function admin_fields($value = '')
     {
-        $html = parent::admin_fields($value);
-        $this->admin_title = __("Radio Field", "wc-kalkulator");
-        return $html;
+        $this->admin_title = __("Radio", "wc-kalkulator");
+        return View::render('fields/admin/select');
     }
     
     /**

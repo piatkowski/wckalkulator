@@ -27,6 +27,7 @@ class FieldsetPostType
         '_wck_assign_type' => array('1', '2', '3'),
         '_wck_assign_products' => 'absint_array',
         '_wck_assign_categories' => 'absint_array',
+        '_wck_assign_tags' => 'absint_array',
         '_wck_assign_priority' => 'absint',
         '_wck_filter_price_enabled' => 'bool',
         '_wck_filter_price_prefix' => 'text',
@@ -61,6 +62,7 @@ class FieldsetPostType
         add_filter('bulk_actions-edit-' . self::POST_TYPE, array(__CLASS__, 'bulk_actions'));
         add_filter('post_row_actions', array(__CLASS__, 'duplicate_post_link'), 10, 2);
         add_action('admin_action_wck_duplicate_post', array(__CLASS__, 'duplicate_post'));
+        add_filter('admin_body_class', array(__CLASS__, 'add_css_class_to_body'));
     }
     
     /**
@@ -140,9 +142,20 @@ class FieldsetPostType
                 $type = (int)get_post_meta($post_id, '_wck_assign_type', true);
                 $products = get_post_meta($post_id, '_wck_assign_products', true);
                 $categories = get_post_meta($post_id, '_wck_assign_categories', true);
+                $tags = get_post_meta($post_id, '_wck_assign_tags', true);
                 echo FieldsetAssignment::get($type) . "<br />";
-                echo join(", ", FieldsetAssignment::products_readable($products)) . " ";
-                echo join(", ", FieldsetAssignment::categories_readable($categories));
+                if (is_array($products) && count($products) > 0) {
+                    echo __('Products: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::products_readable($products)) . " ";
+                }
+                if (is_array($categories) && count($categories) > 0) {
+                    echo __('Categories: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::categories_readable($categories)) . " ";
+                }
+                if (is_array($tags) && count($tags) > 0) {
+                    echo __('Tags: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::tags_readable($tags));
+                }
                 break;
             case 'wck_assign_priority':
                 $value = get_post_meta($post_id, '_wck_assign_priority', true);
@@ -236,7 +249,8 @@ class FieldsetPostType
             
             $can_empty = array(
                 '_wck_assign_products',
-                '_wck_assign_categories'
+                '_wck_assign_categories',
+                '_wck_assign_tags'
             );
             
             /**
@@ -329,9 +343,27 @@ class FieldsetPostType
         wp_enqueue_script(
             'wck-fieldset-script',
             Plugin::url() . '/assets/js/admin.js',
-            array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete')
+            array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete'),
+            Plugin::VERSION
         );
         
+        // @since 1.2.0 - adds wp.media image selector
+        wp_enqueue_media();
+        
+        wp_enqueue_script(
+            'iris',
+            admin_url('js/iris.min.js'),
+            array('jquery-ui-draggable', 'jquery-ui-slider', 'jquery-touch-punch'),
+            false,
+            1
+        );
+        wp_enqueue_script(
+            'wp-color-picker',
+            admin_url('js/color-picker.min.js'),
+            array('iris', 'wp-i18n'),
+            false,
+            1
+        );
         /**
          * This method sets values of $fields_html and $fields_dropdown properties
          */
@@ -346,17 +378,27 @@ class FieldsetPostType
             Cache::get_once('FieldsetPostType_fields_html')
         );
         
+        /**
+         * Add global parameters for auto-suggestion feature
+         */
+        wp_localize_script(
+            'wck-fieldset-script',
+            'wck_global_parameters',
+            GlobalParameter::get_all()
+        );
+        
         $constants = array(
             'wck_load_fieldset' => '_wck_fieldset',
             'wck_load_expression' => '_wck_expression'
         );
         foreach ($constants as $const => $key) {
             $meta = get_post_meta($post->ID, $key, true);
+            
             if (is_array($meta)) {
                 wp_localize_script(
                     'wck-fieldset-script',
                     $const,
-                    $meta
+                    self::decode_array($meta)
                 );
             }
         }
@@ -398,6 +440,7 @@ class FieldsetPostType
     {
         wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.css');
         wp_enqueue_style('wckalkulator_admin_css');
+        wp_enqueue_style('wp-color-picker');
     }
     
     /**
@@ -498,6 +541,32 @@ class FieldsetPostType
                 wp_delete_post($item->ID, true);
             }
         }
+    }
+    
+    /**
+     * Need to wrap CSS styles in .wc-kalkulator-wrapper class
+     * @param $classes
+     * @return string
+     * @since 1.2.0
+     */
+    public static function add_css_class_to_body($classes)
+    {
+        $classes .= ' wc-kalkulator-wrapper ';
+        return $classes;
+    }
+    
+    /**
+     * Decode Html entities in multidimesional array
+     *
+     * @param $data
+     * @return array|string
+     */
+    private static function decode_array($data)
+    {
+        if (is_array($data)) {
+            return array_map(array(__CLASS__, 'decode_array'), $data);
+        }
+        return html_entity_decode($data);
     }
     
 }

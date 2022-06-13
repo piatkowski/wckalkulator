@@ -25,7 +25,7 @@ class CheckboxField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Checkbox Field", "wc-kalkulator");
+        $this->admin_title = __("Checkbox", "wc-kalkulator");
         return View::render('fields/admin/checkbox');
     }
     
@@ -66,6 +66,18 @@ class CheckboxField extends AbstractField
     public function validate($value)
     {
         return empty($value) || (int)$value === 1;
+    }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return (int)$value === 1 ? __('yes', 'wc-kalkulator') : __('no', 'wc-kalkulator');
     }
     
 }

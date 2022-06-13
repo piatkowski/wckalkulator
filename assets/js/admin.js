@@ -16,8 +16,14 @@
             e.preventDefault();
             $WK.saveFields();
         });
+        $('<input type="hidden" class="wck-global-color-picker" />').insertBefore("#wpwrap");
+        $WK.colorpicker = $("input.wck-global-color-picker");
+        $WK.colorpicker.iris();
 
         $WK.expressionLastFocusedInput = null;
+        $WK.wpMediaFrame = null;
+        $WK.wpMediaTarget = null;
+        $WK.iconPreloader = "data:image/gif;base64,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";
 
         $("body").on("focus", "#wck_expression input", function () {
             $WK.expressionLastFocusedInput = $(this);
@@ -93,6 +99,89 @@
             } else {
                 alert("You cannot remove the last condition!");
             }
+        }).on("click", ".action-add-image", function (e) {
+            e.preventDefault();
+            $WK.wpMediaTarget = $(this);
+
+            if ($WK.wpMediaFrame) {
+                $WK.wpMediaFrame.open();
+                return;
+            }
+            $WK.wpMediaFrame = wp.media({
+                multiple: false,
+                button: {
+                    text: "Select this image"
+                }
+            });
+
+            $WK.wpMediaFrame.on('select', function () {
+                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
+                if ($WK.wpMediaTarget.prop("tagName") === "A") {
+                    $WK.wpMediaTarget.next('img.wp-media-image-preview').attr('src', attachment.url);
+                    $WK.wpMediaTarget.next().next('input.wp-media-image-id').attr('value', attachment.id);
+                    $WK.wpMediaTarget.hide();
+                } else {
+                    $WK.wpMediaTarget.attr('src', attachment.url);
+                    $WK.wpMediaTarget.next('input.wp-media-image-id').attr('value', attachment.id);
+                }
+            });
+
+            $WK.wpMediaFrame.open();
+        }).on("click", ".action-add-attachment", function (e) {
+            e.preventDefault();
+            $WK.wpMediaTarget = $(this);
+
+            if ($WK.wpMediaFrame) {
+                $WK.wpMediaFrame.open();
+                return;
+            }
+            $WK.wpMediaFrame = wp.media({
+                multiple: false,
+                button: {
+                    text: "Select this file"
+                }
+            });
+
+            $WK.wpMediaFrame.on('select', function () {
+                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
+                $WK.wpMediaTarget.next('input.wp-media-attachment-id').val(attachment.id);
+                $WK.wpMediaTarget.next().next('a.wp-media-attachment-preview').attr('href', attachment.url).text(attachment.url);
+
+            });
+
+            $WK.wpMediaFrame.open();
+        }).on("focus", '[data-type="colorswatches"] input.fs-title', function (e) {
+            e.preventDefault();
+            var _target = $(this);
+            $WK.colorpicker.iris('show');
+            $(".iris-picker").css({
+                top: _target.offset().top + 40,
+                left: _target.offset().left
+            });
+            $WK.colorpicker.iris('option', 'change', function (event, ui) {
+                _target.val(ui.color.toString());
+                var color = ui.color.toRgb();
+                var t = (color.r + color.g + color.b) / 2;
+                var textColor = (t < 200) ? "#FFFFFF" : "#000000";
+                _target.css({
+                    "background-color": ui.color.toString(),
+                    "color": textColor
+                });
+            });
+            $WK.colorpicker.iris('color', $(this).val());
+
+        });
+
+        $(".iris-square-value").on("click", function (e) {
+            e.preventDefault();
+        });
+
+        $(document).click(function (e) {
+            if (!$(e.target).closest('.iris-picker, [data-type="colorswatches"] input.fs-title').length) {
+                if ($('.iris-picker').is(":visible")) {
+                    $WK.colorpicker.iris('hide');
+                }
+            }
         });
 
         $("form#post").submit(function (e) {
@@ -126,6 +215,7 @@
             $WK.changeAssignType();
             $("form#post").attr("novalidate", "");
             $WK.buildTooltips("");
+            $WK.appendGlobalParameters();
         };
 
         $WK.buildTooltips = function (selector) {
@@ -137,10 +227,16 @@
 
         $WK.changeAssignType = function () {
             var disabled = $("#assign_type").val() === "1";
-            $("#assign_products, #assign_categories").prop("disabled", disabled);
+            $("#assign_products, #assign_categories, #assign_tags").prop("disabled", disabled);
         };
         $("#assign_type").on("change", $WK.changeAssignType);
 
+        $WK.preloadMedia = function (id, callback) {
+            wp.media.attachment(id).fetch().then(function () {
+                callback(wp.media.attachment(id));
+            });
+            return;
+        };
 
         $WK.addField = function (type) {
             $WK.counter += 1;
@@ -189,7 +285,8 @@
                     "title": input_ftitle.val(),
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
-                    "css_class": input_css_class.val()
+                    "css_class": input_css_class.val(),
+                    "required": (($row.find('input.f-required').length > 0) ? $row.find('input.f-required').is(':checked') : true)
                 };
 
                 var input_fprice = $row.find('input.f-price');
@@ -200,34 +297,48 @@
                     }
                 }
 
-                var input_frequired = false;
+                var input_fimgwidth = $row.find('input.fimg-width');
+                if (input_fimgwidth.length > 0) {
+                    field.image_size = input_fimgwidth.val()
+                }
+
                 var $fs_options;
 
                 switch (field.type) {
                     case 'select':
                     case 'radio':
+                    case 'imageselect':
+                    case 'imageswatches':
+                    case 'colorswatches':
+                    case 'radiogroup':
+                    case 'checkboxgroup':
                         field.options_name = [];
                         field.options_title = [];
+                        if (field.type === "imageselect" || field.type === "imageswatches") {
+                            field.options_image = [];
+                        }
+                        if (field.type === "checkboxgroup") {
+                            field.select_limit = $row.find("input.fcbg-limit").val();
+                        }
                         $fs_options = $row.find(".fs-option");
                         $fs_options.each(function () {
-                            var fs_name = $(this).find("input.fs-name");
-                            /*if (fs_name.val() === "" || typeof fs_name == "undefined") {
-                                fs_name.addClass("form-required");
-                                error = true;
-                            }*/
                             var fs_title = $(this).find("input.fs-title");
-                            /*if (fs_title.val() === "" || typeof fs_title === "undefined") {
-                                fs_title.addClass("form-required");
-                                error = true;
-                            }*/
+                            var fs_name = $(this).find("input.fs-name");
+
                             var f_default_value = $(this).find('input.f-default-value').is(":checked");
                             //alert("State: " + f_default_value);
                             if (typeof f_default_value !== "undefined" && f_default_value === true) {
-                                field.default_value = fs_name.val();
+                                field.default_value = fs_name.val() + ":" + fs_title.val();
                             }
-                            field.options_name.push(fs_name.val());
+                            field.options_name.push(fs_name.val() + ":" + fs_title.val());
                             field.options_title.push(fs_title.val());
+
+                            if (field.type === "imageselect" || field.type === "imageswatches") {
+                                var fs_image = $(this).find("input.fs-image");
+                                field.options_image.push(fs_image.val());
+                            }
                         });
+
                         break;
                     case 'dropdown':
                         field.options_title = [];
@@ -245,10 +356,6 @@
                             }
                             field.options_title.push(fs_title.val());
                         });
-
-                        input_frequired = $row.find('input.f-required');
-                        field.required = input_frequired.is(':checked');
-
                         break;
 
                     case 'number':
@@ -273,25 +380,40 @@
                     case 'text':
                     case 'textarea':
                     case 'email':
-                        input_frequired = $row.find('input.f-required');
                         var input_ftminlen = $row.find('input.ft-min-length');
                         var input_ftmaxlen = $row.find('input.ft-max-length');
-                        //var input_ftpattern = $row.find('input.ft-pattern');
+                        var input_ftpattern = $row.find('input.ft-pattern');
                         field.min = input_ftminlen.val();
                         field.max = input_ftmaxlen.val();
-                        //field.pattern = input_ftpattern.val();
-                        field.required = input_frequired.is(':checked');
+                        if (input_ftpattern.length > 0) {
+                            field.pattern = input_ftpattern.val();
+                        }
                         break;
-
                     case 'colorpicker':
                     case 'datepicker':
                     case 'rangedatepicker':
-                        input_frequired = $row.find('input.f-required');
-                        field.required = input_frequired.is(':checked');
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
-
+                    case 'fileupload':
+                        field.max_file_count = $row.find('input.fu-max-file-count').val();
+                        field.max_file_size = $row.find('input.fu-max-file-size').val();
+                        field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
+                        break;
+                    case 'html':
+                    case 'paragraph':
+                    case 'hidden':
+                    case 'attachment':
+                        field.content = $row.find('.fst-content').val();
+                        break;
+                    case 'link':
+                        field.content = $row.find('.fst-content').val();
+                        field.target = $row.find('.fst-target').val();
+                        break;
+                    case 'heading':
+                        field.content = $row.find('.fst-content').val();
+                        field.level = $row.find('.fst-level').val();
+                        break;
                     /*default:
                         error = true;
                         alert("Error! Unrecognized field type!");
@@ -327,11 +449,41 @@
 
         };
 
+        $WK.appendGlobalParameters = function () {
+            if (typeof wck_global_parameters !== undefined) {
+                $.each(wck_global_parameters, function (name, value) {
+                    var name = "global:" + name;
+                    suggest.push(name);
+                    $("#formula_fields").append('<span class="formula-field">{' + name + '}</span> ');
+                });
+            }
+        }
+
         $WK.appendFormulaVars = function (field) {
             $WK.fields[field.name] = field;
             if (field.use_expression) {
-                suggest.push(field.name);
-                $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                if (field.type !== 'checkboxgroup') {
+                    suggest.push(field.name);
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                } else {
+                    suggest.push(field.name + ":sum");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
+                    suggest.push(field.name + ":min");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
+                    suggest.push(field.name + ":max");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
+                }
+                if (field.type === "rangedatepicker") {
+                    suggest.push(field.name + ":date_from");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
+                    suggest.push(field.name + ":date_to");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_to}</span> ');
+                    suggest.push(field.name + ":days");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':days}</span> ');
+                } else if (field.type === "datepicker") {
+                    suggest.push(field.name + ":date");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                }
             }
         };
 
@@ -350,15 +502,25 @@
                     $("#" + field_id + " .f-title").val(this.title);
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
+                    if ($("#" + field_id + " .f-required").length > 0) {
+                        $("#" + field_id + " .f-required").prop("checked", this.required);
+                    }
 
                     var fprice = $("#" + field_id + " .f-price");
                     if (fprice.length > 0) {
                         fprice.val(this.price);
                     }
-                    var options_title, options_name, default_value, first, $checked;
+
+                    var fimgwidth = $("#" + field_id + " .fimg-width");
+                    if (fimgwidth.length > 0) {
+                        fimgwidth.val(this.image_size);
+                    }
+
+
+                    var options_title, options_name, options_image, default_value, first, $checked;
 
                     if (this.type === "dropdown") {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
+
                         options_title = this.options_title;
                         default_value = this.default_value;
                         first = true;
@@ -383,19 +545,39 @@
                             }
                         });
 
-                    } else if (this.type === "select" || this.type === "radio") {
+                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup', 'imageswatches', 'colorswatches'].indexOf(this.type) >= 0) {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
-                        console.log("Dropdown: ", default_value);
+                        if (this.type === "imageselect" || this.type === "imageswatches") {
+                            options_image = this.options_image;
+                            wp.media.attachment(options_image).fetch();
+                        }
+                        if (this.type === "checkboxgroup") {
+                            $("#" + field_id + " .fcbg-limit").val(this.select_limit);
+                        }
+                        //console.log("Dropdown: ", default_value);
                         first = true;
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
-                            //console.log(option_name);
+                            //Clean option_name after ":"
+                            if (option_name.indexOf(':') >= 0) {
+                                option_name = option_name.slice(0, option_name.indexOf(':'));
+                            }
+
                             if (first) {
                                 var $first = $field.find(".fs-option");
                                 $first.find("input.fs-name").val(option_name);
                                 $first.find("input.fs-title").val(options_title[i]);
+                                var fs_image = $first.find("input.fs-image");
+                                if (fs_image.length > 0) {
+                                    fs_image.val(options_image[i]);
+                                    $first.find("a.action-add-image").hide();
+                                    $first.find(".wp-media-image-preview").attr("src", $WK.iconPreloader);
+                                    $WK.preloadMedia(options_image[i], function (attachment) {
+                                        $first.find(".wp-media-image-preview").attr("src", attachment.get('url'));
+                                    });
+                                }
                                 if (default_value === option_name) {
                                     $checked = $first.find("input.f-default-value");//.prop("checked", true);
                                 }
@@ -404,6 +586,15 @@
                                 var $clone = $field.find(".fs-option").last().clone().insertBefore($("#" + field_id + " .fs-options .action-add"));
                                 $clone.find("input.fs-name").val(option_name);
                                 $clone.find("input.fs-title").val(options_title[i]);
+                                fs_image = $clone.find("input.fs-image");
+                                if (fs_image.length > 0) {
+                                    fs_image.val(options_image[i]);
+                                    $clone.find("a.action-add-image").hide();
+                                    $clone.find(".wp-media-image-preview").attr("src", $WK.iconPreloader);
+                                    $WK.preloadMedia(options_image[i], function (attachment) {
+                                        $clone.find(".wp-media-image-preview").attr("src", attachment.get('url'));
+                                    });
+                                }
                                 if (default_value === option_name) {
                                     $checked = $clone.find("input.f-default-value");//.prop("checked", true);
                                 }
@@ -422,11 +613,28 @@
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
+                        if (this.type === "text'") {
+                            $("#" + field_id + " .ft-pattern").val(this.pattern);
+                        }
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
+                    } else if (this.type === "fileupload") {
+                        $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
+                        $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
+                        $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
+                    } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
+                        $("#" + field_id + " .fst-content").val(this.content);
+                        if (this.type === 'heading') {
+                            $("#" + field_id + " .fst-level").val(this.level);
+                        } else if (this.type === 'link') {
+                            $("#" + field_id + " .fst-target").val(this.target);
+                        } else if (this.type === 'attachment') {
+                            $WK.preloadMedia(this.content, function (attachment) {
+                                console.log(field_id, attachment.get('url'));
+                                $("#" + field_id + " .wp-media-attachment-preview").attr("href", attachment.get('url')).text(attachment.get('url'));
+                            });
+                        }
                     }
                 });
                 $WK.saveFields();

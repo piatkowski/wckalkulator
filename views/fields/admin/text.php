@@ -9,6 +9,12 @@ use WCKalkulator\Helper;
     <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
 </label>
 
+<label><?php _e('Pattern (RegExp)', 'wc-kalkulator'); ?>
+    <?php echo Helper::html_help_tip( __("Regular expression that the field's value is checked against.", 'wc-kalkulator')); ?>
+</label>
+<input type="text" class="param ft-pattern" value="" placeholder="[A-Za-z0-9]+">
+
+
 <label>* <?php _e('Min. length', 'wc-kalkulator'); ?>
     <?php echo Helper::html_help_tip( __('Minimum character length. Consider that minimum length > 0 makes this field always required.', 'wc-kalkulator')); ?></label>
 <input type="number" class="param ft-min-length" step="1" min="0" value="0">

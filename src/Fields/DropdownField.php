@@ -25,7 +25,7 @@ class DropdownField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Dropdown Field", "wc-kalkulator");
+        $this->admin_title = __("Dropdown", "wc-kalkulator");
         return View::render('fields/admin/dropdown');
     }
     
@@ -71,6 +71,18 @@ class DropdownField extends AbstractField
             return true;
         }
         return in_array($value, $this->data["options_title"]);
+    }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $value;
     }
     
 }

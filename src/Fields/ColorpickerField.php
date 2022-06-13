@@ -38,7 +38,7 @@ class ColorpickerField extends TextField
             'wck-color-picker',
             Plugin::url() . '/assets/js/colorpicker.js',
             array('wp-color-picker'),
-            false,
+            Plugin::VERSION,
             1
         );
     }

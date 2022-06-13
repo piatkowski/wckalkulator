@@ -6,29 +6,29 @@
     <meta name="turbo-cache-control" content="no-cache">
 
     <!-- Primary Meta Tags -->
-    <title>About the Plugin | WC Kalkulator Woocommerce Plugin</title>
-    <meta name="title" content="About the Plugin | WC Kalkulator Woocommerce Plugin">
+    <title>About the Plugin | Custom fields and price calculator</title>
+    <meta name="title" content="About the Plugin | Custom fields and price calculator">
     <meta name="description" content="The plugin extends the Woocommerce store with the ability to add your own fields to the product page." />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wckalkulator.com/usermanual/about/">
-    <meta property="og:title" content="About the Plugin | WC Kalkulator Woocommerce Plugin">
+    <meta property="og:title" content="About the Plugin | Custom fields and price calculator">
     <meta property="og:description" content="The plugin extends the Woocommerce store with the ability to add your own fields to the product page.">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://wckalkulator.com/usermanual/about/">
-    <meta property="twitter:title" content="About the Plugin | WC Kalkulator Woocommerce Plugin">
+    <meta property="twitter:title" content="About the Plugin | Custom fields and price calculator">
     <meta property="twitter:description" content="The plugin extends the Woocommerce store with the ability to add your own fields to the product page.">
     
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="/resources/css/retype.css?v=1.11.2.705361152565" rel="stylesheet" data-turbo-track="reload" />
+    <link href="/resources/css/retype.css?v=1.11.2.708431741646" rel="stylesheet" data-turbo-track="reload" />
 
-    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.705361152565" defer data-turbo-track="reload"></script>
+    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.708431741646" defer data-turbo-track="reload"></script>
     <script type="text/javascript" src="/resources/js/retype.js?v=1.11.2" defer data-turbo-track="reload"></script>
-    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.705361152565" defer></script>
+    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.708431741646" defer></script>
 </head>
     <body>
         <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -45,7 +45,7 @@
             <div class="flex items-center px-2 md:px-6">
                 <a id="docs-site-logo" href="/" class="flex items-center leading-snug text-xl">
                     <span class="dark:text-white font-semibold line-clamp-1 md:line-clamp-2">WC Kalkulator</span>
-                </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">v1.1.0</span>
+                </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">v1.2.0</span>
             </div>
 
             <span class="hidden h-8 border-r md:inline-block dark:border-dark-650"></span>
@@ -244,6 +244,7 @@ Some of fields can be used to get informations from Customer (for example: text,
 <li><strong>Fieldset</strong> - store manager can create the fieldset which consists of different <strong>Fields</strong>. Fieldset must have at least one <strong>Field</strong> and the expression (formula) to calculate the product price</li>
 <li><strong>Expression/Formula</strong> - mathematical and/or logical expression using to calculate the product price. The expression can be single-line (one-line) or conditional. <strong>Expression</strong> is protected and calculated only server-side.</li>
 <li><strong>Validation</strong> - each <strong>Field</strong> has specific requirements to be met. Incorrect values make it impossible to calculate the price and add the product to the cart.</li>
+<li><strong>Global Parameters</strong> - are numeric variables which can be used in formulas across all fieldsets.</li>
 </ul>
 <doc-anchor-target id="requirements">
     <h2>
@@ -258,8 +259,8 @@ Some of fields can be used to get informations from Customer (for example: text,
 </ul>
 <p><strong>Maximum tested version</strong></p>
 <ul>
-<li>Wordpress v.5.9.2</li>
-<li>Woocommerce v.6.3.1</li>
+<li>Wordpress v.6.0.0</li>
+<li>Woocommerce v.6.5.1</li>
 </ul>
 <p><strong>Recommended version</strong></p>
 <p>We strongly recommend to use <strong>most recent</strong> versions of Wordpress and Woocommerce.
@@ -289,7 +290,7 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 <li><strong>expression builder</strong></li>
 <li>define single-line expression to calculate the price</li>
 <li>define unlimited conditional expressions to calculate the price</li>
-<li>attach fieldset to: all products/catgories, selected products/categories</li>
+<li>attach fieldset to: all products/catgories/tags, selected products/categories/tags</li>
 <li><strong>supported variable products</strong></li>
 <li><strong>supported multisite</strong></li>
 <li>the plugin is translatable</li>
@@ -301,6 +302,11 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 <li>supported price filters</li>
 <li>customizable HTML code of every field</li>
 <li>HMTL template of every field can be overridden in a theme directory</li>
+<li>static fields such as HTML, Heading, Paragraph, Hidden, Link, Attachment</li>
+<li>math functions to use in the expression</li>
+<li>additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)</li>
+<li>global parameters can be defined and used in formula</li>
+<li>ability to edit product fields after from a cart</li>
 </ul>
 <doc-anchor-target id="conflict-with-other-plugins">
     <h2>

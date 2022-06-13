@@ -19,6 +19,7 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 - **Fieldset** - store manager can create the fieldset which consists of different **Fields**. Fieldset must have at least one **Field** and the expression (formula) to calculate the product price
 - **Expression/Formula** - mathematical and/or logical expression using to calculate the product price. The expression can be single-line (one-line) or conditional. **Expression** is protected and calculated only server-side.
 - **Validation** - each **Field** has specific requirements to be met. Incorrect values make it impossible to calculate the price and add the product to the cart.
+- **Global Parameters** - are numeric variables which can be used in formulas across all fieldsets.
 
 ## Requirements
 
@@ -27,8 +28,8 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 - Woocommerce v.3.5.0
 
 **Maximum tested version**  
-- Wordpress v.5.9.2
-- Woocommerce v.6.3.1
+- Wordpress v.6.0.0
+- Woocommerce v.6.5.1
 
 **Recommended version**  
 
@@ -51,7 +52,7 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 - **expression builder**
 - define single-line expression to calculate the price
 - define unlimited conditional expressions to calculate the price
-- attach fieldset to: all products/catgories, selected products/categories
+- attach fieldset to: all products/catgories/tags, selected products/categories/tags
 - **supported variable products**
 - **supported multisite**
 - the plugin is translatable
@@ -63,6 +64,11 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 - supported price filters
 - customizable HTML code of every field
 - HMTL template of every field can be overridden in a theme directory
+- static fields such as HTML, Heading, Paragraph, Hidden, Link, Attachment
+- math functions to use in the expression
+- additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
+- global parameters can be defined and used in formula
+- ability to edit product fields after from a cart
 
 ## Conflict with other plugins 
 

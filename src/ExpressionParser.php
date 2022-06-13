@@ -2,8 +2,9 @@
 
 namespace WCKalkulator;
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage as ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\SyntaxError as SyntaxError;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 /**
  * Class ExpressionParser
@@ -61,6 +62,13 @@ class ExpressionParser
     private $is_valid = false;
     
     /**
+     * Instance of ExpressionLanguage
+     *
+     * @var ExpressionLanguage|null
+     */
+    private $expression = null;
+    
+    /**
      * ExpressionParser constructor.
      *
      * @param string $expr
@@ -71,13 +79,14 @@ class ExpressionParser
     {
         foreach ($vars as $key => $val) {
             if (is_numeric($val)) {
-                $this->vars[$key] = $val;
+                $this->vars[str_replace(':', '__p__', $key)] = $val;
             }
         }
         if (!empty($this->vars)) {
             $this->var_names = array_keys($this->vars);
         }
-        $this->expr = $expr;
+        
+        $this->expr = str_replace(':', '__p__', $expr);
         $this->base_expr = $this->expr;
         
         $this->detect_mode();
@@ -85,10 +94,11 @@ class ExpressionParser
         
         if (is_array($this->expr) && $this->is_mode_valid()) {
             $has_required_vars = $this->check_required_variables();
+            
             if ($has_required_vars) {
                 $this->is_valid = true;
             } else {
-                $this->error .= __("ExpressionParser: Missing required vars.", "wc-kalkulator") . "\n";
+                $this->error .= __("-", "wc-kalkulator") . "\n";
             }
         }
         
@@ -99,6 +109,10 @@ class ExpressionParser
         if (!is_array($this->expr)) {
             $this->error .= __("ExpressionParser: Prepared expression has incorrect type.", "wc-kalkulator") . "\n";
         }
+        
+        //Create ExpressionLanguage instance
+        $this->expression = new ExpressionLanguage();
+        $this->register_functions();
         
     }
     
@@ -163,7 +177,12 @@ class ExpressionParser
      */
     private function str_clean($str)
     {
-        return str_replace(array('{', '}', ',', 'constant('), array('', '', '.', '('), $str);
+        return
+            str_replace(
+                array('{', '}', ',', 'constant(', ';', ':'),
+                array('', '', '.', '(', ',', '__p__'),
+                html_entity_decode($str)
+            );
     }
     
     /**
@@ -244,6 +263,19 @@ class ExpressionParser
     }
     
     /**
+     * Extend ExpressionLanguage Component to use math functions
+     *
+     * @since 1.2.0
+     */
+    private function register_functions()
+    {
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
+        foreach ($functions as $function) {
+            $this->expression->addFunction(ExpressionFunction::fromPhp($function));
+        }
+    }
+    
+    /**
      * Checks if the instance of parser is valid - has required fields and the correct mode
      *
      * @return bool
@@ -273,9 +305,8 @@ class ExpressionParser
         if ($this->mode === self::MODE_CONDITIONAL) {
             foreach ($this->expr as $expr) {
                 
-                $expression = new ExpressionLanguage();
                 try {
-                    $condition_value = $expression->evaluate($expr['if'], $this->vars);
+                    $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
                     if ($condition_value === true) {
                         return $this->calc_or_fail($expr['then']);
                     }
@@ -313,9 +344,8 @@ class ExpressionParser
      */
     private function calc_or_fail($expr)
     {
-        $expression = new ExpressionLanguage();
         try {
-            $value = $expression->evaluate($expr, $this->vars);
+            $value = $this->expression->evaluate($expr, $this->vars);
             if ($value < 0) {
                 return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $value);
             } elseif ($value === 0) {

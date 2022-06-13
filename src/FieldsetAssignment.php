@@ -84,19 +84,41 @@ class FieldsetAssignment
      */
     public static function match($product_id)
     {
-        if((int)$product_id === 0)
+        if ((int)$product_id === 0)
             return 0;
-        
+        /*
+         * Return cached fieldset
+         */
         $cached = Cache::get('FieldsetAssignment_match_' . $product_id);
         if ($cached)
             return $cached;
+        /*
+         * Get categories IDs
+         */
         $category_id = array();
-
-        $terms = get_the_terms($product_id, 'product_cat');
-        foreach ($terms as $term) {
-            $category_id[] = $term->term_id;
-        }
         
+        $terms = get_the_terms($product_id, 'product_cat');
+        
+        if (is_array($terms)) {
+            foreach ($terms as $term) {
+                $category_id[] = $term->term_id;
+            }
+        }
+        /*
+         * Get tags IDs
+         */
+        $tag_id = array();
+        
+        $terms = get_the_terms($product_id, 'product_tag');
+        
+        if (is_array($terms)) {
+            foreach ($terms as $term) {
+                $tag_id[] = $term->term_id;
+            }
+        }
+        /*
+         * Get all fieldsets
+         */
         $posts = get_posts(array(
             'post_type' => FieldsetPostType::POST_TYPE,
             'per_page' => -1,
@@ -112,6 +134,7 @@ class FieldsetAssignment
                 'type' => get_post_meta($post->ID, '_wck_assign_type', true),
                 'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
                 'categories' => (array)get_post_meta($post->ID, '_wck_assign_categories', true),
+                'tags' => (array)get_post_meta($post->ID, '_wck_assign_tags', true),
                 'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
             );
             
@@ -123,13 +146,17 @@ class FieldsetAssignment
                     break;
                 
                 case FieldsetAssignment::TYPE_ALL_EXCEPT:
-                    if (!in_array($product_id, $assign['products']) && count(array_intersect($category_id, $assign['categories'])) === 0) {
+                    if (!in_array($product_id, $assign['products'])
+                        && count(array_intersect($category_id, $assign['categories'])) === 0
+                        && count(array_intersect($tag_id, $assign['tags'])) === 0) {
                         $has_match = true;
                     }
                     break;
                 
                 case FieldsetAssignment::TYPE_ONLY_SELECTED:
-                    if (in_array($product_id, $assign['products']) || count(array_intersect($category_id, $assign['categories'])) > 0) {
+                    if (in_array($product_id, $assign['products'])
+                        || count(array_intersect($category_id, $assign['categories'])) > 0
+                        || count(array_intersect($tag_id, $assign['tags'])) > 0) {
                         $has_match = true;
                     }
                     break;
@@ -141,7 +168,7 @@ class FieldsetAssignment
             }
             
         }
-  
+        
         Cache::store('FieldsetAssignment_match_' . $product_id, $matching);
         return $matching;
     }
@@ -202,6 +229,36 @@ class FieldsetAssignment
                     }
                     
                     $term->formatted_name .= $term->name . ' (' . $term->count . ')';
+                    $result[$term->term_id] = $term->formatted_name;
+                }
+            }
+        }
+        return $result;
+    }
+    
+    
+    /**
+     * Tags ids as input. Method outputs array of readable tags titles, example: [16] => 'Custom Tag'
+     *
+     * @param $tags
+     * @return array
+     * @since 1.1.0
+     */
+    public static function tags_readable($tags)
+    {
+        $result = array();
+        if (is_array($tags)) {
+            $terms = get_terms(array(
+                'taxonomy' => array('product_tag'),
+                'orderby' => 'id',
+                'order' => 'ASC',
+                'hide_empty' => false,
+                'fields' => 'all',
+                'include' => $tags
+            ));
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $term->formatted_name = '#'.$term->name . ' (' . $term->count . ')';
                     $result[$term->term_id] = $term->formatted_name;
                 }
             }

@@ -1,0 +1,151 @@
+/* Product fields
+
+.single-product div.product table.variations, table.variations
+  td.label
+    margin-bottom: 10px
+    .wck-field-tip
+      width: 18px
+      height: 22px
+      font-size: 18px
+      vertical-align: middle
+    label
+      font-weight: 600
+      .required-asterisk
+        color: red
+  td.value
+    padding-bottom: 1em
+    label, select, input[type=text], input[type=email], input[type=number], textarea
+      display: block
+      width: 100%
+      max-width: 100% !important
+      cursor: pointer
+    label
+      [type=checkbox], [type=radio]
+        margin-right: 5px
+      &.inline
+        display: inline !important
+        width: auto !important
+    .wck-imageselect
+      width: auto
+      cursor: pointer
+      display: inline-block
+      margin: 0px 5px 5px 0
+      text-align: center
+      [type=radio]
+        position: absolute
+        opacity: 0
+        width: 0
+        height: 0
+        &:checked + img
+          outline: 2px solid #222
+      img
+        max-width: 60px
+        margin: 0 auto
+      span
+        font-size: 13px
+    .wck-range-date-picker
+      width: 49% !important
+      float: left
+      &.date_from
+        margin-right: 2%
+      input
+        float:left
+  tr.wck-colorswatches
+    td.value
+      label
+        display: inline-block
+        width: auto
+  .clearfix
+    clear: both
+    content: ""
+
+
+/* Style for image swatches and color swatches
+
+.wck-imageswatches [type=radio], .wck-colorswatches [type=radio]
+  position: absolute
+  opacity: 0
+  width: 0
+  height: 0
+
+.wck-imageswatches [type=radio] + img
+  cursor: pointer
+  display: inline
+  max-width: 60px
+  margin: 0px 5px 5px 0
+
+.wck-colorswatches [type=radio] + span.colorswatch
+  cursor: pointer
+  display: inline-block
+  width: 40px
+  height: 40px
+  margin: 0px 5px 5px 0
+
+.wck-imageswatches [type=radio]:checked + img, .wck-colorswatches [type=radio]:checked + span.colorswatch
+  outline: 2px solid #222
+
+.wck-imageswatches .caption
+  display: none
+
+/* jQuery Tiptip
+
+#tiptip_holder
+  display: none
+  z-index: 8675309
+  position: absolute
+  top: 0
+  left: 0
+
+  &.tip_top
+    padding-bottom: 5px
+
+    #tiptip_arrow_inner
+      margin-top: -7px
+      margin-left: -6px
+      border-top-color: #333
+
+  &.tip_bottom
+    padding-top: 5px
+
+    #tiptip_arrow_inner
+      margin-top: -5px
+      margin-left: -6px
+      border-bottom-color: #333
+
+  &.tip_right
+    padding-left: 5px
+
+    #tiptip_arrow_inner
+      margin-top: -6px
+      margin-left: -5px
+      border-right-color: #333
+
+  &.tip_left
+    padding-right: 5px
+
+    #tiptip_arrow_inner
+      margin-top: -6px
+      margin-left: -7px
+      border-left-color: #333
+
+#tiptip_content, .chart-tooltip, .wc_error_tip
+  color: #fff
+  font-size: .8em
+  max-width: 150px
+  background: #333
+  text-align: center
+  border-radius: 3px
+  padding: .618em 1em
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2)
+
+#tiptip_content code, .chart-tooltip code, .wc_error_tip code
+  padding: 1px
+  background: #888
+
+#tiptip_arrow, #tiptip_arrow_inner
+  position: absolute
+  border-color: transparent
+  border-style: solid
+  border-width: 6px
+  height: 0
+  width: 0

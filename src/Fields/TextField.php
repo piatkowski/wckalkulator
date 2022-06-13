@@ -10,12 +10,12 @@ use WCKalkulator\View;
  */
 class TextField extends AbstractField
 {
-    protected $parameters = array("type", "name", "title", "hint", "css_class", "required", "default_value", "min", "max", "price");
-    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "");
+    protected $parameters = array("type", "name", "title", "hint", "css_class", "required", "default_value", "min", "max", "price", "pattern");
+    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "", "pattern" => "");
     protected $data;
     protected $type = "text";
     protected $admin_title;
-    protected $use_expression = false;
+    protected $use_expression = true;
     protected $group = "input";
     
     /**
@@ -25,7 +25,7 @@ class TextField extends AbstractField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Text Field", "wc-kalkulator");
+        $this->admin_title = __("Text", "wc-kalkulator");
         return View::render('fields/admin/text');
     }
     
@@ -41,6 +41,7 @@ class TextField extends AbstractField
         $args['min_length'] = $this->data["min"];
         $args['max_length'] = $this->data["max"];
         $args['value'] = $value;
+        $args['pattern'] = $this->data('pattern');
         
         return View::render('fields/front/text', $args);
     }
@@ -90,6 +91,18 @@ class TextField extends AbstractField
         }
         
         return $is_longer_than_min && $is_shorter_than_max && $is_required_and_nonempty;
+    }
+    
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $value;
     }
     
 }

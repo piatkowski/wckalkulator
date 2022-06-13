@@ -1,0 +1,871 @@
+# Copyright (C) 2022 Krzysztof Piątkowski
+# This file is distributed under the GPLv2.
+msgid ""
+msgstr ""
+"Project-Id-Version: WC Kalkulator 1.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/WC Kalkulator\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2022-06-13T07:09:44+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.6.0\n"
+"X-Domain: wc-kalkulator\n"
+
+#. Plugin Name of the plugin
+msgid "WC Kalkulator"
+msgstr ""
+
+#. Description of the plugin
+msgid "Description: Store Manager can add fieldsets to Products and Orders. WC Kalkulator allows to order and calculate the price of the product based on the values of the fields selected by the Customer."
+msgstr ""
+
+#. Author of the plugin
+msgid "Krzysztof Piątkowski"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://wckalkulator.com"
+msgstr ""
+
+#: src/Ajax.php:75
+msgid "You should check at least one option."
+msgstr ""
+
+#: src/ExpressionParser.php:101
+msgid "-"
+msgstr ""
+
+#: src/ExpressionParser.php:106
+msgid "ExpressionParser: Invalid calculation mode."
+msgstr ""
+
+#: src/ExpressionParser.php:110
+msgid "ExpressionParser: Prepared expression has incorrect type."
+msgstr ""
+
+#: src/ExpressionParser.php:316
+msgid "ExpressionParser: Division by zero"
+msgstr ""
+
+#: src/ExpressionParser.php:320
+msgid "ExpressionParser: Undefined result!"
+msgstr ""
+
+#: src/ExpressionParser.php:323
+msgid "ExpressionParser: Undefined calculation mode!"
+msgstr ""
+
+#: src/ExpressionParser.php:350
+msgid "The price is less than zero."
+msgstr ""
+
+#: src/ExpressionParser.php:352
+msgid "The price is equal zero."
+msgstr ""
+
+#: src/ExpressionParser.php:358
+msgid "Division by zero."
+msgstr ""
+
+#: src/Fields/AbstractField.php:26
+msgid "Input Fields"
+msgstr ""
+
+#: src/Fields/AbstractField.php:27
+msgid "Select Fields"
+msgstr ""
+
+#: src/Fields/AbstractField.php:28
+msgid "Picker Fields"
+msgstr ""
+
+#: src/Fields/AbstractField.php:29
+msgid "Upload Fields"
+msgstr ""
+
+#: src/Fields/AbstractField.php:30
+msgid "Static Fields"
+msgstr ""
+
+#: src/Fields/AbstractField.php:31
+msgid "Other Fields"
+msgstr ""
+
+#: src/Fields/AttachmentField.php:29
+#: views/fields/admin/attachment.php:8
+msgid "File Attachment"
+msgstr ""
+
+#: src/Fields/CheckboxField.php:28
+msgid "Checkbox"
+msgstr ""
+
+#: src/Fields/CheckboxField.php:57
+#: src/Fields/CheckboxField.php:80
+msgid "yes"
+msgstr ""
+
+#: src/Fields/CheckboxField.php:57
+#: src/Fields/CheckboxField.php:80
+msgid "no"
+msgstr ""
+
+#: src/Fields/CheckboxgroupField.php:23
+msgid "Multi Checkbox"
+msgstr ""
+
+#: src/Fields/ColorpickerField.php:53
+msgid "Color Picker"
+msgstr ""
+
+#: src/Fields/ColorswatchesField.php:24
+msgid "Color Swatches"
+msgstr ""
+
+#: src/Fields/DatepickerField.php:61
+msgid "Date Picker"
+msgstr ""
+
+#: src/Fields/DropdownField.php:28
+msgid "Dropdown"
+msgstr ""
+
+#: src/Fields/EmailField.php:23
+msgid "E-mail Field"
+msgstr ""
+
+#: src/Fields/FileuploadField.php:28
+msgid "File Upload"
+msgstr ""
+
+#: src/Fields/HeadingField.php:28
+msgid "Heading"
+msgstr ""
+
+#: src/Fields/HiddenField.php:29
+msgid "Hidden"
+msgstr ""
+
+#: src/Fields/HtmlField.php:29
+msgid "HTML"
+msgstr ""
+
+#: src/Fields/ImageselectField.php:24
+msgid "Select Image"
+msgstr ""
+
+#: src/Fields/ImageswatchesField.php:22
+msgid "Image Swatches"
+msgstr ""
+
+#: src/Fields/LinkField.php:29
+msgid "Link / URL"
+msgstr ""
+
+#: src/Fields/NumberField.php:28
+msgid "Number Field"
+msgstr ""
+
+#: src/Fields/ParagraphField.php:28
+msgid "Paragraph"
+msgstr ""
+
+#: src/Fields/RadioField.php:23
+msgid "Radio"
+msgstr ""
+
+#: src/Fields/RangedatepickerField.php:61
+msgid "Range Date Picker"
+msgstr ""
+
+#: src/Fields/SelectField.php:28
+msgid "Select"
+msgstr ""
+
+#: src/Fields/TextareaField.php:23
+msgid "Textarea"
+msgstr ""
+
+#: src/Fields/TextField.php:28
+msgid "Text"
+msgstr ""
+
+#: src/FieldsetAssignment.php:36
+msgid "All Products"
+msgstr ""
+
+#: src/FieldsetAssignment.php:37
+msgid "All Products, except below:"
+msgstr ""
+
+#: src/FieldsetAssignment.php:38
+msgid "Only selected below:"
+msgstr ""
+
+#: src/FieldsetPostType.php:82
+msgid "Fieldsets"
+msgstr ""
+
+#: src/FieldsetPostType.php:83
+#: src/FieldsetPostType.php:84
+msgid "Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:85
+msgid "WCK Fieldsets"
+msgstr ""
+
+#: src/FieldsetPostType.php:86
+msgid "View Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:87
+msgid "Add new Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:88
+#: src/GlobalParametersPostType.php:61
+msgid "Add new"
+msgstr ""
+
+#: src/FieldsetPostType.php:89
+msgid "Edit Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:90
+msgid "Save Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:91
+msgid "Search Fieldset"
+msgstr ""
+
+#: src/FieldsetPostType.php:92
+msgid "Fieldset not found"
+msgstr ""
+
+#: src/FieldsetPostType.php:93
+msgid "There is no Fieldset in the trash"
+msgstr ""
+
+#: src/FieldsetPostType.php:95
+msgid "Fieldsets for Product Fields"
+msgstr ""
+
+#: src/FieldsetPostType.php:125
+msgid "Assigned to"
+msgstr ""
+
+#: src/FieldsetPostType.php:126
+msgid "Priority"
+msgstr ""
+
+#: src/FieldsetPostType.php:148
+msgid "Products: "
+msgstr ""
+
+#: src/FieldsetPostType.php:152
+msgid "Categories: "
+msgstr ""
+
+#: src/FieldsetPostType.php:156
+msgid "Tags: "
+msgstr ""
+
+#: src/FieldsetPostType.php:177
+#: src/GlobalParametersPostType.php:128
+msgid "Documentation"
+msgstr ""
+
+#: src/FieldsetPostType.php:181
+#: views/admin/assignment.php:29
+msgid "Assign to"
+msgstr ""
+
+#: src/FieldsetPostType.php:185
+msgid "Product Fields Settings"
+msgstr ""
+
+#: src/FieldsetPostType.php:189
+msgid "Add Field"
+msgstr ""
+
+#: src/FieldsetPostType.php:193
+msgid "Price Calculation"
+msgstr ""
+
+#: src/FieldsetPostType.php:197
+msgid "Price Filtering"
+msgstr ""
+
+#: src/FieldsetPostType.php:467
+msgid "This action is restriced!"
+msgstr ""
+
+#: src/FieldsetPostType.php:474
+msgid "Go back to the Fieldset list"
+msgstr ""
+
+#: src/FieldsetPostType.php:475
+msgid "You cannot duplicate this Fieldset!"
+msgstr ""
+
+#: src/FieldsetPostType.php:516
+msgid "Duplicate Fieldset"
+msgstr ""
+
+#: src/FieldsetProduct.php:408
+msgid "Field %s is required."
+msgstr ""
+
+#: src/FieldsetProduct.php:437
+msgid "Field %s has incorrect value."
+msgstr ""
+
+#: src/FieldsetProduct.php:550
+msgid "Cannot access product data!"
+msgstr ""
+
+#: src/FieldsetProduct.php:561
+msgid "Fields are not valid!"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:55
+#: src/GlobalParametersPostType.php:97
+msgid "Parameters"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:56
+#: src/GlobalParametersPostType.php:57
+msgid "Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:58
+msgid "WCK Global Params"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:59
+msgid "View Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:60
+msgid "Add new Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:62
+msgid "Edit Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:63
+msgid "Save Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:64
+msgid "Search Parameter"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:65
+msgid "Parameter not found"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:66
+msgid "There is no Parameter in the trash"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:68
+msgid "Global Parameters for WCK Fieldset"
+msgstr ""
+
+#: src/GlobalParametersPostType.php:132
+msgid "Global parameters"
+msgstr ""
+
+#: src/Settings.php:46
+msgid "General Settings"
+msgstr ""
+
+#: src/Settings.php:91
+msgid "Settings Saved"
+msgstr ""
+
+#: src/Settings.php:101
+msgid "Save settings"
+msgstr ""
+
+#: src/Woocommerce/Product.php:177
+msgid "Cannot calculate the correct price!"
+msgstr ""
+
+#: src/Woocommerce/Product.php:398
+msgid "Product has incorrect parameters! Missing field "
+msgstr ""
+
+#: src/Woocommerce/Product.php:406
+msgid "Corrupted data! You cannot checkout."
+msgstr ""
+
+#: views/admin/assignment.php:30
+msgid "You can choose several types of assignment"
+msgstr ""
+
+#: views/admin/assignment.php:41
+msgid "Choose Products"
+msgstr ""
+
+#: views/admin/assignment.php:42
+msgid "Search a product by title. You can choose multiple products."
+msgstr ""
+
+#: views/admin/assignment.php:54
+msgid "Choose Categories"
+msgstr ""
+
+#: views/admin/assignment.php:55
+msgid "Search a category by title. You can choose multiple categories."
+msgstr ""
+
+#: views/admin/assignment.php:66
+msgid "Choose Tags"
+msgstr ""
+
+#: views/admin/assignment.php:67
+msgid "Search a tag by name. You can choose multiple tags."
+msgstr ""
+
+#: views/admin/assignment.php:80
+msgid "Priority (number)"
+msgstr ""
+
+#: views/admin/assignment.php:81
+msgid "If the product has many groups assigned to it, the one with the highest priority (the highest number) will be used. "
+msgstr ""
+
+#: views/admin/documentation.php:4
+msgid "Read Documentation"
+msgstr ""
+
+#: views/admin/documentation.php:9
+msgid "Support"
+msgstr ""
+
+#: views/admin/documentation.php:14
+msgid "Report Issue"
+msgstr ""
+
+#: views/admin/documentation.php:19
+msgid "Request Feature"
+msgstr ""
+
+#: views/admin/expression.php:12
+msgid "Choose the type of calculation"
+msgstr ""
+
+#: views/admin/expression.php:20
+msgid "Turn off"
+msgstr ""
+
+#: views/admin/expression.php:27
+msgid "Single-line Formula"
+msgstr ""
+
+#: views/admin/expression.php:28
+msgid "The result of the calculation is a number."
+msgstr ""
+
+#: views/admin/expression.php:35
+msgid "Conditional Expression"
+msgstr ""
+
+#: views/admin/expression.php:36
+msgid "If the condition [if] is met, calculate the price according to the assigned formula [=]. You can use multiple conditions. The [else] formula is used when none of the conditions are met."
+msgstr ""
+
+#: views/admin/expression.php:49
+msgid "Build the formula"
+msgstr ""
+
+#: views/admin/expression.php:54
+#: views/admin/expression.php:61
+msgid "equation..."
+msgstr ""
+
+#: views/admin/expression.php:63
+msgid "Add contition"
+msgstr ""
+
+#: views/admin/expression.php:68
+msgid "Price calculation has been disabled."
+msgstr ""
+
+#: views/admin/fields.php:23
+msgid "Choose a field type from the list and click \"Add field\"."
+msgstr ""
+
+#: views/admin/fields.php:27
+msgid "Add field"
+msgstr ""
+
+#: views/admin/fields_editor.php:8
+msgid "Add your first field. Select a field type from the dropdown at the right box and click \"Add field\"."
+msgstr ""
+
+#: views/admin/global_parameters.php:19
+msgid "Name"
+msgstr ""
+
+#: views/admin/global_parameters.php:26
+msgid "Value (numeric)"
+msgstr ""
+
+#: views/admin/pricefilter.php:27
+msgid "Enable price filtering"
+msgstr ""
+
+#: views/admin/pricefilter.php:28
+msgid "Check to enable price filtering"
+msgstr ""
+
+#: views/admin/pricefilter.php:34
+msgid "Price prefix"
+msgstr ""
+
+#: views/admin/pricefilter.php:35
+msgid "For example: \"from\""
+msgstr ""
+
+#: views/admin/pricefilter.php:42
+msgid "Price value to show"
+msgstr ""
+
+#: views/admin/pricefilter.php:43
+msgid "For example the lowest price"
+msgstr ""
+
+#: views/admin/pricefilter.php:50
+msgid "Price sufix"
+msgstr ""
+
+#: views/admin/pricefilter.php:51
+msgid "For example: \"per m2\""
+msgstr ""
+
+#: views/fields/admin.php:21
+msgid "Unique Field Name"
+msgstr ""
+
+#: views/fields/admin.php:22
+msgid "Field name must be unique and consist of letters, numbers and underscores. Correct names are: field_name, product_width."
+msgstr ""
+
+#: views/fields/admin.php:29
+msgid "Title"
+msgstr ""
+
+#: views/fields/admin.php:30
+msgid "Title will be displayed on the product page."
+msgstr ""
+
+#: views/fields/admin.php:39
+msgid "Hint for Customer (tooltip)"
+msgstr ""
+
+#: views/fields/admin.php:40
+msgid "Text to be displayed as a tooltip just like this one."
+msgstr ""
+
+#: views/fields/admin.php:46
+msgid "CSS Class"
+msgstr ""
+
+#: views/fields/admin.php:47
+msgid "CSS class or multiple classes separated by a space."
+msgstr ""
+
+#: views/fields/admin/attachment.php:9
+msgid "Select a file to attach"
+msgstr ""
+
+#: views/fields/admin/attachment.php:10
+msgid "Select File"
+msgstr ""
+
+#: views/fields/admin/checkbox.php:9
+msgid "Default state checked/unchecked"
+msgstr ""
+
+#: views/fields/admin/checkbox.php:12
+#: views/fields/admin/colorpicker.php:13
+#: views/fields/admin/datepicker.php:18
+#: views/fields/admin/dropdown.php:12
+msgid "Price"
+msgstr ""
+
+#: views/fields/admin/checkbox.php:13
+#: views/fields/admin/colorpicker.php:14
+#: views/fields/admin/datepicker.php:19
+#: views/fields/admin/dropdown.php:13
+msgid "The price value to use in a expression/formula."
+msgstr ""
+
+#: views/fields/admin/checkboxgroup.php:11
+#: views/fields/admin/colorpicker.php:9
+#: views/fields/admin/colorswatches.php:12
+#: views/fields/admin/datepicker.php:9
+#: views/fields/admin/dropdown.php:9
+#: views/fields/admin/fileupload.php:9
+#: views/fields/admin/imageselect.php:12
+#: views/fields/admin/text.php:9
+msgid "Select an option to make the field required "
+msgstr ""
+
+#: views/fields/admin/checkboxgroup.php:14
+msgid "Limit selected checkboxes"
+msgstr ""
+
+#: views/fields/admin/checkboxgroup.php:15
+msgid "Set maximum number of checkboxes the user may select. Empty or \"0\" means no limit."
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:7
+msgid "Thumbnail size [px]"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:15
+#: views/fields/admin/dropdown.php:16
+#: views/fields/admin/imageselect.php:14
+#: views/fields/admin/select.php:7
+msgid "Option Items"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:19
+#: views/fields/admin/imageselect.php:18
+#: views/fields/admin/select.php:11
+msgid "Option value"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:23
+msgid "Color"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:27
+#: views/fields/admin/dropdown.php:24
+#: views/fields/admin/imageselect.php:31
+#: views/fields/admin/select.php:19
+msgid "Default"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:36
+#: views/fields/admin/dropdown.php:33
+#: views/fields/admin/imageselect.php:40
+#: views/fields/admin/select.php:28
+msgid "Add new option"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:39
+#: views/fields/admin/dropdown.php:36
+#: views/fields/admin/imageselect.php:43
+#: views/fields/admin/select.php:31
+msgid "Remove all"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:42
+#: views/fields/admin/dropdown.php:39
+#: views/fields/admin/imageselect.php:46
+#: views/fields/admin/select.php:34
+msgid "Import options"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:45
+#: views/fields/admin/imageselect.php:49
+#: views/fields/admin/select.php:37
+msgid "Import: each option in new line, format: value;title"
+msgstr ""
+
+#: views/fields/admin/colorswatches.php:48
+#: views/fields/admin/dropdown.php:45
+#: views/fields/admin/imageselect.php:52
+#: views/fields/admin/select.php:40
+msgid "Add"
+msgstr ""
+
+#: views/fields/admin/datepicker.php:14
+msgid "Disallow past date"
+msgstr ""
+
+#: views/fields/admin/datepicker.php:15
+msgid "Select this option to disallow the user from selecting a past date "
+msgstr ""
+
+#: views/fields/admin/dropdown.php:20
+#: views/fields/admin/imageselect.php:22
+#: views/fields/admin/select.php:15
+msgid "Option Text"
+msgstr ""
+
+#: views/fields/admin/dropdown.php:42
+msgid "Import: each option in new line"
+msgstr ""
+
+#: views/fields/admin/fileupload.php:11
+msgid "Max. number of files"
+msgstr ""
+
+#: views/fields/admin/fileupload.php:12
+msgid "Maximum numer of files that Customer can upload."
+msgstr ""
+
+#: views/fields/admin/fileupload.php:15
+msgid "Max. file size [MB]"
+msgstr ""
+
+#: views/fields/admin/fileupload.php:16
+msgid "Maximum size of one file in [MB] MegaBytes"
+msgstr ""
+
+#: views/fields/admin/fileupload.php:19
+msgid "Allowed extensions"
+msgstr ""
+
+#: views/fields/admin/fileupload.php:20
+msgid "Select allowed file extensions."
+msgstr ""
+
+#: views/fields/admin/heading.php:9
+msgid "Heading level"
+msgstr ""
+
+#: views/fields/admin/heading.php:15
+msgid "Heading text"
+msgstr ""
+
+#: views/fields/admin/heading.php:16
+#: views/fields/admin/html.php:8
+msgid "Write HTML code which will be displayed on product page."
+msgstr ""
+
+#: views/fields/admin/hidden.php:9
+msgid "Field value"
+msgstr ""
+
+#: views/fields/admin/hidden.php:10
+msgid "You can write any text. This field is not used in the formula."
+msgstr ""
+
+#: views/fields/admin/html.php:7
+msgid "HTML code"
+msgstr ""
+
+#: views/fields/admin/imageselect.php:7
+msgid "Image size [px]"
+msgstr ""
+
+#: views/fields/admin/imageselect.php:26
+msgid "Add Image"
+msgstr ""
+
+#: views/fields/admin/link.php:8
+msgid "Link URL"
+msgstr ""
+
+#: views/fields/admin/link.php:9
+msgid "Write only URL starting with https://..."
+msgstr ""
+
+#: views/fields/admin/link.php:11
+msgid "Link opening"
+msgstr ""
+
+#: views/fields/admin/link.php:13
+msgid "Open in new window"
+msgstr ""
+
+#: views/fields/admin/link.php:14
+msgid "Open in the same window"
+msgstr ""
+
+#: views/fields/admin/number.php:9
+msgid "Min. value"
+msgstr ""
+
+#: views/fields/admin/number.php:10
+msgid "The minimum value of the field."
+msgstr ""
+
+#: views/fields/admin/number.php:14
+msgid "Max. value"
+msgstr ""
+
+#: views/fields/admin/number.php:15
+msgid "The maximum value of the field."
+msgstr ""
+
+#: views/fields/admin/number.php:19
+msgid "Default value"
+msgstr ""
+
+#: views/fields/admin/number.php:20
+msgid "The default value of the field."
+msgstr ""
+
+#: views/fields/admin/paragraph.php:7
+msgid "Paragraph content"
+msgstr ""
+
+#: views/fields/admin/text.php:12
+msgid "Pattern (RegExp)"
+msgstr ""
+
+#: views/fields/admin/text.php:13
+msgid "Regular expression that the field's value is checked against."
+msgstr ""
+
+#: views/fields/admin/text.php:18
+msgid "Min. length"
+msgstr ""
+
+#: views/fields/admin/text.php:19
+msgid "Minimum character length. Consider that minimum length > 0 makes this field always required."
+msgstr ""
+
+#: views/fields/admin/text.php:22
+msgid "Max. length"
+msgstr ""
+
+#: views/fields/admin/text.php:23
+msgid "Maximum charaster length."
+msgstr ""
+
+#: views/fields/admin/text.php:26
+msgid "Placeholder"
+msgstr ""
+
+#: views/fields/admin/text.php:27
+msgid "The placeholder specifies a short hint to user. It is displayed in the field before the user enters a text."
+msgstr ""
+
+#: views/fields/admin/text.php:30
+msgid "Price for the field filled in by the user "
+msgstr ""
+
+#: views/fields/admin/text.php:31
+msgid "The price value to use in a expression/formula. If the user does not fill in the field, the price is 0."
+msgstr ""
+
+#: views/fields/front/checkbox.php:19
+msgid "Yes"
+msgstr ""
+
+#: views/fields/front/checkboxgroup.php:13
+msgid "(max. %s)"
+msgstr ""
+
+#: views/woocommerce/cart.php:12
+msgid "Edit product"
+msgstr ""
+
+#: views/woocommerce/price_block.php:7
+msgid "Total"
+msgstr ""

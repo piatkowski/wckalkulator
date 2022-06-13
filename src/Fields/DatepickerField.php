@@ -29,7 +29,7 @@ class DatepickerField extends TextField
             'wck-date-picker',
             Plugin::url() . '/assets/js/datepicker.js',
             array('jquery-ui-datepicker'),
-            false,
+            Plugin::VERSION,
             1
         );
     }
@@ -117,4 +117,15 @@ class DatepickerField extends TextField
         return $is_valid;
     }
     
+    /**
+     * Display value of the field in order line item at backend
+     *
+     * @param $value
+     * @return string
+     * @since 1.2.0
+     */
+    public function order_item_value($value)
+    {
+        return $this->get_option_title($value);
+    }
 }

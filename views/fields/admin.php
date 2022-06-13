@@ -7,7 +7,8 @@ use WCKalkulator\Helper;
 
 ?>
 <div class="field" data-type="<?php echo esc_html($view->type); ?>"
-     data-use-expression="<?php echo esc_attr($view->use_expression); ?>">
+     data-use-expression="<?php echo esc_attr($view->use_expression); ?>"
+     data-group="<?php echo esc_attr($view->group); ?>">
     <div class="header">
         <span class="action-drag left dashicons dashicons-move"></span>
         <span class="left text"><?php echo esc_html($view->title); ?></span>
@@ -24,12 +25,15 @@ use WCKalkulator\Helper;
                    required>
         </div>
         <div class="half second">
+            <?php if ($view->show_title) : ?>
             <label>* <?php _e('Title', 'wc-kalkulator'); ?>
                 <?php echo Helper::html_help_tip(__('Title will be displayed on the product page.', 'wc-kalkulator')); ?>
             </label>
             <input type="text" class="param f-title" placeholder="Field Name" required>
+            <?php endif; ?>
         </div>
         <div class="clear"></div>
+        <?php if ($view->group !== 'static') : ?>
         <div class="half first">
         <label>
             <?php _e('Hint for Customer (tooltip)', 'wc-kalkulator'); ?>
@@ -46,6 +50,7 @@ use WCKalkulator\Helper;
                placeholder="css_class">
         </div>
         <div class="clear"></div>
+        <?php endif; ?>
         <?php echo wp_kses($view->admin_fields, \WCKalkulator\Sanitizer::allowed_html()); ?>
     </div>
 </div>

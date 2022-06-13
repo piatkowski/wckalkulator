@@ -281,14 +281,13 @@ class FieldsetProduct
      * @return string|null
      * @since 1.0.0
      */
-    public function render()
+    public function render($html)
     {
-        
         return View::render('woocommerce/product', array(
             'product_id' => $this->product_id,
-            'variation_id' => $this->variation_id
+            'variation_id' => $this->variation_id,
+            'html' => $html
         ));
-        
     }
     
     /**
@@ -318,7 +317,6 @@ class FieldsetProduct
     {
         $this->user_input = $input;
         
-        
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
         } else {
@@ -330,22 +328,10 @@ class FieldsetProduct
             return false;
         }
         
-        /**
-         * Add field's static prices to $user_input
-         */
-        $field_names = array_keys($this->user_input);
-        foreach ($this->fields() as $field) {
-            $name = $field->data("name");
-            if($field->data("price") !== null && in_array($name, $field_names)) {
-                $field_static_price = Sanitizer::sanitize($field->data("price"), "price");
-                if ($field->type() === "checkbox") {
-                    $field_static_price = intval((int)$this->user_input[$name]  === 1) * $field_static_price;
-                }
-                if(empty($this->user_input[$field->data("name")])) {
-                    $field_static_price = 0;
-                }
-                $this->user_input[$field->data("name")] = $field_static_price;
-            }
+        $this->add_static_prices($input);
+        
+        foreach (GlobalParameter::get_all() as $name => $value) {
+            $this->user_input['global:' . $name] = $value;
         }
         
         return $this->is_valid;
@@ -359,19 +345,39 @@ class FieldsetProduct
      */
     public function validate_for_expression()
     {
-        $field_names = array_keys($this->user_input);
+        if (!is_array($this->expression())) {
+            return true;
+        }
         foreach ($this->fields() as $field) {
             if ($field->use_expression()) {
                 $field_name = $field->data("name");
-                if (!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') {
-                    return false;
-                }
-                if (!$field->validate($this->user_input[$field_name])) {
-                    return false;
+                if (strpos('{' . $field_name . '}', $this->expression('expr')) !== false) {
+                    if (!$field->validate($this->user_input[$field_name])) {
+                        return false;
+                    }
                 }
             }
         }
         return true;
+    }
+    
+    /**
+     * Get the expression
+     *
+     * @return mixed|null
+     * @since 1.0.0
+     */
+    public function expression($key = '')
+    {
+        if ($key === '') {
+            return $this->data->expression;
+        }
+        
+        if (is_array($this->data->expression) && isset($this->data->expression[$key])) {
+            return $this->data->expression[$key];
+        }
+        
+        return;
     }
     
     /**
@@ -400,7 +406,7 @@ class FieldsetProduct
             if ((!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') && $field->is_required()) {
                 $this->validation_notices[] = sprintf(
                     __('Field %s is required.', 'wc-kalkulator'),
-                    $field->data("title")
+                    $field->data("title").$field->data("name")
                 );
                 $is_valid = false;
             }
@@ -438,6 +444,69 @@ class FieldsetProduct
         }
         $this->user_input = $filtered_input;
         return true;
+    }
+    
+    /**
+     * Add field's static price to $user_input
+     *
+     * @param $input
+     * @return void
+     * @since 1.2.0
+     */
+    public function add_static_prices($input)
+    {
+        if (!is_array($this->user_input)) {
+            return;
+        }
+        $field_names = array_keys($this->user_input);
+        foreach ($this->fields() as $field) {
+            $name = $field->data("name");
+            if ($field->data("price") !== null && in_array($name, $field_names)) {
+                $static_price = Sanitizer::sanitize($field->data("price"), "price");
+                if ($field->type() === "checkbox") {
+                    $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                }
+                if (empty($this->user_input[$field->data("name")])) {
+                    $static_price = 0;
+                }
+                $this->user_input[$name] = $static_price;
+            }
+            if ($field->group() !== 'static' && isset($input[$name])) {
+                $this->register_extra_input_parameters($field, $input[$name]);
+            }
+        }
+        
+    }
+    
+    /**
+     * Add extra input parameters field:param to the $user_input
+     *
+     * @param $field
+     * @param $input
+     * @since 1.2.0
+     */
+    public function register_extra_input_parameters($field, $input)
+    {
+        $name = $field->data("name");
+        
+        switch ($field->type()) {
+            case 'rangedatepicker':
+                $date_from = strtotime($input['from']);
+                $date_to = strtotime($input['to']);
+                $this->user_input[$name . ':date_from'] = $date_from;
+                $this->user_input[$name . ':date_to'] = $date_to;
+                $this->user_input[$name . ':days'] = abs(round(($date_to - $date_from) / 86400));
+                break;
+            case 'datepicker':
+                $this->user_input[$name . ':date'] = strtotime($input);
+                break;
+            case 'checkboxgroup':
+                $input = array_map('floatval', $input);
+                $this->user_input[$name . ':max'] = is_null($input) ? 0 : max($input);
+                $this->user_input[$name . ':min'] = is_null($input) ? 0 : min($input);
+                $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
+                break;
+        }
     }
     
     /**
@@ -484,25 +553,13 @@ class FieldsetProduct
             
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
-                $price = $parser->execute();
-                return $price;
+                return $parser->execute();
             } else {
                 return Ajax::response('error', $parser->error);
             }
         } else {
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
-    }
-    
-    /**
-     * Get the expression
-     *
-     * @return mixed|null
-     * @since 1.0.0
-     */
-    public function expression()
-    {
-        return $this->data->expression;
     }
     
     /**
