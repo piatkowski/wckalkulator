@@ -22,13 +22,15 @@
     label
       [type=checkbox], [type=radio]
         margin-right: 5px
+      &.inline
+        display: inline !important
+        width: auto !important
     .wck-imageselect
       width: auto
       cursor: pointer
       display: inline-block
       margin: 0px 5px 5px 0
       text-align: center
-      width: 70px
       [type=radio]
         position: absolute
         opacity: 0
@@ -48,6 +50,11 @@
         margin-right: 2%
       input
         float:left
+  tr.wck-colorswatches
+    td.value
+      label
+        display: inline-block
+        width: auto
   .clearfix
     clear: both
     content: ""

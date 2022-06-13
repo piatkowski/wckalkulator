@@ -11,7 +11,7 @@ use WCKalkulator\View;
 class ColorswatchesField extends SelectField
 {
     protected $parameters = array("type", "name", "title", "hint", "options_name", "options_title", "options_image", "css_class", "required", "default_value");
-    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "");
+    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "", "image_size" => 40);
     protected $type = "colorswatches";
     
     /**
@@ -23,6 +23,25 @@ class ColorswatchesField extends SelectField
     {
         $this->admin_title = __("Color Swatches", "wc-kalkulator");
         return View::render('fields/admin/' . $this->type);
+    }
+    
+    /**
+     * Output HTML for product page
+     * @param $selected_name
+     * @return string
+     */
+    public function render_for_product($selected_name = "")
+    {
+        if ($selected_name === "") {
+            $selected_name = $this->data["default_value"];
+        }
+        $args = $this->prepared_data();
+        $args['value'] = $selected_name;
+        $args['options_name'] = $this->data['options_name'];
+        $args['options_title'] = $this->data['options_title'];
+        $args['size'] = $this->data('image_size');
+        
+        return View::render('fields/front/' . $this->type, $args);
     }
     
     /**

@@ -10,8 +10,8 @@ use WCKalkulator\View;
  */
 class TextField extends AbstractField
 {
-    protected $parameters = array("type", "name", "title", "hint", "css_class", "required", "default_value", "min", "max", "price");
-    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "");
+    protected $parameters = array("type", "name", "title", "hint", "css_class", "required", "default_value", "min", "max", "price", "pattern");
+    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "", "pattern" => "");
     protected $data;
     protected $type = "text";
     protected $admin_title;
@@ -41,6 +41,7 @@ class TextField extends AbstractField
         $args['min_length'] = $this->data["min"];
         $args['max_length'] = $this->data["max"];
         $args['value'] = $value;
+        $args['pattern'] = $this->data('pattern');
         
         return View::render('fields/front/text', $args);
     }

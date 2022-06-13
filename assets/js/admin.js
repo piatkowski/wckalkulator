@@ -297,6 +297,11 @@
                     }
                 }
 
+                var input_fimgwidth = $row.find('input.fimg-width');
+                if (input_fimgwidth.length > 0) {
+                    field.image_size = input_fimgwidth.val()
+                }
+
                 var $fs_options;
 
                 switch (field.type) {
@@ -377,10 +382,12 @@
                     case 'email':
                         var input_ftminlen = $row.find('input.ft-min-length');
                         var input_ftmaxlen = $row.find('input.ft-max-length');
-                        //var input_ftpattern = $row.find('input.ft-pattern');
+                        var input_ftpattern = $row.find('input.ft-pattern');
                         field.min = input_ftminlen.val();
                         field.max = input_ftmaxlen.val();
-                        //field.pattern = input_ftpattern.val();
+                        if (input_ftpattern.length > 0) {
+                            field.pattern = input_ftpattern.val();
+                        }
                         break;
                     case 'colorpicker':
                     case 'datepicker':
@@ -495,7 +502,7 @@
                     $("#" + field_id + " .f-title").val(this.title);
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
-                    if( $("#" + field_id + " .f-required").length > 0) {
+                    if ($("#" + field_id + " .f-required").length > 0) {
                         $("#" + field_id + " .f-required").prop("checked", this.required);
                     }
 
@@ -503,6 +510,13 @@
                     if (fprice.length > 0) {
                         fprice.val(this.price);
                     }
+
+                    var fimgwidth = $("#" + field_id + " .fimg-width");
+                    if (fimgwidth.length > 0) {
+                        fimgwidth.val(this.image_size);
+                    }
+
+
                     var options_title, options_name, options_image, default_value, first, $checked;
 
                     if (this.type === "dropdown") {
@@ -547,7 +561,7 @@
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
                             //Clean option_name after ":"
-                            if( option_name.indexOf(':') >= 0) {
+                            if (option_name.indexOf(':') >= 0) {
                                 option_name = option_name.slice(0, option_name.indexOf(':'));
                             }
 
@@ -599,6 +613,9 @@
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
+                        if (this.type === "text'") {
+                            $("#" + field_id + " .ft-pattern").val(this.pattern);
+                        }
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);

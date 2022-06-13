@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 use WCKalkulator\Helper;
 ?>
-<label>* <?php _e('Image width', 'wc-kalkulator'); ?></label>
+<label>* <?php _e('Image size [px]', 'wc-kalkulator'); ?></label>
 <input type="number" class="param fimg-width" step="1" min="0" value="0">
 
 <label>

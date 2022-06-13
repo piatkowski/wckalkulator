@@ -16,6 +16,7 @@ if (!defined('ABSPATH')) {
     <td class="value">
         <input type="text" id="<?php echo esc_html($view->id); ?>" class="attached enabled"
                name="<?php echo esc_html($view->name); ?>"
+               pattern="<?php echo esc_attr($view->pattern); ?>"
                placeholder="<?php echo esc_html($view->placeholder); ?>"
                minlength="<?php echo absint($view->min_length); ?>" maxlength="<?php echo absint($view->max_length); ?>"
                value="<?php echo esc_html($view->value); ?>"<?php echo esc_html($view->required); ?>>

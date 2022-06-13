@@ -11,7 +11,7 @@ use WCKalkulator\View;
 class ImageselectField extends SelectField
 {
     protected $parameters = array("type", "name", "title", "hint", "options_name", "options_title", "options_image", "css_class", "required", "default_value");
-    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "");
+    protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "", "image_size" => 60);
     protected $type = "imageselect";
     
     /**
@@ -21,7 +21,7 @@ class ImageselectField extends SelectField
      */
     public function admin_fields($value = '')
     {
-        $this->admin_title = __("Radio w/ Image", "wc-kalkulator");
+        $this->admin_title = __("Select Image", "wc-kalkulator");
         return View::render('fields/admin/' . $this->type);
     }
     
@@ -68,6 +68,7 @@ class ImageselectField extends SelectField
         $args['options_name'] = $this->data['options_name'];
         $args['options_title'] = $this->data['options_title'];
         $args['options_image'] = $this->data['options_image'];
+        $args['size'] = $this->data("image_size");
         
         return View::render('fields/front/' . $this->type, $args);
     }

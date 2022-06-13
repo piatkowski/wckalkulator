@@ -42,7 +42,10 @@ final class Sanitizer
                 'data-type' => true,
                 'data-group' => true,
                 'data-required' => true,
-                'data-limit' => true
+                'data-limit' => true,
+                'style' => true,
+                'pattern' => true,
+                'title' => true
             ),
             'textarea' => array(
                 'name' => true,
@@ -54,7 +57,8 @@ final class Sanitizer
                 'placeholder' => true,
                 'minlength' => true,
                 'maxlength' => true,
-                'required' => true
+                'required' => true,
+                'style' => true
             ),
             'select' => array(
                 'name' => true,
@@ -66,7 +70,8 @@ final class Sanitizer
                 'placeholder' => true,
                 'minlength' => true,
                 'maxlength' => true,
-                'required' => true
+                'required' => true,
+                'style' => true
             ),
             'option' => array(
                 'name' => true,
@@ -74,8 +79,13 @@ final class Sanitizer
                 'checked' => true,
                 'selected' => true,
                 'class' => true,
-                'id' => true
+                'id' => true,
+                'style' => true
             ),
+            'label' => array(
+                'style' => true,
+                'for' => true
+            )
         );
         return array_merge($allowed, wp_kses_allowed_html('post'));
     }
