@@ -65,11 +65,22 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 - regular and sale price are supported
 - supported price filters
 - customizable HTML code of every field
-- HMTL template of every field can be overridden in a theme directory
+- HTML template of every field can be overridden in a theme directory
 
 Full documentation at: [wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+
+2022-06-13 v.1.2.0
+
+- New fields: image select, image swatches, color swatches, checkbox group (multicheckbox), HTML, Heading, Paragraph, Hidden, Link, Attachment
+- Math functions to use in the expression
+- Additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
+- Global parameters can be defined and used in formula
+- Assign fieldset to product's tags
+- Customer can edit cart item
+- text field has new option: pattern (regexp)
+- bug fixes
 
 2022-06-03 v.1.1.3
 
