@@ -1,6 +1,6 @@
 ---
 order: 2000
-label: "Welcome"
+label: "WC Kalkulator"
 icon: home
 ---
 

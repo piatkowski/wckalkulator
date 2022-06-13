@@ -25,7 +25,7 @@ Click **Add Fieldset** to create new one. The empty form looks like below:
 ![](../images/assign_to.png)
 
 - **Fieldset Title** is used only in Wordpress dashboard
-- **Assign to** - you can assign this fieldset to products or categories. If product has more than one fieldsetm, you can set priority. 
+- **Assign to** - you can assign this fieldset to products, categories or tags. If product has more than one fieldset, you can set priority. 
 !!!warning Priority
 Higher value have higher priority
 !!!

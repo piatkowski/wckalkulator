@@ -2,10 +2,10 @@ input: .
 output: .retype
 url: https://wckalkulator.com
 meta:
-  title: " | WC Kalkulator Woocommerce Plugin"
+  title: " | Custom fields and price calculator"
 branding:
   title: WC Kalkulator
-  label: v1.1.0
+  label: v1.2.0
 links:
 - text: Get the Plugin
   link: https://wordpress.org/plugins/wc-kalkulator/

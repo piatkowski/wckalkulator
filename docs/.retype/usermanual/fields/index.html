@@ -6,30 +6,30 @@
     <meta name="turbo-cache-control" content="no-cache">
 
     <!-- Primary Meta Tags -->
-    <title>Field Types | WC Kalkulator Woocommerce Plugin</title>
-    <meta name="title" content="Field Types | WC Kalkulator Woocommerce Plugin">
+    <title>Field Types | Custom fields and price calculator</title>
+    <meta name="title" content="Field Types | Custom fields and price calculator">
     <meta name="description" content="The plugin comes with several built-in fields to be used on the product page. Please contact us if you need to add new field types." />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wckalkulator.com/usermanual/fields/">
-    <meta property="og:title" content="Field Types | WC Kalkulator Woocommerce Plugin">
+    <meta property="og:title" content="Field Types | Custom fields and price calculator">
     <meta property="og:description" content="The plugin comes with several built-in fields to be used on the product page. Please contact us if you need to add new field types.">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://wckalkulator.com/usermanual/fields/">
-    <meta property="twitter:title" content="Field Types | WC Kalkulator Woocommerce Plugin">
+    <meta property="twitter:title" content="Field Types | Custom fields and price calculator">
     <meta property="twitter:description" content="The plugin comes with several built-in fields to be used on the product page. Please contact us if you need to add new field types.">
     
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="/resources/css/retype.css?v=1.11.2.705361152565" rel="stylesheet" data-turbo-track="reload" />
+    <link href="/resources/css/retype.css?v=1.11.2.708431741646" rel="stylesheet" data-turbo-track="reload" />
 
-    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.705361152565" defer data-turbo-track="reload"></script>
+    <script type="text/javascript" src="/resources/js/config.js?v=1.11.2.708431741646" defer data-turbo-track="reload"></script>
     <script type="text/javascript" src="/resources/js/retype.js?v=1.11.2" defer data-turbo-track="reload"></script>
-    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.705361152565" defer></script>
-    <script id="prism-js" type="text/javascript" src="/resources/js/prism.js?v=1.11.2.705361152565" defer></script>
+    <script id="lunr-js" type="text/javascript" src="/resources/js/lunr.js?v=1.11.2.708431741646" defer></script>
+    <script id="prism-js" type="text/javascript" src="/resources/js/prism.js?v=1.11.2.708431741646" defer></script>
 </head>
     <body>
         <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -46,7 +46,7 @@
             <div class="flex items-center px-2 md:px-6">
                 <a id="docs-site-logo" href="/" class="flex items-center leading-snug text-xl">
                     <span class="dark:text-white font-semibold line-clamp-1 md:line-clamp-2">WC Kalkulator</span>
-                </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">v1.1.0</span>
+                </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">v1.2.0</span>
             </div>
 
             <span class="hidden h-8 border-r md:inline-block dark:border-dark-650"></span>
@@ -673,6 +673,79 @@ Even if you have not checked <strong>Required</strong> option.</p>
 &lt;label for=&quot;...&quot;&gt;&lt;input type=&quot;radio&quot;...&gt;Option B&lt;/label&gt;
 &lt;label for=&quot;...&quot;&gt;&lt;input type=&quot;radio&quot;...&gt;Option C&lt;/label&gt;</code></pre>
 </doc-codeblock></div>
+<doc-anchor-target id="checkbox-group-multi-checkbox">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#checkbox-group-multi-checkbox">#</doc-anchor-trigger>
+        <span>Checkbox Group (Multi Checkbox)</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>Checkbox Group</strong> is used to display a group of checkboxes. It is possible to define selection limit (i.e. customer can choose max 2 options).</p>
+<doc-anchor-target id="color-swatches">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#color-swatches">#</doc-anchor-trigger>
+        <span>Color Swatches</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>Color Swatches</strong> are shown as square thumbnails, which may be selected by a customer. Each options has a numeric value to use in a formula.</p>
+<doc-anchor-target id="image-swatches">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#image-swatches">#</doc-anchor-trigger>
+        <span>Image Swatches</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>Image Swatches</strong> works like Color Swatches, but you can define images instead of colors.</p>
+<doc-anchor-target id="image-select">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#image-select">#</doc-anchor-trigger>
+        <span>Image Select</span>
+    </h2>
+</doc-anchor-target>
+<p><strong>Image Select</strong> works similar to Image Swatches, but you can define Caption/Title for each image option.</p>
+<doc-anchor-target id="static-html">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-html">#</doc-anchor-trigger>
+        <span>Static: HTML</span>
+    </h2>
+</doc-anchor-target>
+<p>Displays content from a HTML code. It is filtered by <code v-pre>wp_kses_post</code></p>
+<doc-anchor-target id="static-attachment">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-attachment">#</doc-anchor-trigger>
+        <span>Static: Attachment</span>
+    </h2>
+</doc-anchor-target>
+<p>You can add file/media attachment, to be downloaded by the Customer on product page.</p>
+<doc-anchor-target id="static-heading">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-heading">#</doc-anchor-trigger>
+        <span>Static: Heading</span>
+    </h2>
+</doc-anchor-target>
+<p>You can add heading h1-h6 in product page</p>
+<doc-anchor-target id="static-paragraph">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-paragraph">#</doc-anchor-trigger>
+        <span>Static: Paragraph</span>
+    </h2>
+</doc-anchor-target>
+<p>You can add text in paragraph tag in product page</p>
+<doc-anchor-target id="static-hidden">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-hidden">#</doc-anchor-trigger>
+        <span>Static: Hidden</span>
+    </h2>
+</doc-anchor-target>
+<p>You can add hidden input fields to store predefined values. This field does not accept user input.</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre class="language-markup"><code v-pre class="language-markup">&lt;input type=&quot;hidden&quot;...&gt;</code></pre>
+</doc-codeblock></div>
+<doc-anchor-target id="static-link">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#static-link">#</doc-anchor-trigger>
+        <span>Static: Link</span>
+    </h2>
+</doc-anchor-target>
+<p>You can add link to any website, file attachment, URL.</p>
 
 
 

@@ -6,6 +6,16 @@ icon: star
 
 # News
 
+## Version 1.2.0 has been released
+*Update: 2022-06-13*
+
+- [X] many new fields
+- [X] static fields
+- [X] field's built-in modifiers
+- [X] global parameters
+- [X] functions in expressions
+- [X] customer can edit product in the cart
+
 ## What we are working on?
 *Update: 2022-02-18*
 

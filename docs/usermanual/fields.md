@@ -177,3 +177,47 @@ This field is required by default.
 <label for="..."><input type="radio"...>Option C</label>
 ```
 
+## Checkbox Group (Multi Checkbox)
+
+**Checkbox Group** is used to display a group of checkboxes. It is possible to define selection limit (i.e. customer can choose max 2 options).
+
+## Color Swatches
+
+**Color Swatches** are shown as square thumbnails, which may be selected by a customer. Each options has a numeric value to use in a formula.
+
+## Image Swatches
+
+**Image Swatches** works like Color Swatches, but you can define images instead of colors.
+
+## Image Select
+
+**Image Select** works similar to Image Swatches, but you can define Caption/Title for each image option.
+
+## Static: HTML
+
+Displays content from a HTML code. It is filtered by ``wp_kses_post``
+
+## Static: Attachment
+
+You can add file/media attachment, to be downloaded by the Customer on product page.
+
+## Static: Heading
+
+You can add heading h1-h6 in product page
+
+## Static: Paragraph
+
+You can add text in paragraph tag in product page
+
+## Static: Hidden
+
+You can add hidden input fields to store predefined values. This field does not accept user input.
+
+```html
+<input type="hidden"...>
+```
+
+## Static: Link
+
+You can add link to any website, file attachment, URL.
+

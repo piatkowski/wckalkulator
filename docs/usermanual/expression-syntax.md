@@ -8,7 +8,9 @@ icon: code
 ## Field names
 
 ```
-{field_name}
+{field_name} - local field
+{fiel_name:function} - built-in field's function
+{global:parameter_name} - global paramter
 ```
 
 ## Arithmetic operators
@@ -45,4 +47,17 @@ or
 !       - not
 &&      - and
 ||      - or
+```
+
+## Math Functions
+
+```
+round(x,p)      - round "x" with the precision of "p"
+ceil(x)         - round up to the integer number
+floor(x)        - round down to the integer number
+abs(x)          - absolute number
+max(a,b,...)    - maximal value
+min(a,b,...)    - minimal value
+pow(x,p)        - "x" raised to the power of "p" (x^p) 
+sqrt(x)         - square root of "x"
 ```
