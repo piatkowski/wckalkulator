@@ -5,6 +5,16 @@ icon: git-branch
 ---
 # CHANGELOG
 
+2022-06-14
+v.1.2.2
+
+- add notices
+
+2022-06-13
+v.1.2.1
+
+- fixed issue with price calculation
+
 2022-06-13
 v.1.2.0
 
