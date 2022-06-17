@@ -506,6 +506,10 @@ class FieldsetProduct
                 $this->user_input[$name . ':min'] = is_null($input) ? 0 : min($input);
                 $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
                 break;
+            case 'text':
+            case 'textarea':
+                $this->user_input[$name . ':text'] = sanitize_text_field($input);
+                break;
         }
     }
     

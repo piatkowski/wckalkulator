@@ -4,7 +4,7 @@
         var userTimeout;
 
         function calculatePrice() {
-            var data = $(".summary form").serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + ajax_object._wck_ajax_nonce;
+            var data = $("form.cart").serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + ajax_object._wck_ajax_nonce;
             $.post(ajax_object.ajax_url, data, function (response) {
                 if (response) {
                     $("#wckalkulator-price").html(response);

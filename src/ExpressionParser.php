@@ -79,7 +79,12 @@ class ExpressionParser
     {
         foreach ($vars as $key => $val) {
             //if (is_numeric($val)) {
-            $this->vars[str_replace(':', '__p__', $key)] = floatval($val);
+            $var_name = str_replace(':', '__p__', $key);
+            if(substr($key, -5) === ':text') {
+                $this->vars[$var_name] = (string) $val;
+            } else {
+                $this->vars[$var_name] = floatval($val);
+            }
             //}
         }
         if (!empty($this->vars)) {
@@ -269,7 +274,7 @@ class ExpressionParser
      */
     private function register_functions()
     {
-        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt', 'strlen');
         foreach ($functions as $function) {
             $this->expression->addFunction(ExpressionFunction::fromPhp($function));
         }

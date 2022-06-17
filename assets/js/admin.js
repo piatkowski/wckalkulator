@@ -473,6 +473,10 @@
                     suggest.push(field.name + ":max");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
                 }
+                if (field.type === "text" ||field.type === "textarea") {
+                    suggest.push(field.name + ":text");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
+                }
                 if (field.type === "rangedatepicker") {
                     suggest.push(field.name + ":date_from");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
