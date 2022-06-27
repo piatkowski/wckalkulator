@@ -5,6 +5,9 @@
 
         function calculatePrice() {
             var data = $("form.cart").serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + ajax_object._wck_ajax_nonce;
+            $.each($("form.cart input[type=file].wck_imageupload"), function(){
+                data += "&" + $(this).attr("name") + "=" + (($(this)[0].files.length === 1) ? $(this)[0].files[0].size : 0);
+            });
             $.post(ajax_object.ajax_url, data, function (response) {
                 if (response) {
                     $("#wckalkulator-price").html(response);

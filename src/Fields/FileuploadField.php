@@ -5,6 +5,15 @@ namespace WCKalkulator\Fields;
 use WCKalkulator\View;
 
 /**
+ *
+ *
+ *
+ * !!!!! This class is not finished yet !!!!
+ *
+ *
+ *
+ *
+ *
  * Class FileuploadFiled
  * @package WCKalkulator
  */

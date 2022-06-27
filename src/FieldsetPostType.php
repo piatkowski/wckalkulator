@@ -185,10 +185,10 @@ class FieldsetPostType
                 'title' => __('Product Fields Settings', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
-            'fields' => array(
+            /*'fields' => array(
                 'title' => __('Add Field', 'wc-kalkulator'),
                 'position' => 'advanced'
-            ),
+            ),*/
             'expression' => array(
                 'title' => __('Price Calculation', 'wc-kalkulator'),
                 'position' => 'advanced'
@@ -411,7 +411,7 @@ class FieldsetPostType
      * For each class defined in Plugin::$defined_fields do:
      *  1. crate an instance of field class
      *  2. store HTML output from render_admin() method => $fields_html
-     *  3. build $fields_dropdown array to use in the metabox => views/admin/fields.php
+     *  3. build $fields_dropdown array to use in the metabox => views/admin/fields_editor.php
      *
      * @since 1.1.0
      */

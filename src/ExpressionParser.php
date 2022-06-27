@@ -351,6 +351,7 @@ class ExpressionParser
     {
         try {
             $value = $this->expression->evaluate($expr, $this->vars);
+            //var_dump($this->vars);
             if ($value < 0) {
                 return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $value);
             } elseif ($value === 0) {

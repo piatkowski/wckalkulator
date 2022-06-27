@@ -21,42 +21,42 @@ class FieldsetProduct
      * @var array
      */
     private static $instance = null;
-    
+
     /**
      * @var array
      */
     private $validation_notices = array();
-    
+
     /**
      * @var object
      */
     private $data;
-    
+
     /**
      * @var array of Field classes
      */
     private $fields;
-    
+
     /**
      * @var array
      */
     private $user_input;
-    
+
     /**
      * @var bool
      */
     private $is_valid = false;
-    
+
     /**
      * @var int
      */
     private $product_id;
-    
+
     /**
      * @var int
      */
     private $variation_id;
-    
+
     /**
      * Private constructor for a singleton
      *
@@ -65,7 +65,7 @@ class FieldsetProduct
     protected function __construct()
     {
     }
-    
+
     /**
      * Get instance of a singleton
      *
@@ -77,10 +77,10 @@ class FieldsetProduct
         if (self::$instance === null) {
             self::$instance = new static();
         }
-        
+
         return self::$instance;
     }
-    
+
     /**
      * Initialize product_id, variation_id and load fieldset data from the Post meta.
      * + Initialize Fields classes
@@ -94,14 +94,14 @@ class FieldsetProduct
     {
         $this->product_id = ($product_id === null) ? Product::get_id() : $product_id;
         $this->variation_id = ($product_id === null) ? null : $variation_id;
-        
+
         //if ($this->has_fieldset()) {
         $this->data = $this->get_data();
         $this->init_fields();
         //}
         return $this->data;
     }
-    
+
     /**
      * Get all meta data for Fieldset
      * Pass $id = null to check current product
@@ -122,7 +122,7 @@ class FieldsetProduct
         }
         return (object)$result;
     }
-    
+
     /**
      * Get ID of the Fieldset (Post ID)
      * Pass $product_id = null to check current product
@@ -137,7 +137,7 @@ class FieldsetProduct
         }
         return null;
     }
-    
+
     /**
      * Get meta data by $key and post $id
      * Pass $id = null to check current product
@@ -155,7 +155,7 @@ class FieldsetProduct
         }
         return null;
     }
-    
+
     /**
      * Initializes Fields classes. Load defined settings.
      *
@@ -177,7 +177,7 @@ class FieldsetProduct
             }
         }
     }
-    
+
     /**
      * Check if Product has fieldset
      * Pass $current = 'current' to check current product
@@ -197,7 +197,7 @@ class FieldsetProduct
         }
         return false;
     }
-    
+
     /**
      * Check if Product has expression (mode !== "off")
      * Pass $current = 'current' to check current product
@@ -216,10 +216,10 @@ class FieldsetProduct
         } elseif ($current === '') {
             $id = $this->get_id();
         }
-        
+
         return $id > 0 && $this->get_data($id)->choose_expression_type !== "off";
     }
-    
+
     /**
      * Cannot unserialize a singleton
      * @throws \Exception
@@ -229,7 +229,7 @@ class FieldsetProduct
     {
         throw new \Exception("Cannot unserialize a singleton.");
     }
-    
+
     /**
      * Get the product_id
      *
@@ -240,7 +240,7 @@ class FieldsetProduct
     {
         return $this->product_id;
     }
-    
+
     /**
      * Get the fieldset data
      *
@@ -252,7 +252,7 @@ class FieldsetProduct
     {
         return $this->data;
     }
-    
+
     /**
      * Get the version hash
      *
@@ -263,7 +263,7 @@ class FieldsetProduct
     {
         return $this->data->version_hash;
     }
-    
+
     /**
      * Get fieldset id
      *
@@ -274,7 +274,7 @@ class FieldsetProduct
     {
         return $this->data->id;
     }
-    
+
     /**
      * Return HTML string for product page
      *
@@ -289,7 +289,7 @@ class FieldsetProduct
             'html' => $html
         ));
     }
-    
+
     /**
      * Return one field by its name. If field does not exists, return false
      *
@@ -304,7 +304,84 @@ class FieldsetProduct
         }
         return false;
     }
-    
+
+    /**
+     * Gets user input from $_POST. Sanitize input
+     *
+     * @return array
+     * @since 1.2.0
+     */
+    public function get_user_input()
+    {
+        $user_input = array();
+        $allowed_names = $this->fields_names();
+
+        if (isset($_POST['wck']) && is_array($_POST['wck'])) {
+
+            $filtered_post = array();
+
+            foreach ($allowed_names as $name) {
+                if (isset($_POST['wck'][$name])) {
+                    $filtered_post[$name] = $_POST['wck'][$name];
+                }
+            }
+
+            $user_input = Sanitizer::sanitize($filtered_post, 'array');
+        }
+
+        $user_input['_files'] = array();
+
+        $customer_dir = '/wc-kalkulator/customer-data/' . date("Y/m/");
+        $upload_path = wp_upload_dir()['basedir'] . $customer_dir;
+        $upload_url = wp_upload_dir()['baseurl'] . $customer_dir;
+
+        if (isset($_FILES['wck'])) {
+            foreach ($_FILES['wck']['name'] as $name => $file_name) {
+                if (in_array($name, $allowed_names) && $_FILES['wck']['error'][$name] == 0) {
+                    $validate = wp_check_filetype_and_ext($_FILES['wck']['tmp_name'][$name], $file_name);
+                    if ($validate['ext'] !== false) {
+                        $file = uniqid() . '.' . $validate['ext'];
+                        $upload_file    = wp_unique_filename($upload_path, $file);
+                        $temp_file      = 'wckalkulator_tmp_' . wp_unique_filename(get_temp_dir(), $file);
+                        $user_input[$name] = round($_FILES['wck']['size'][$name] / 1000000, 2); //B to MB (not MiB)
+                        $user_input['_files'][$name] = array(
+                            'name'          => $name,
+                            'type'          => $_FILES['wck']['type'][$name],
+                            'tmp_name'      => $_FILES['wck']['tmp_name'][$name],
+                            'upload_path'   => $upload_path . $upload_file,
+                            'upload_url'    => $upload_url . $upload_file,
+                            'upload_tmp'    => get_temp_dir() . $temp_file,
+                            'size'          => $_FILES['wck']['size'][$name],
+                            'error'         => 0,
+                        );
+                    }
+                }
+            }
+        }
+
+        $this->user_input = $user_input;
+
+        return $user_input;
+    }
+
+    /**
+     * Handles file upload to temp directory when adding to the cart
+     *
+     * @return void
+     * @since 1.3.0
+     */
+    public function handle_temp_upload()
+    {
+        $files = isset($this->user_input['_files']) ? $this->user_input['_files'] : null;
+        if (!empty($files) && !empty($this->user_input)) {
+            foreach ($files as $name => $data) {
+                if ($this->fields[$name]->validate($data)) {
+                    $this->fields[$name]->upload_temp($data);
+                }
+            }
+        }
+    }
+
     /**
      * Validate user input
      *
@@ -316,27 +393,27 @@ class FieldsetProduct
     public function validate($input, $is_ajax_cart = false)
     {
         $this->user_input = $input;
-        
+
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
         } else {
             $this->is_valid = $this->validate_names() && $this->validate_values();
         }
-        
+
         if (!$this->is_valid) {
             $this->user_input = array();
             return false;
         }
-        
+
         $this->add_static_prices($input);
-        
+
         foreach (GlobalParameter::get_all() as $name => $value) {
             $this->user_input['global:' . $name] = $value;
         }
-        
+
         return $this->is_valid;
     }
-    
+
     /**
      * Validates only fields, which will be used to calculate the price. Use by ajax calls: src/Ajax.php
      *
@@ -360,7 +437,7 @@ class FieldsetProduct
         }
         return true;
     }
-    
+
     /**
      * Get the expression
      *
@@ -372,14 +449,14 @@ class FieldsetProduct
         if ($key === '') {
             return $this->data->expression;
         }
-        
+
         if (is_array($this->data->expression) && isset($this->data->expression[$key])) {
             return $this->data->expression[$key];
         }
-        
+
         return;
     }
-    
+
     /**
      * Get fields
      *
@@ -390,7 +467,7 @@ class FieldsetProduct
     {
         return $this->fields;
     }
-    
+
     /**
      * Check if $input has all required fields.
      *
@@ -406,14 +483,14 @@ class FieldsetProduct
             if ((!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') && $field->is_required()) {
                 $this->validation_notices[] = sprintf(
                     __('Field %s is required.', 'wc-kalkulator'),
-                    $field->data("title").$field->data("name")
+                    $field->data("title") . ' ' . $field->data("name")
                 );
                 $is_valid = false;
             }
         }
         return $is_valid;
     }
-    
+
     /**
      * Validate's user input based on fields
      *
@@ -423,15 +500,21 @@ class FieldsetProduct
     public function validate_values()
     {
         $filtered_input = array();
+
         foreach ($this->fields() as $field) {
-            
+
             $field_name = $field->data("name");
-            
+
             if (!array_key_exists($field_name, $this->user_input)) {
                 continue;
             }
-            $value = $this->user_input[$field_name];
-            
+
+            if (isset($this->user_input['_files'][$field_name])) {
+                $value = $this->user_input['_files'][$field_name];
+            } else {
+                $value = $this->user_input[$field_name];
+            }
+
             if (!$field->validate($value)) {
                 $this->validation_notices[] = sprintf(
                     __('Field %s has incorrect value.', 'wc-kalkulator'),
@@ -439,13 +522,15 @@ class FieldsetProduct
                 );
                 return false;
             }
-            
+
             $filtered_input[$field_name] = $value;
         }
+        $files = $this->user_input['_files'];
         $this->user_input = $filtered_input;
+        $this->user_input['_files'] = $files;
         return true;
     }
-    
+
     /**
      * Add field's static price to $user_input
      *
@@ -459,25 +544,30 @@ class FieldsetProduct
             return;
         }
         $field_names = array_keys($this->user_input);
+
         foreach ($this->fields() as $field) {
             $name = $field->data("name");
+
+            // Check if field has price paramter and its name is in user input
             if ($field->data("price") !== null && in_array($name, $field_names)) {
                 $static_price = Sanitizer::sanitize($field->data("price"), "price");
+
                 if ($field->type() === "checkbox") {
                     $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
                 }
+
                 if (empty($this->user_input[$field->data("name")])) {
                     $static_price = 0;
                 }
                 $this->user_input[$name] = $static_price;
             }
+
             if ($field->group() !== 'static' && isset($input[$name])) {
                 $this->register_extra_input_parameters($field, $input[$name]);
             }
         }
-        
     }
-    
+
     /**
      * Add extra input parameters field:param to the $user_input
      *
@@ -488,7 +578,7 @@ class FieldsetProduct
     public function register_extra_input_parameters($field, $input)
     {
         $name = $field->data("name");
-        
+
         switch ($field->type()) {
             case 'rangedatepicker':
                 $date_from = strtotime($input['from']);
@@ -510,9 +600,12 @@ class FieldsetProduct
             case 'textarea':
                 $this->user_input[$name . ':text'] = sanitize_text_field($input);
                 break;
+            case 'imageupload':
+                $this->user_input[$name . ':size'] = round(absint($input) / 1000000, 2);
+                break;
         }
     }
-    
+
     /**
      * Returns field names
      *
@@ -523,7 +616,7 @@ class FieldsetProduct
     {
         return array_keys($this->fields);
     }
-    
+
     /**
      * Returns array of validation notices
      *
@@ -534,7 +627,7 @@ class FieldsetProduct
     {
         return $this->validation_notices;
     }
-    
+
     /**
      * Returns expression value based on user input
      *
@@ -554,7 +647,7 @@ class FieldsetProduct
                     return Ajax::response('error', __("Cannot access product data!", "wc-kalkulator"));
                 }
             }
-            
+
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
                 return $parser->execute();
@@ -565,7 +658,7 @@ class FieldsetProduct
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
     }
-    
+
     /**
      * Cannot clone singleton
      *

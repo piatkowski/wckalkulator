@@ -299,7 +299,7 @@
 
                 var input_fimgwidth = $row.find('input.fimg-width');
                 if (input_fimgwidth.length > 0) {
-                    field.image_size = input_fimgwidth.val()
+                    field.image_size = input_fimgwidth.val();
                 }
 
                 var $fs_options;
@@ -395,8 +395,8 @@
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
-                    case 'fileupload':
-                        field.max_file_count = $row.find('input.fu-max-file-count').val();
+                    case 'imageupload':
+                        //field.max_file_count = $row.find('input.fu-max-file-count').val();
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
                         break;
@@ -623,8 +623,8 @@
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
-                    } else if (this.type === "fileupload") {
-                        $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
+                    } else if (this.type === "imageupload") {
+                        //$("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
                     } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
