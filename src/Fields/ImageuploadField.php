@@ -40,7 +40,13 @@ class ImageuploadField extends AbstractField
     {
         $args = $this->prepared_data();
         $args['max_file_size'] = $this->data('max_file_size');
-        $args['allowed_extensions'] = $this->data('allowed_extensions');
+        if (!empty($this->data('allowed_extensions'))) {
+            $args['allowed_extensions'] = $this->data('allowed_extensions');
+            $args['accept'] = '.' . str_replace('|', ', .', $this->data('allowed_extensions'));
+        } else {
+            $args['allowed_extensions'] = 'jpg|jpeg|png|gif';
+            $args['accept'] = '.jpg, .jpeg, .png, .gif';
+        }
         return View::render('fields/front/' . $this->type, $args);
     }
 

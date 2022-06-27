@@ -170,6 +170,14 @@
             });
             $WK.colorpicker.iris('color', $(this).val());
 
+        }).on("click", "input.allowed-extensions", function () {
+            var field_id = '#' + $(this).closest('li').attr('id');
+            var ext = [];
+            $(field_id + " input.allowed-extensions:checked").each(function () {
+                console.log($(this).data('extension'));
+                ext.push($(this).data('extension'));
+            });
+            $(field_id + " input.fu-allowed-extensions").val(ext.join('|'));
         });
 
         $(".iris-square-value").on("click", function (e) {
@@ -473,7 +481,7 @@
                     suggest.push(field.name + ":max");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
                 }
-                if (field.type === "text" ||field.type === "textarea") {
+                if (field.type === "text" || field.type === "textarea") {
                     suggest.push(field.name + ":text");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
                 }

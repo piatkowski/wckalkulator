@@ -21,6 +21,7 @@
       -moz-box-sizing: border-box
       box-sizing: border-box
     li
+      box-shadow: 0px 5px 10px #ccc
       margin-bottom: 5px
       .field
         border: 1px solid #AAA
@@ -41,6 +42,8 @@
             padding-left: 10px
           .first
             padding-right: 10px
+          .fu-allowed-extensions
+            margin-top: 10px
           label
             font-size: 12px
             margin-bottom: 3px
@@ -110,6 +113,10 @@
   ul#f-field-list li .field .body .param:not([type=checkbox]), ul#f-field-list li .field .body label
     display: block
     width: 100%
+    &.inline
+      display: inline
+      margin-right: 10px
+      width: auto
   ul#f-field-list li .field .body .param.f-required, ul#f-field-list li .field .body .param.fdp-disallow-past-date, ul#f-field-list li .field .body .param[type=checkbox]
     margin: 10px 15px 14px 3px
   ul#f-field-list li .field .body input[type="text"].param,
@@ -194,3 +201,15 @@
   .fields-section
     text-align: center
     padding: 50px
+    margin: 0 auto
+    max-width: 500px
+    select, button
+      font-size: 16px
+    select
+      width: 300px
+      padding: 5px 10px
+    button
+      width: 50px
+      padding: 3px 8px
+      span
+        line-height: 2

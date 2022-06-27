@@ -4,18 +4,26 @@
         var userTimeout;
 
         function calculatePrice() {
-            var data = $("form.cart").serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + ajax_object._wck_ajax_nonce;
+            var data = $("form.cart").serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + wck_ajax_object._wck_ajax_nonce;
             $.each($("form.cart input[type=file].wck_imageupload"), function(){
                 data += "&" + $(this).attr("name") + "=" + (($(this)[0].files.length === 1) ? $(this)[0].files[0].size : 0);
             });
-            $.post(ajax_object.ajax_url, data, function (response) {
+            $.post(wck_ajax_object.ajax_url, data, function (response) {
                 if (response) {
                     $("#wckalkulator-price").html(response);
                 }
             });
         }
 
-        if (ajax_object._wck_has_expression === "1") {
+        $('input.wck_imageupload').on('change', function(e){
+           var size = $(this)[0].files[0].size;
+           if( size > $(this).data("maxfilesize") * 1000000) {
+               alert(wck_ajax_object._wck_i18n_maxfilesize + " Max. " + $(this).data("maxfilesize") + "MB");
+               $(this).val('');
+           }
+        });
+
+        if (wck_ajax_object._wck_has_expression === "1") {
             $(document).on('change', 'form.cart input, form.cart select', function () {
                 clearTimeout(userTimeout);
                 userTimeout = setTimeout(function () {
@@ -59,7 +67,7 @@
                 var group = $(this).data("group");
                 if (group !== lastGroup) {
                     if ($(this).data("required") === 1 && $("input[type=checkbox][data-group="+group+"]:checked").length === 0) {
-                        $("input[type=checkbox][data-group="+group+"]").get(0).setCustomValidity(ajax_object._wck_i18n_required);
+                        $("input[type=checkbox][data-group="+group+"]").get(0).setCustomValidity(wck_ajax_object._wck_i18n_required);
                         _form.reportValidity();
                         e.preventDefault();
                         return false;

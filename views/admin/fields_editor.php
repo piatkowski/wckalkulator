@@ -8,11 +8,9 @@ use WCKalkulator\Cache;
 
 ?>
 <ul id="f-field-list">
-    <li class="welcome">
-        <?php _e('Add your first field. Select a field type from the dropdown at the right box and click "Add field".', 'wc-kalkulator'); ?>
-    </li>
 </ul>
 <div class="fields-section">
+
         <select id="select-field">
             <?php foreach (Cache::get_once('FieldsetPostType_fields_dropdown') as $group => $fields): ?>
                 <optgroup label="<?php echo esc_html($group); ?>">
@@ -25,7 +23,7 @@ use WCKalkulator\Cache;
             <?php endforeach; ?>
         </select>
         <button type="button" class="button" id="add-field-button">
-            <?php _e('Add field', 'wc-kalkulator'); ?>
+            <span class="dashicons dashicons-plus"></span>
         </button>
 
 </div>

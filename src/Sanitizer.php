@@ -45,7 +45,11 @@ final class Sanitizer
                 'data-limit' => true,
                 'style' => true,
                 'pattern' => true,
-                'title' => true
+                'title' => true,
+                'data-extension' => true,
+                'accept' => true,
+                'onchange' => true,
+                'data-maxfilesize' => true,
             ),
             'textarea' => array(
                 'name' => true,
