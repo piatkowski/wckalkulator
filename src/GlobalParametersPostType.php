@@ -15,12 +15,12 @@ namespace WCKalkulator;
 class GlobalParametersPostType
 {
     const POST_TYPE = "wck_global_parameter";
-    
+
     public static $meta_keys = array(
         '_wck_param_name' => 'text',
         '_wck_param_value' => 'float'
     );
-    
+
     /**
      * Initialize properties, add WP actions and filters.
      *
@@ -36,8 +36,11 @@ class GlobalParametersPostType
         add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'));
         add_filter('get_user_option_meta-box-order_' . self::POST_TYPE, array(__CLASS__, 'metabox_order'));
         add_filter('bulk_actions-edit-' . self::POST_TYPE, array(__CLASS__, 'bulk_actions'));
+        add_action('load-edit.php', function () {
+            add_filter('views_edit-' . self::POST_TYPE, array(__CLASS__, 'help'));
+        });
     }
-    
+
     /**
      *  Registers the new Post Type
      *
@@ -48,7 +51,7 @@ class GlobalParametersPostType
         if (post_type_exists(self::POST_TYPE)) {
             return;
         }
-        
+
         register_post_type(self::POST_TYPE,
             array(
                 'labels' => array(
@@ -84,7 +87,7 @@ class GlobalParametersPostType
             )
         );
     }
-    
+
     /**
      * Add columns in the Post List
      *
@@ -98,7 +101,7 @@ class GlobalParametersPostType
         unset($columns['date']);
         return $columns;
     }
-    
+
     /**
      * Set column values in the Post List
      *
@@ -114,7 +117,7 @@ class GlobalParametersPostType
             echo esc_html($name . ' = ' . $value);
         }
     }
-    
+
     /**
      * Add metaboxes to the new Post Type
      * Each metabox has its own template file in the "/views/admin" directory
@@ -133,7 +136,7 @@ class GlobalParametersPostType
                 'position' => 'advanced'
             )
         );
-        
+
         foreach ($metaboxes as $id => $metabox) {
             add_meta_box(
                 'wck_' . $id,
@@ -148,8 +151,8 @@ class GlobalParametersPostType
             );
         }
     }
-    
-    
+
+
     /**
      * Reorder the metaboxes in the Post Type edit view
      *
@@ -164,7 +167,7 @@ class GlobalParametersPostType
             'side' => 'submitdiv,wck_docs'
         );
     }
-    
+
     /**
      * Save custom post data
      *
@@ -175,13 +178,13 @@ class GlobalParametersPostType
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
             return;
-        
+
         global $post;
-        
+
         if (isset($_POST['_wck_nonce']) && wp_verify_nonce($_POST['_wck_nonce'], self::POST_TYPE)) {
-            
+
             $post_id = $post->ID;
-            
+
             foreach (self::$meta_keys as $key => $data_type) {
                 if (isset($_POST[$key])) {
                     $value = Sanitizer::sanitize($_POST[$key], $data_type);
@@ -190,7 +193,7 @@ class GlobalParametersPostType
             }
         }
     }
-    
+
     /**
      * Remove "edit" option from the bulk actions dropdown
      *
@@ -203,7 +206,7 @@ class GlobalParametersPostType
         unset($actions['edit']);
         return $actions;
     }
-    
+
     /**
      * Removes all custom posts
      *
@@ -226,5 +229,20 @@ class GlobalParametersPostType
             }
         }
     }
-    
+
+    /**
+     * Display help for the user
+     *
+     * @return void
+     * @since 1.3.0
+     */
+    public static function help()
+    {
+        echo '<p>';
+        _e('Global Parameters are numeric variables, which can be used in formulas across all fieldsets. For example if you define MyParam = 100, then you can use {MyParam} in all fieldsets.', 'wc-kalkulator');
+        echo '<br />';
+        _e('Click "Add New" to create new global parameter.', 'wc-kalkulator');
+        echo '</p>';
+    }
+
 }

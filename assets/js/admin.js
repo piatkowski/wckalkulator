@@ -170,6 +170,14 @@
             });
             $WK.colorpicker.iris('color', $(this).val());
 
+        }).on("click", "input.allowed-extensions", function () {
+            var field_id = '#' + $(this).closest('li').attr('id');
+            var ext = [];
+            $(field_id + " input.allowed-extensions:checked").each(function () {
+                console.log($(this).data('extension'));
+                ext.push($(this).data('extension'));
+            });
+            $(field_id + " input.fu-allowed-extensions").val(ext.join('|'));
         });
 
         $(".iris-square-value").on("click", function (e) {
@@ -299,7 +307,7 @@
 
                 var input_fimgwidth = $row.find('input.fimg-width');
                 if (input_fimgwidth.length > 0) {
-                    field.image_size = input_fimgwidth.val()
+                    field.image_size = input_fimgwidth.val();
                 }
 
                 var $fs_options;
@@ -395,8 +403,8 @@
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
-                    case 'fileupload':
-                        field.max_file_count = $row.find('input.fu-max-file-count').val();
+                    case 'imageupload':
+                        //field.max_file_count = $row.find('input.fu-max-file-count').val();
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
                         break;
@@ -472,6 +480,10 @@
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
                     suggest.push(field.name + ":max");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
+                }
+                if (field.type === "text" || field.type === "textarea") {
+                    suggest.push(field.name + ":text");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
                 }
                 if (field.type === "rangedatepicker") {
                     suggest.push(field.name + ":date_from");
@@ -619,10 +631,13 @@
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
-                    } else if (this.type === "fileupload") {
-                        $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
+                    } else if (this.type === "imageupload") {
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
+                        var ext = this.allowed_extensions.split("|");
+                        ext.forEach(function (e) {
+                            $("#" + field_id + " .allowed-extensions.ext-" + e).prop("checked", true);
+                        });
                     } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
                         $("#" + field_id + " .fst-content").val(this.content);
                         if (this.type === 'heading') {

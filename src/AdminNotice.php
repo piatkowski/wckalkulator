@@ -57,14 +57,14 @@ class AdminNotice
     {
         wp_enqueue_script(
             'wck-admin-notice-script',
-            Plugin::url() . '/assets/js/notice.js',
+            Plugin::url() . '/assets/js/notice.min.js',
             ['jquery'],
             Plugin::VERSION
         );
         
         wp_localize_script(
             'wck-admin-notice-script',
-            'ajax_object',
+            'wck_ajax_object',
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 '_wck_ajax_nonce' => wp_create_nonce(AdminNotice::NONCE),

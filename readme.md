@@ -1,78 +1,141 @@
-=== Custom Fields and Price Calculator for WooCommerce (Product Addons) ===
+=== Custom Fields and Price Calculator for WooCommerce ===
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.0
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
 
-WooCommerce custom fields and custom price calculation. Add fields to product page of your WooCommerce store. Use formula based price calculation.
+WooCommerce extra product fields and price calculator (formula). Absolutely FREE - 21 different field types on your product and order page.
 
 == Description ==
-**WC Kalkulator** is a Wordpress plugin which extends the WooCommerce to use custom fields with products and orders (woocommerce custom fields, product price).
-Custom fields can be used to calculate a custom product price in WooCommerce store.
 
-Full documentation at: [wckalkulator.com](https://wckalkulator.com)
+**WC Kalkulator (WCK)** is a Wordpress plugin which extends the WooCommerce to use custom extra fields with products and orders.
+Extra product fields can be used to calculate product price and save information in order details.
 
-You can sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.**
+*	Absolutely **FREE plugin** with **PRO features**
+*	**21 field types** to get customer input
+*	Price calculation based on **formula** or **conditional expression**
 
-## What makes WC Kalkulator (Custom Fields and Price Calculator for WooCommerce) unique ?
+Sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.** WooCommerce Custom Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating custom price. You can create a personalized product in your store.
 
-When designing the functionality of the plugin, we wanted to obtain software that would be easy to use and **highly configurable** and **suitable for any** type of store. 
+## Documentation
 
-WooCommerce Custom Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating the custom price. 
-Some of custom fields are not used in formulas, but you can use it to get informations from Customer (for example: text, date, date range, color, dropdown, etc.)
+*	Documentation @ [wckalkulator.com](https://wckalkulator.com)
+*	GitHub @ [github.com/piatkowski](https://github.com/piatkowski/wckalkulator)
 
-The plugin is designed to work with multisite mode. We encourage you to contact us and request new features.
+## 21 Field Types (ALL FREE)
 
-You can create a personalized product in your store.
+    1.  Attachment (URL/File)
+    2.  Checkbox
+    3.  Multi checkbox (group)
+    4.  Color Picker
+    5.  Color Swatches
+    6.  Date Picker
+    7.  Date Range Picker
+    8.  Dropdown
+    9.  E-mail input
+    10. Heading
+    11. Hidden
+    12. HTML
+    13. Image Select
+    14. Image Swatches
+    15. Link   
+    16. Number
+    17. Paragraph
+    18. Radio
+    19. Select
+    20. Textarea
+    21. Text input
+= =
 
-# About the Plugin (Custom Fields and Price Calculator for WooCommerce)
-
-The plugin extends the WooCommerce store with the ability to add your own fields (woocommerce custom fields) to the product page. 
-Almost all fields are used in formulas to calculate a custom price (woocommerce custom price) for a product. 
-The plugin allows full freedom to define fields and formulas for calculating the woocommerce custom price.
-Some of custom fields can be used to get informations from Customer (for example: text, date, date range, color, dropdown, etc.)
-
-The plugin is designed to work with multisite mode. We encourage you to contact us and request new features. You can create a personalized product in your woocommerce store.
-
-## Definitions (Custom Fields and Custom Price)
+## Definitions
 
 - **Field** - is used to get user's input on the woocommerce product page. Custom Field can be used to calculate the price (is used in formula)
+
 - **Fieldset** - store manager can create the fieldset (set of custom product fields) which consists of different **Fields**. Fieldset must have at least one **Field** and the expression (formula) to calculate the product price
+
 - **Expression/Formula** - mathematical and/or logical expression using to calculate the woocommerce custom price. The expression can be single-line (one-line) or conditional. **Expression** is protected and calculated only server-side.
+
 - **Validation** - each **Field** has specific requirements to be met. Incorrect values make it impossible to calculate the woocommerce custom price and add the product to the cart.
+
 - **Global Parameters** - are numeric variables which can be used in formulas across all fieldsets.
 
-## Features
+### Formula/Expression Builder
 
-- define unlimited fieldsets with unlimited fields
-- fields are displayed in product page, cart and order details,
-- **expression builder**
-- define single-line expression to calculate the price
-- define unlimited conditional expressions to calculate the price
-- attach fieldset to: all products/catgories/tags, selected products/categories/tags
-- **supported variable products**
-- **supported multisite**
-- the plugin is translatable
-- every field has built-in validation tests
-- the product will be removed from user's cart when shop manager updates the fieldset settings
-- **product shortcodes are supported**
-- **the formula is protected and will not be shown to the user** - the price is calculated only server-side
-- regular and sale price are supported
-- supported price filters
-- customizable HTML code of every field
-- HMTL template of every field can be overridden in a theme directory
-- static fields such as HTML, Heading, Paragraph, Hidden, Link, Attachment
-- math functions to use in the expression
-- additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
-- global parameters can be defined and used in formula
-- ability to edit product fields after from a cart
+Use field's values as variables to calculate product price. Drag&drop conditional statements.
 
-Full documentation at: [wckalkulator.com](https://wckalkulator.com)
+### Display Fields
+
+Assign fields to products, categories or product tags. Include/exclude options.
+Mass assignment.
+
+### Validation
+
+Each field has built-in validation tests on user input. You can define additional conditions.
+
+### Protected Formula
+
+The price is calculated server-side only, so the Client can't see exact expression.
+
+### Advanced Customization
+
+Field HTML templates can be overloaded in your theme file. Each field has CSS class to set custom styles.
+
+### Functions
+
+You can use basic math functions in the formula. Fields such as Multi-checkbox, Date Picker, Date Range Picker has additional functions to get sum, min, max value or get date, days between dates values as number.
+
+### Global Parameters
+
+You can define numeric variable across all fieldsets. You can modify all prices by global parameters.
+
+### Cart
+
+The customer can edit product options after adding to cart.
+
+## Compatibility
+
+*	multisite mode is supported
+*	product shortcodes
+*	translation
+*	virtual and variable products are supported
+*	product regular and sale prices are supported
+*	product tags
+
+## More Features
+
+*   define unlimited fieldsets with unlimited fields
+*    fields are displayed in product page, cart and order details,
+*    **expression builder**
+*    define single-line expression to calculate the price
+*    define unlimited conditional expressions to calculate the price
+*    attach fieldset to: all products/catgories/tags, selected products/categories/tags
+*    **supported variable products**
+*    **supported multisite**
+*    the plugin is translatable
+*    every field has built-in validation tests
+*    the product will be removed from user's cart when shop manager updates the fieldset settings
+*    **product shortcodes are supported**
+*    **the formula is protected and will not be shown to the user** - the price is calculated only server-side
+*    regular and sale price are supported
+*    supported price filters
+*    customizable HTML code of every field
+*    HMTL template of every field can be overridden in a theme directory
+*    static fields such as HTML, Heading, Paragraph, Hidden, Link, Attachment
+*    math functions to use in the expression
+*    additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
+*    global parameters can be defined and used in formula
+*    ability to edit product fields after from a cart
+
+Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+
+2022-06-15 v.1.2.3
+
+- issue with ajax form serialization has been fixed
 
 2022-06-14 v.1.2.2
 
@@ -118,7 +181,6 @@ Full documentation at: [wckalkulator.com](https://wckalkulator.com)
 - performance fixes
 - bug fixes
 
-2022-01-20
-v.1.0.0
+2022-01-20 v.1.0.0
 
 - Initial release

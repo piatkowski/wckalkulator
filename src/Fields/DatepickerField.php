@@ -27,7 +27,7 @@ class DatepickerField extends TextField
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script(
             'wck-date-picker',
-            Plugin::url() . '/assets/js/datepicker.js',
+            Plugin::url() . '/assets/js/datepicker.min.js',
             array('jquery-ui-datepicker'),
             Plugin::VERSION,
             1
