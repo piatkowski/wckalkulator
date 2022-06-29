@@ -23,7 +23,7 @@ use WCKalkulator\Helper;
 <label><?php _e('Allowed extensions', 'wc-kalkulator'); ?>
     <?php echo Helper::html_help_tip(__('Select allowed file extensions.', 'wc-kalkulator')); ?></label>
 
-<label class="inline"><input type="checkbox" data-extension="jpg|jpeg" class="allowed-extensions">JPG/JPEG</label>
-<label class="inline"><input type="checkbox" data-extension="gif" class="allowed-extensions">GIF</label>
-<label class="inline"><input type="checkbox" data-extension="png" class="allowed-extensions">PNG</label>
+<label class="inline"><input type="checkbox" data-extension="jpg|jpeg" class="allowed-extensions ext-jpg">JPG/JPEG</label>
+<label class="inline"><input type="checkbox" data-extension="gif" class="allowed-extensions ext-gif">GIF</label>
+<label class="inline"><input type="checkbox" data-extension="png" class="allowed-extensions ext-png">PNG</label>
 <input type="hidden" class="param fu-allowed-extensions">

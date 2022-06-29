@@ -342,7 +342,7 @@ class FieldsetPostType
         wp_enqueue_script('jquery-ui-sortable');
         wp_enqueue_script(
             'wck-fieldset-script',
-            Plugin::url() . '/assets/js/admin.js',
+            Plugin::url() . '/assets/js/admin.min.js',
             array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete'),
             Plugin::VERSION
         );
@@ -438,7 +438,7 @@ class FieldsetPostType
      */
     private static function add_styles()
     {
-        wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.css');
+        wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.min.css');
         wp_enqueue_style('wckalkulator_admin_css');
         wp_enqueue_style('wp-color-picker');
     }

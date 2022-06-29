@@ -57,7 +57,7 @@ class AdminNotice
     {
         wp_enqueue_script(
             'wck-admin-notice-script',
-            Plugin::url() . '/assets/js/notice.js',
+            Plugin::url() . '/assets/js/notice.min.js',
             ['jquery'],
             Plugin::VERSION
         );

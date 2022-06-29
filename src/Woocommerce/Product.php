@@ -50,11 +50,11 @@ class Product
         if ($fieldset->has_fieldset('current')) {
 
             if ($fieldset->has_expression('current')) {
-                wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.css');
+                wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.min.css');
                 wp_enqueue_style('wckalkulator_price_css');
             }
 
-            wp_register_style('wckalkulator_product_css', Plugin::url() . '/assets/css/product.css');
+            wp_register_style('wckalkulator_product_css', Plugin::url() . '/assets/css/product.min.css');
             wp_enqueue_style('wckalkulator_product_css');
 
             wp_enqueue_script('jquery-tiptip',
@@ -93,7 +93,7 @@ class Product
                 );
             }
         } else if (is_page('cart') || is_cart() || is_checkout() || is_page('checkout')) {
-            wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/cart.css');
+            wp_register_style('wckalkulator_frontend_css', Plugin::url() . '/assets/css/cart.min.css');
             wp_enqueue_style('wckalkulator_frontend_css');
         }
     }

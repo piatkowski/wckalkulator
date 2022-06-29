@@ -36,7 +36,7 @@ class Settings
                 'label' => __('Display calculation errors', 'wc-kalkulator'),
                 'desc' => __('Enable this option to show additional informations about price calculation errors. This errors are shown only to admin user or shop manager. This messages are not public.', 'wc-kalkulator'),
                 'type' => 'checkbox',
-                'default' => 1,
+                'default' => 'yes',
             ),
             'upload_retain_time' => array(
                 'label' => __('Keep customer files [days]', 'wc-kalkulator'),
@@ -205,8 +205,8 @@ class Settings
         $input['form_css_selector'] = sanitize_text_field($input['form_css_selector']);
         $input['display_errors'] = $input['display_errors'] === 'yes' ? 'yes' : 'no';
 
-        $input['upload_retain_time'] = absint($input['upload_retain_time']);
-        $input['upload_temp_retain_time'] = absint($input['upload_temp_retain_time']);
+        $input['upload_retain_time'] = max(1, absint($input['upload_retain_time']));
+        $input['upload_temp_retain_time'] = max(1, absint($input['upload_temp_retain_time']));
         return $input;
     }
 }

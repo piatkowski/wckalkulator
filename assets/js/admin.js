@@ -632,9 +632,12 @@
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
                     } else if (this.type === "imageupload") {
-                        //$("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
+                        var ext = this.allowed_extensions.split("|");
+                        ext.forEach(function (e) {
+                            $("#" + field_id + " .allowed-extensions.ext-" + e).prop("checked", true);
+                        });
                     } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
                         $("#" + field_id + " .fst-content").val(this.content);
                         if (this.type === 'heading') {

@@ -341,18 +341,18 @@ class FieldsetProduct
                     $validate = wp_check_filetype_and_ext($_FILES['wck']['tmp_name'][$name], $file_name);
                     if ($validate['ext'] !== false) {
                         $file = uniqid() . '.' . $validate['ext'];
-                        $upload_file    = wp_unique_filename($upload_path, $file);
-                        $temp_file      = 'wckalkulator_tmp_' . wp_unique_filename(get_temp_dir(), $file);
+                        $upload_file = wp_unique_filename($upload_path, $file);
+                        $temp_file = 'wckalkulator_tmp_' . wp_unique_filename(get_temp_dir(), $file);
                         $user_input[$name] = round($_FILES['wck']['size'][$name] / 1000000, 2); //B to MB (not MiB)
                         $user_input['_files'][$name] = array(
-                            'name'          => $name,
-                            'type'          => $_FILES['wck']['type'][$name],
-                            'tmp_name'      => $_FILES['wck']['tmp_name'][$name],
-                            'upload_path'   => $upload_path . $upload_file,
-                            'upload_url'    => $upload_url . $upload_file,
-                            'upload_tmp'    => get_temp_dir() . $temp_file,
-                            'size'          => $_FILES['wck']['size'][$name],
-                            'error'         => 0,
+                            'name' => $name,
+                            'type' => $_FILES['wck']['type'][$name],
+                            'tmp_name' => $_FILES['wck']['tmp_name'][$name],
+                            'upload_path' => $upload_path . $upload_file,
+                            'upload_url' => $upload_url . $upload_file,
+                            'upload_tmp' => get_temp_dir() . $temp_file,
+                            'size' => $_FILES['wck']['size'][$name],
+                            'error' => 0,
                         );
                     }
                 }
@@ -425,10 +425,16 @@ class FieldsetProduct
         if (!is_array($this->expression())) {
             return true;
         }
+
+        //Implode array as string
+        $expr = implode("", array_map(function ($a) {
+            return implode("", $a);
+        }, $this->expression('expr')));
+
         foreach ($this->fields() as $field) {
             if ($field->use_expression()) {
                 $field_name = $field->data("name");
-                if (strpos('{' . $field_name . '}', $this->expression('expr')) !== false) {
+                if (strpos('{' . $field_name . '}', $expr) !== false) {
                     if (!$field->validate($this->user_input[$field_name])) {
                         return false;
                     }
@@ -454,7 +460,7 @@ class FieldsetProduct
             return $this->data->expression[$key];
         }
 
-        return;
+        return null;
     }
 
     /**

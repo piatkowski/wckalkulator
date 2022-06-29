@@ -87,7 +87,8 @@ if (!class_exists('WCKalkulator\Plugin')) {
         public static function run()
         {
             register_activation_hook(__FILE__, array(__CLASS__, 'activation'));
-            
+            register_deactivation_hook(__FILE__, array(__CLASS__, 'deactivation'));
+
             self::$url = plugins_url('', __FILE__);
             self::$path = WP_PLUGIN_DIR . '/' . Plugin::NAME;
             
@@ -97,6 +98,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Product::init();
             Settings::init();
             AdminNotice::init();
+            Cron::init();
         }
         
         /**
@@ -151,11 +153,23 @@ if (!class_exists('WCKalkulator\Plugin')) {
         /**
          * Store the current version number of this plugin
          *
+         * @return void
          * @since 1.0.0
          */
         public static function activation()
         {
             update_option('wck_version', self::VERSION);
+        }
+
+        /**
+         * Delete cron jobs
+         *
+         * @return void
+         * @since 1.3.0
+         */
+        public static function deactivation()
+        {
+            Cron::deactivate();
         }
         
     }
