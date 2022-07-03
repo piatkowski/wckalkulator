@@ -645,12 +645,13 @@ class FieldsetProduct
         if ($this->is_valid) {
             if ((int)$this->product_id > 0) {
                 $product_helper = new ProductHelper($this->product_id, $this->variation_id);
+
                 if ($product_helper->is_valid() && isset($_POST["quantity"])) {
                     $this->user_input["product_price"] = $product_helper->price();
                     $this->user_input["product_regular_price"] = $product_helper->regular_price();
                     $this->user_input["quantity"] = absint($_POST["quantity"]);
                 } else {
-                    return Ajax::response('error', __("Cannot access product data!", "wc-kalkulator"));
+                    return Ajax::response('error', __("Cannot access product data or it is a variable product. Select variation options first!", "wc-kalkulator"));
                 }
             }
 

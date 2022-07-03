@@ -38,8 +38,13 @@ class HtmlField extends AbstractField
      */
     public function render_for_product($value = "")
     {
+        $content = $this->data('content');
+        preg_match('/{=(.+)}/m', $content, $matches);
+        if(!empty($matches)) {
+            var_dump($matches);
+        }
         return View::render('fields/front/' . $this->type, array(
-            'content' => $this->data('content')
+            'content' => $content
         ));
     }
 
