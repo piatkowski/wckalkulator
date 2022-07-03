@@ -89,6 +89,9 @@ final class Sanitizer
             'label' => array(
                 'style' => true,
                 'for' => true
+            ),
+            'span' => array(
+                'data-expr' => true
             )
         );
         return array_merge($allowed, wp_kses_allowed_html('post'));
