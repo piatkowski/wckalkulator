@@ -203,6 +203,9 @@
 .wc-kalkulator-wrapper .input-equation i::after {
   content: "=";
 }
+.wc-kalkulator-wrapper #addon-inputs .input-equation i::after {
+  content: "add";
+}
 .wc-kalkulator-wrapper .input-else i::after {
   content: "else";
 }

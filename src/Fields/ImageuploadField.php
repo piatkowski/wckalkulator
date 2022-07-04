@@ -59,7 +59,7 @@ class ImageuploadField extends AbstractField
     {
         return View::render('fields/cart', array(
             'title' => $this->data['title'],
-            'value' => $value
+            'value' => round($value / 1000000, 2) . ' MB'
         ));
     }
 

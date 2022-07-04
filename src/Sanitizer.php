@@ -14,7 +14,7 @@ namespace WCKalkulator;
  */
 final class Sanitizer
 {
-    const MAX_DEPTH = 10;
+    const MAX_DEPTH = 1000;
     
     /**
      * Allowed HTML tags for wp_kses function

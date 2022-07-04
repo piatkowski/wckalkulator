@@ -13,7 +13,7 @@ class Settings
 
     const OPTIONS = "wck_options";
 
-    private static array $fields;
+    private static $fields;
 
     /**
      * Add actions and filters

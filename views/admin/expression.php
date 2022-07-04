@@ -19,7 +19,7 @@ use WCKalkulator\Helper;
     <label class="pr-20" for="choose_expression_type_off">
         <?php _e('Turn off', 'wc-kalkulator'); ?>
     </label>
-    
+
     <input type="radio" name="_wck_choose_expression_type" id="choose_expression_type_oneline"
            class="expression_type expression_oneline"
            value="oneline" checked>
@@ -72,6 +72,8 @@ use WCKalkulator\Helper;
 </div>
 
 <div class="expression_addon">
+    <p><?php _e('If the "if" condition is met, the price from the "add" field will be added to the price of the product.
+    Unlike the conditional expression, Price Add-ons allows you to add multiple amounts to the price of a product.', 'wc-kalkulator'); ?></p>
     <div id="addon-inputs"></div>
     <button type="button" class="button add-addon"><?php _e('New addon', 'wc-kalkulator'); ?></button>
 </div>

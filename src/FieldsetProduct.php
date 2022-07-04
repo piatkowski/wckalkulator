@@ -343,7 +343,7 @@ class FieldsetProduct
                         $file = uniqid() . '.' . $validate['ext'];
                         $upload_file = wp_unique_filename($upload_path, $file);
                         $temp_file = 'wckalkulator_tmp_' . wp_unique_filename(get_temp_dir(), $file);
-                        $user_input[$name] = round($_FILES['wck']['size'][$name] / 1000000, 2); //B to MB (not MiB)
+                        $user_input[$name] = $_FILES['wck']['size'][$name]; //fixed
                         $user_input['_files'][$name] = array(
                             'name' => $name,
                             'type' => $_FILES['wck']['type'][$name],
@@ -654,7 +654,6 @@ class FieldsetProduct
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
                 }
             }
-
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
                 return $parser->execute();

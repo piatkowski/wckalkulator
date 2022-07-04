@@ -639,7 +639,7 @@
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
-                        if (this.type === "text'") {
+                        if (this.type === "text") {
                             $("#" + field_id + " .ft-pattern").val(this.pattern);
                         }
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
