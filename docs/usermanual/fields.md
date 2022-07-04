@@ -195,7 +195,8 @@ This field is required by default.
 
 ## Static: HTML
 
-Displays content from a HTML code. It is filtered by ``wp_kses_post``
+Displays content from a HTML code. It is filtered by ``wp_kses_post``.
+You can use dynamic expression in the contents, for example: ``{={field_1}*{field_2}/1000}``
 
 ## Static: Attachment
 
@@ -207,7 +208,8 @@ You can add heading h1-h6 in product page
 
 ## Static: Paragraph
 
-You can add text in paragraph tag in product page
+You can add text in paragraph tag in product page.
+You can use dynamic expression in the contents, for example: ``{={field_1}*{field_2}/1000}``
 
 ## Static: Hidden
 
@@ -221,3 +223,11 @@ You can add hidden input fields to store predefined values. This field does not 
 
 You can add link to any website, file attachment, URL.
 
+## Image upload
+
+You can get image file from the customer. Files are saved in customer directory on checkout.
+Go to Settings Page to set cron jobs invervals. Files are uploaded to the temp directory and will be deleted after time. Files will be kept longer if the customer places an order.
+Customer files will be deleted after 360 days (default option), but you can set your own interval.
+!!!
+You can use ``file size [MB]`` parameter in formulas.
+!!!

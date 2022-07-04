@@ -8,7 +8,7 @@
         $("#f-field-list").sortable({
             "handle": ".action-drag"
         });
-        $("#extra-inputs").sortable({
+        $("#extra-inputs, #addon-inputs").sortable({
             "handle": ".action-drag"
         });
 
@@ -98,6 +98,17 @@
                 }
             } else {
                 alert("You cannot remove the last condition!");
+            }
+        }).on("click", ".expression_addon .input-group .action-delete", function () {
+            var $target = $(this).closest(".input-group");
+            if ($("#addon-inputs .input-group").length > 1) {
+                if (confirm("Are you sure?")) {
+                    $target.hide('slow', function () {
+                        $target.remove();
+                    });
+                }
+            } else {
+                alert("You cannot remove the last addon!");
             }
         }).on("click", ".action-add-image", function (e) {
             e.preventDefault();
@@ -495,6 +506,9 @@
                 } else if (field.type === "datepicker") {
                     suggest.push(field.name + ":date");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                } else if (field.type === "imageupload") {
+                    suggest.push(field.name + ":size");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
                 }
             }
         };
@@ -660,7 +674,7 @@
         // -------- EXPRESSION EDITOR -----------
 
         $WK.showExpressionEditor = function () {
-            $("div.expression_oneline, div.expression_conditional, div.expression_off").hide();
+            $("div.expression_oneline, div.expression_conditional, div.expression_off, div.expression_addon").hide();
             $("div.expression_" + $WK.expression.mode).show();
             if ($WK.expression.mode === "off") {
                 $(".off-hide").hide();
@@ -674,7 +688,7 @@
             $WK.showExpressionEditor();
         });
 
-        $WK.addCondition = function (if_value, then_value) {
+        $WK.addCondition = function (if_value, then_value, addon = false) {
             var $html = $('<div class="input-group">' +
                 '<span class="action-drag dashicons left dashicons-move"></span>' +
                 '<span class="action-delete dashicons right dashicons-no-alt"></span>' +
@@ -687,12 +701,20 @@
                 '</div></div>');
             $(".input-if input", $html).val(if_value);
             $(".input-equation input", $html).val(then_value);
-            $("div#extra-inputs").append($html);
+            if (addon === true) {
+                $("div#addon-inputs").append($html);
+            } else {
+                $("div#extra-inputs").append($html);
+            }
             $WK.autocomplete();
         };
 
         $("button.add-condition").on("click", function () {
             $WK.addCondition();
+        });
+
+        $("button.add-addon").on("click", function () {
+            $WK.addCondition("", "", true);
         });
 
         $WK.autocomplete = function () {
@@ -751,6 +773,23 @@
                 }
             }
 
+            if (mode === "addon") {
+                var data = [];
+                $(".expression_addon .input-group").each(function () {
+                    var input_if = $(this).find(".input-if input").val();
+                    var input_eq = $(this).find(".input-equation input").val();
+                    data.push({
+                        "type": "condition",
+                        "if": input_if,
+                        "then": input_eq
+                    });
+                });
+                $WK.expression.expr = data;
+                if ($WK.expression.expr.length > 0) {
+                    $WK.expr_saved = true;
+                }
+            }
+
             if (mode === "off") {
                 $("input[name=_wck_expression]").val("off");
             } else {
@@ -775,6 +814,12 @@
                         }
                     });
                     $("input[name=_wck_choose_expression_type].expression_conditional").prop("checked", true);
+                    $WK.showExpressionEditor();
+                } else if ($WK.expression.mode === "addon") {
+                    $.each($WK.expression.expr, function () {
+                        $WK.addCondition(this.if, this.then, true);
+                    });
+                    $("input[name=_wck_choose_expression_type].expression_addon").prop("checked", true);
                     $WK.showExpressionEditor();
                 }
             } else {

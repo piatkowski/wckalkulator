@@ -31,9 +31,17 @@ use WCKalkulator\Helper;
     <input type="radio" name="_wck_choose_expression_type" id="choose_expression_type_conditional"
            class="expression_type expression_conditional"
            value="conditional">
-    <label for="choose_expression_type_conditional">
+    <label class="pr-20" for="choose_expression_type_conditional">
         <?php _e('Conditional Expression', 'wc-kalkulator'); ?>
         <?php echo Helper::html_help_tip(__('If the condition [if] is met, calculate the price according to the assigned formula [=]. You can use multiple conditions. The [else] formula is used when none of the conditions are met.', 'wc-kalkulator')); ?>
+    </label>
+
+    <input type="radio" name="_wck_choose_expression_type" id="choose_expression_type_addon"
+           class="expression_type expression_addon"
+           value="addon">
+    <label for="choose_expression_type_addon">
+        <?php _e('Price Add-ons', 'wc-kalkulator'); ?> <sup style="color:red">Experimental</sup>
+        <?php echo Helper::html_help_tip(__('The basic price of the product is increased by the price of the add-ons', 'wc-kalkulator')); ?>
     </label>
 </p>
 <p class="off-hide">
@@ -61,6 +69,11 @@ use WCKalkulator\Helper;
         <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
     </div>
     <button type="button" class="button add-condition"><?php _e('Add contition', 'wc-kalkulator'); ?></button>
+</div>
+
+<div class="expression_addon">
+    <div id="addon-inputs"></div>
+    <button type="button" class="button add-addon"><?php _e('New addon', 'wc-kalkulator'); ?></button>
 </div>
 
 <div class="expression_off">

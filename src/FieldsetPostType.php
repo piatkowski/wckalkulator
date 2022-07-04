@@ -35,7 +35,7 @@ class FieldsetPostType
         '_wck_filter_price_sufix' => 'text',
         '_wck_fieldset' => 'json', //will be stored as array
         '_wck_expression' => 'json', //will be stored as array
-        '_wck_choose_expression_type' => array('oneline', 'conditional', 'off'),
+        '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
         '_wck_priority' => 'int'
     );

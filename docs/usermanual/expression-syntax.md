@@ -60,4 +60,5 @@ max(a,b,...)    - maximal value
 min(a,b,...)    - minimal value
 pow(x,p)        - "x" raised to the power of "p" (x^p) 
 sqrt(x)         - square root of "x"
+strlen(x)       - get length of a text; use with text fields
 ```

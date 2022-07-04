@@ -5,6 +5,20 @@ icon: git-branch
 ---
 # CHANGELOG
 
+2022-07-04
+v.1.3.0
+
+- you can use formulas in HTML/Paragraph field, for example: {={field_a}*{field_b}/100}
+- Image upload field added – you can use file size parameter in expressions
+- cron jobs to keep uploaded files clean
+- strlen() function added to expressions – it returns text length
+- Settings page added – you can define custom product form selector, you can toggle error messages for admin/manager
+
+2022-06-15
+v.1.2.3
+
+- bug fixes
+
 2022-06-14
 v.1.2.2
 

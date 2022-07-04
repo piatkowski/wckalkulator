@@ -6,6 +6,14 @@ icon: star
 
 # News
 
+## Version 1.3.0 has been released
+*Update: 2022-07-04*
+
+- [X] Image upload field
+- [X] Use dynamic formula in a static field's contents
+- [X] Settings page
+- [X] Strlen() function to get a text length
+
 ## Version 1.2.0 has been released
 *Update: 2022-06-13*
 

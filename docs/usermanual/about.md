@@ -44,6 +44,7 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 
 - <a href="https://symfony.com/doc/5.4/components/expression_language.html" target="_blank" rel="nofollow">Symfony ExpressionLanguage Component</a>
 - jQuery, jQuery UI (built in Wordpress Core)
+- <a href="https://github.com/bugwheels94/math-expression-evaluator" target="_blank" rel="nofollow">Math Expression Evaluator</a> by bugwheels94
 
 ## Features
 
@@ -63,15 +64,19 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 - regular and sale price are supported
 - supported price filters
 - customizable HTML code of every field
-- HMTL template of every field can be overridden in a theme directory
+- HTML template of every field can be overridden in a theme directory
 - static fields such as HTML, Heading, Paragraph, Hidden, Link, Attachment
 - math functions to use in the expression
 - additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
 - global parameters can be defined and used in formula
 - ability to edit product fields after from a cart
+- image upload field (use file size in formula/expression)
+- dynamic formula in a static field's contents
 
 ## Conflict with other plugins 
 
 This plugin has been tested only with Wordpress and Woocommerce without additional plugins.
 Note that there may be a conflict with plugins that modifies the product price and user's cart, or has similar functionality. 
 This section will be updated and conflicts will be resolved. 
+
+- We know about issue with displaying prices in a cart page. In some themes there's an issue with cart page. Theme should display `cart item price` instead of `product price`. The plugin modifies cart items, but not products itself.
