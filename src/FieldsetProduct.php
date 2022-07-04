@@ -651,7 +651,7 @@ class FieldsetProduct
                     $this->user_input["product_regular_price"] = $product_helper->regular_price();
                     $this->user_input["quantity"] = absint($_POST["quantity"]);
                 } else {
-                    return Ajax::response('error', __("Cannot access product data or it is a variable product. Select variation options first!", "wc-kalkulator"));
+                    return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
                 }
             }
 
