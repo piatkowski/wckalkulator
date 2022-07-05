@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Kalkulator 1.2.0\n"
+"Project-Id-Version: WC Kalkulator 1.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/WC Kalkulator\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-06-13T07:09:44+00:00\n"
+"POT-Creation-Date: 2022-07-05T19:22:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wc-kalkulator\n"
@@ -30,43 +30,58 @@ msgstr ""
 msgid "https://wckalkulator.com"
 msgstr ""
 
+#: src/AdminNotice.php:143
+msgid "Thank you for using <strong>WC Kalkulator</strong>! Please <a href=\"https://wordpress.org/support/plugin/wc-kalkulator/reviews/#new-post\" target=\"_blank\">rate us &#9733;&#9733;&#9733;&#9733;&#9733;</a> and remember that WCK will always be for free!"
+msgstr ""
+
+#: src/AdminNotice.php:158
+msgid "Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - <a href=\"https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY\"><strong>Yes, I'd like to support!</strong></a>"
+msgstr ""
+
 #: src/Ajax.php:75
 msgid "You should check at least one option."
 msgstr ""
 
-#: src/ExpressionParser.php:101
+#: src/Ajax.php:76
+msgid "This file is too big!"
+msgstr ""
+
+#: src/ExpressionParser.php:107
 msgid "-"
 msgstr ""
 
-#: src/ExpressionParser.php:106
+#: src/ExpressionParser.php:112
 msgid "ExpressionParser: Invalid calculation mode."
 msgstr ""
 
-#: src/ExpressionParser.php:110
+#: src/ExpressionParser.php:116
 msgid "ExpressionParser: Prepared expression has incorrect type."
 msgstr ""
 
-#: src/ExpressionParser.php:316
+#: src/ExpressionParser.php:355
+#: src/ExpressionParser.php:375
 msgid "ExpressionParser: Division by zero"
 msgstr ""
 
-#: src/ExpressionParser.php:320
+#: src/ExpressionParser.php:357
 msgid "ExpressionParser: Undefined result!"
 msgstr ""
 
-#: src/ExpressionParser.php:323
-msgid "ExpressionParser: Undefined calculation mode!"
-msgstr ""
-
-#: src/ExpressionParser.php:350
+#: src/ExpressionParser.php:382
+#: src/ExpressionParser.php:420
 msgid "The price is less than zero."
 msgstr ""
 
-#: src/ExpressionParser.php:352
+#: src/ExpressionParser.php:384
+#: src/ExpressionParser.php:422
 msgid "The price is equal zero."
 msgstr ""
 
-#: src/ExpressionParser.php:358
+#: src/ExpressionParser.php:393
+msgid "ExpressionParser: Undefined calculation mode!"
+msgstr ""
+
+#: src/ExpressionParser.php:428
 msgid "Division by zero."
 msgstr ""
 
@@ -137,7 +152,7 @@ msgstr ""
 msgid "E-mail Field"
 msgstr ""
 
-#: src/Fields/FileuploadField.php:28
+#: src/Fields/FileuploadField.php:37
 msgid "File Upload"
 msgstr ""
 
@@ -159,6 +174,14 @@ msgstr ""
 
 #: src/Fields/ImageswatchesField.php:22
 msgid "Image Swatches"
+msgstr ""
+
+#: src/Fields/ImageuploadField.php:30
+msgid "Image Upload"
+msgstr ""
+
+#: src/Fields/ImageuploadField.php:62
+msgid "File size:"
 msgstr ""
 
 #: src/Fields/LinkField.php:29
@@ -227,7 +250,7 @@ msgid "Add new Fieldset"
 msgstr ""
 
 #: src/FieldsetPostType.php:88
-#: src/GlobalParametersPostType.php:61
+#: src/GlobalParametersPostType.php:64
 msgid "Add new"
 msgstr ""
 
@@ -276,7 +299,7 @@ msgid "Tags: "
 msgstr ""
 
 #: src/FieldsetPostType.php:177
-#: src/GlobalParametersPostType.php:128
+#: src/GlobalParametersPostType.php:131
 msgid "Documentation"
 msgstr ""
 
@@ -287,10 +310,6 @@ msgstr ""
 
 #: src/FieldsetPostType.php:185
 msgid "Product Fields Settings"
-msgstr ""
-
-#: src/FieldsetPostType.php:189
-msgid "Add Field"
 msgstr ""
 
 #: src/FieldsetPostType.php:193
@@ -317,81 +336,113 @@ msgstr ""
 msgid "Duplicate Fieldset"
 msgstr ""
 
-#: src/FieldsetProduct.php:408
+#: src/FieldsetProduct.php:494
 msgid "Field %s is required."
 msgstr ""
 
-#: src/FieldsetProduct.php:437
+#: src/FieldsetProduct.php:529
 msgid "Field %s has incorrect value."
 msgstr ""
 
-#: src/FieldsetProduct.php:550
-msgid "Cannot access product data!"
+#: src/FieldsetProduct.php:657
+msgid "Select variation options first!"
 msgstr ""
 
-#: src/FieldsetProduct.php:561
+#: src/FieldsetProduct.php:667
 msgid "Fields are not valid!"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:55
-#: src/GlobalParametersPostType.php:97
+#: src/GlobalParametersPostType.php:58
+#: src/GlobalParametersPostType.php:100
 msgid "Parameters"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:56
-#: src/GlobalParametersPostType.php:57
+#: src/GlobalParametersPostType.php:59
+#: src/GlobalParametersPostType.php:60
 msgid "Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:58
+#: src/GlobalParametersPostType.php:61
 msgid "WCK Global Params"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:59
+#: src/GlobalParametersPostType.php:62
 msgid "View Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:60
+#: src/GlobalParametersPostType.php:63
 msgid "Add new Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:62
+#: src/GlobalParametersPostType.php:65
 msgid "Edit Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:63
+#: src/GlobalParametersPostType.php:66
 msgid "Save Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:64
+#: src/GlobalParametersPostType.php:67
 msgid "Search Parameter"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:65
+#: src/GlobalParametersPostType.php:68
 msgid "Parameter not found"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:66
+#: src/GlobalParametersPostType.php:69
 msgid "There is no Parameter in the trash"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:68
+#: src/GlobalParametersPostType.php:71
 msgid "Global Parameters for WCK Fieldset"
 msgstr ""
 
-#: src/GlobalParametersPostType.php:132
+#: src/GlobalParametersPostType.php:135
 msgid "Global parameters"
 msgstr ""
 
-#: src/Settings.php:46
-msgid "General Settings"
+#: src/GlobalParametersPostType.php:242
+msgid "Global Parameters are numeric variables, which can be used in formulas across all fieldsets. For example if you define MyParam = 100, then you can use {MyParam} in all fieldsets."
 msgstr ""
 
-#: src/Settings.php:91
+#: src/GlobalParametersPostType.php:244
+msgid "Click \"Add New\" to create new global parameter."
+msgstr ""
+
+#: src/Settings.php:30
+msgid "Form selector"
+msgstr ""
+
+#: src/Settings.php:31
+msgid "You can change default form tag selector. It is a form on product page with \"Add to cart\" button. Default value is: form.cart"
+msgstr ""
+
+#: src/Settings.php:36
+msgid "Display calculation errors"
+msgstr ""
+
+#: src/Settings.php:37
+msgid "Enable this option to show additional informations about price calculation errors. This errors are shown only to admin user or shop manager. This messages are not public."
+msgstr ""
+
+#: src/Settings.php:42
+msgid "Keep customer files [days]"
+msgstr ""
+
+#: src/Settings.php:43
+msgid "Number of days for which files uploaded by clients will be kept. Applies to files attached to orders."
+msgstr ""
+
+#: src/Settings.php:48
+msgid "Keep temp files [days]"
+msgstr ""
+
+#: src/Settings.php:126
 msgid "Settings Saved"
 msgstr ""
 
-#: src/Settings.php:101
+#: src/Settings.php:136
 msgid "Save settings"
 msgstr ""
 
@@ -399,11 +450,11 @@ msgstr ""
 msgid "Cannot calculate the correct price!"
 msgstr ""
 
-#: src/Woocommerce/Product.php:398
+#: src/Woocommerce/Product.php:393
 msgid "Product has incorrect parameters! Missing field "
 msgstr ""
 
-#: src/Woocommerce/Product.php:406
+#: src/Woocommerce/Product.php:402
 msgid "Corrupted data! You cannot checkout."
 msgstr ""
 
@@ -483,33 +534,39 @@ msgstr ""
 msgid "If the condition [if] is met, calculate the price according to the assigned formula [=]. You can use multiple conditions. The [else] formula is used when none of the conditions are met."
 msgstr ""
 
-#: views/admin/expression.php:49
+#: views/admin/expression.php:43
+msgid "Price Add-ons"
+msgstr ""
+
+#: views/admin/expression.php:44
+msgid "The basic price of the product is increased by the price of the add-ons"
+msgstr ""
+
+#: views/admin/expression.php:57
 msgid "Build the formula"
 msgstr ""
 
-#: views/admin/expression.php:54
-#: views/admin/expression.php:61
+#: views/admin/expression.php:62
+#: views/admin/expression.php:69
 msgid "equation..."
 msgstr ""
 
-#: views/admin/expression.php:63
-msgid "Add contition"
+#: views/admin/expression.php:71
+msgid "Add condition"
 msgstr ""
 
-#: views/admin/expression.php:68
+#: views/admin/expression.php:75
+msgid ""
+"If the \"if\" condition is met, the price from the \"add\" field will be added to the price of the product.\n"
+"    Unlike the conditional expression, Price Add-ons allows you to add multiple amounts to the price of a product."
+msgstr ""
+
+#: views/admin/expression.php:78
+msgid "New addon"
+msgstr ""
+
+#: views/admin/expression.php:83
 msgid "Price calculation has been disabled."
-msgstr ""
-
-#: views/admin/fields.php:23
-msgid "Choose a field type from the list and click \"Add field\"."
-msgstr ""
-
-#: views/admin/fields.php:27
-msgid "Add field"
-msgstr ""
-
-#: views/admin/fields_editor.php:8
-msgid "Add your first field. Select a field type from the dropdown at the right box and click \"Add field\"."
 msgstr ""
 
 #: views/admin/global_parameters.php:19
@@ -552,20 +609,20 @@ msgstr ""
 msgid "For example: \"per m2\""
 msgstr ""
 
-#: views/fields/admin.php:21
-msgid "Unique Field Name"
-msgstr ""
-
 #: views/fields/admin.php:22
-msgid "Field name must be unique and consist of letters, numbers and underscores. Correct names are: field_name, product_width."
-msgstr ""
-
-#: views/fields/admin.php:29
 msgid "Title"
 msgstr ""
 
-#: views/fields/admin.php:30
+#: views/fields/admin.php:23
 msgid "Title will be displayed on the product page."
+msgstr ""
+
+#: views/fields/admin.php:29
+msgid "Unique Field Name"
+msgstr ""
+
+#: views/fields/admin.php:30
+msgid "Field name must be unique and consist of letters, numbers and underscores. Correct names are: field_name, product_width."
 msgstr ""
 
 #: views/fields/admin.php:39
@@ -617,6 +674,7 @@ msgstr ""
 #: views/fields/admin/dropdown.php:9
 #: views/fields/admin/fileupload.php:9
 #: views/fields/admin/imageselect.php:12
+#: views/fields/admin/imageupload.php:11
 #: views/fields/admin/text.php:9
 msgid "Select an option to make the field required "
 msgstr ""
@@ -718,6 +776,7 @@ msgid "Maximum numer of files that Customer can upload."
 msgstr ""
 
 #: views/fields/admin/fileupload.php:15
+#: views/fields/admin/imageupload.php:19
 msgid "Max. file size [MB]"
 msgstr ""
 
@@ -726,10 +785,12 @@ msgid "Maximum size of one file in [MB] MegaBytes"
 msgstr ""
 
 #: views/fields/admin/fileupload.php:19
+#: views/fields/admin/imageupload.php:23
 msgid "Allowed extensions"
 msgstr ""
 
 #: views/fields/admin/fileupload.php:20
+#: views/fields/admin/imageupload.php:24
 msgid "Select allowed file extensions."
 msgstr ""
 
@@ -764,6 +825,20 @@ msgstr ""
 
 #: views/fields/admin/imageselect.php:26
 msgid "Add Image"
+msgstr ""
+
+#: views/fields/admin/imageupload.php:14
+#: views/fields/admin/text.php:30
+msgid "Price for the field filled in by the user "
+msgstr ""
+
+#: views/fields/admin/imageupload.php:15
+#: views/fields/admin/text.php:31
+msgid "The price value to use in a expression/formula. If the user does not fill in the field, the price is 0."
+msgstr ""
+
+#: views/fields/admin/imageupload.php:20
+msgid "Maximum size of one file in [MB] megabytes"
 msgstr ""
 
 #: views/fields/admin/link.php:8
@@ -846,14 +921,6 @@ msgstr ""
 msgid "The placeholder specifies a short hint to user. It is displayed in the field before the user enters a text."
 msgstr ""
 
-#: views/fields/admin/text.php:30
-msgid "Price for the field filled in by the user "
-msgstr ""
-
-#: views/fields/admin/text.php:31
-msgid "The price value to use in a expression/formula. If the user does not fill in the field, the price is 0."
-msgstr ""
-
 #: views/fields/front/checkbox.php:19
 msgid "Yes"
 msgstr ""
@@ -862,7 +929,7 @@ msgstr ""
 msgid "(max. %s)"
 msgstr ""
 
-#: views/woocommerce/cart.php:12
+#: views/woocommerce/cart.php:15
 msgid "Edit product"
 msgstr ""
 
