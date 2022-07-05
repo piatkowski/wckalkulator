@@ -331,29 +331,35 @@ class ExpressionParser
             return $this->calc_error("ExpressionParser: invalid data!");
         }
 
+        /*
+         * 1. Evaluate single-line expression
+         */
         if ($this->mode === self::MODE_ONELINE) {
             return $this->calc_or_fail($this->expr['eq']);
         }
 
+        /*
+         * 2. Evaluate conditional expression
+         */
         if ($this->mode === self::MODE_CONDITIONAL) {
-            foreach ($this->expr as $expr) {
-
-                try {
+            try {
+                foreach ($this->expr as $expr) {
                     $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
                     if ($condition_value === true) {
                         return $this->calc_or_fail($expr['then']);
                     }
-                } catch (SyntaxError $e) {
-                    return $this->calc_error($e->getMessage());
-                } catch (\DivisionByZeroError $e) {
-                    return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
                 }
-
+            } catch (SyntaxError $e) {
+                return $this->calc_error($e->getMessage());
+            } catch (\DivisionByZeroError $e) {
+                return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
             }
             return $this->calc_error(__("ExpressionParser: Undefined result!", "wc-kalkulator"));
-
         }
 
+        /*
+         * 3. Evaluate price addons and return the sum of addons
+         */
         if ($this->mode === self::MODE_ADDON) {
             $addons_price = $this->expression->evaluate('product_price', $this->vars);
             try {
@@ -381,6 +387,9 @@ class ExpressionParser
             return Ajax::response('success', $addons_price);
         }
 
+        /*
+         * 4. Return error if calculation mode is not matching
+         */
         return $this->calc_error(__("ExpressionParser: Undefined calculation mode!", "wc-kalkulator"));
     }
 
@@ -407,7 +416,6 @@ class ExpressionParser
     {
         try {
             $value = $this->expression->evaluate($expr, $this->vars);
-            //var_dump($this->vars);
             if ($value < 0) {
                 return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $value);
             } elseif ($value === 0) {

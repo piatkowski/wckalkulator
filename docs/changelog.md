@@ -8,6 +8,7 @@ icon: git-branch
 2022-07-04
 v.1.3.0
 
+- new calculation mode - Price Add-ons
 - you can use formulas in HTML/Paragraph field, for example: {={field_a}*{field_b}/100}
 - Image upload field added – you can use file size parameter in expressions
 - cron jobs to keep uploaded files clean

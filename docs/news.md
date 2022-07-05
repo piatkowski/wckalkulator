@@ -9,6 +9,7 @@ icon: star
 ## Version 1.3.0 has been released
 *Update: 2022-07-04*
 
+- [X] Price Add-ons
 - [X] Image upload field
 - [X] Use dynamic formula in a static field's contents
 - [X] Settings page
