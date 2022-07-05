@@ -39,6 +39,9 @@ Higher value have higher priority
 
 Fields can be added, deleted and reordered (drag&drop). Parameters of each field are described in the **Field Types** section.
 
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+
+
 ![](../images/add_fieldset_number_field.png)
 
 !!!warning

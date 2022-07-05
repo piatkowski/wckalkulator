@@ -18,3 +18,5 @@ For example: ``view/fields/front/text.php`` should be copied to the ``/themes/yo
 |``views/woocommerce/catalog_price.php``|Template for the price filter - prefix, price, suffix.|
 |``views/woocommerce/price_block.php``|Template for the "Total" in the product page|
 |``views/woocommerce/product.php``|Container for the fields on the product page|
+
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)

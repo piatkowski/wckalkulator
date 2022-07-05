@@ -7,13 +7,13 @@ branding:
   title: WC Kalkulator
   label: v.1.3
 links:
+- text: Buy me a Coffee
+  link: https://www.buymeacoffee.com/piatkowski
+  icon: heart
 - text: Get the Plugin
   link: https://wordpress.org/plugins/wc-kalkulator/
   icon: download
-- text: Report Issue
-  link: https://wordpress.org/support/plugin/wc-kalkulator/
-  icon: issue-opened
-- text: Request Feature
+- text: Support
   link: https://wordpress.org/support/plugin/wc-kalkulator/
   icon: star
 - text: Donate
