@@ -12,7 +12,7 @@ WooCommerce extra product fields and price calculator (formula). Absolutely FREE
 == Description ==
 
 **WC Kalkulator (WCK)** is a Wordpress plugin which extends the WooCommerce to use custom extra fields with products and orders.
-Extra product fields can be used to calculate product price and save information in order details.
+Extra product fields can be used to calculate product price and save information in order details. 
 
 *	Absolutely **FREE plugin** with **PRO features**
 *	**22 field types** to get customer input
