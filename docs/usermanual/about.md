@@ -13,6 +13,9 @@ Some of fields can be used to get informations from Customer (for example: text,
 
 The plugin is designed to work with multisite mode. We encourage you to contact us and request new features.
 
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+
+
 ## Definitions
 
 - **Field** - is used to get user's input on the product page. Field can be used to calculate the price (is used in formula)

@@ -24,3 +24,5 @@ Some of fields are not used in formulas, but you can use it to get informations 
 The plugin is designed to work with multisite mode. We encourage you to contact us and request new features.
 
 ![](../images/product_page_example.png)
+
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
