@@ -68,7 +68,7 @@ use WCKalkulator\Helper;
     <div class="input-icon input-else">
         <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
     </div>
-    <button type="button" class="button add-condition"><?php _e('Add contition', 'wc-kalkulator'); ?></button>
+    <button type="button" class="button add-condition"><?php _e('Add condition', 'wc-kalkulator'); ?></button>
 </div>
 
 <div class="expression_addon">
