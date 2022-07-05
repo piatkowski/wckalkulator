@@ -11,6 +11,9 @@ Custom fields can be used to calculate a custom product price.
 
 You can sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.**
 
+[!ref target="blank" text="WCK YouTube tutorials"](https://www.youtube.com/channel/UCnMHay68CLmOtfRuCqlUuDg)
+[!embed](https://youtu.be/Jrc1dXof_pw)
+
 ## What makes **WC Kalkulator** unique ?
 
 When designing the functionality of the plugin, we wanted to obtain software that would be easy to use and **highly configurable** and **suitable for any** type of store. 

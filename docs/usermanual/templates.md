@@ -6,9 +6,9 @@ icon: file-code
 # Templates
 
 WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in ``view`` directory can be overriden.
-Just copy file from the ``view`` directory to the ``themes/your-theme/wck-kalkulator`` directory and make your modifications.
+Just copy file from the ``view`` directory to the ``themes/your-theme/wc-kalkulator`` directory and make your modifications.
 
-For example: ``view/fields/front/text.php`` should be copied to the ``/themes/your-theme/wck-kalkulator/fields/front/text.php``
+For example: ``view/fields/front/text.php`` should be copied to the ``/themes/your-theme/wc-kalkulator/fields/front/text.php``
 
 ## Structure of the view directory
 

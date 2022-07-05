@@ -51,6 +51,8 @@ Sell products by anything. You are not limited to sell only by length, area, vol
     22. Image upload
 = =
 
+[youtube https://www.youtube.com/watch?v=Jrc1dXof_pw]
+
 ## Definitions
 
 - **Field** - is used to get user's input on the woocommerce product page. Custom Field can be used to calculate the price (is used in formula)

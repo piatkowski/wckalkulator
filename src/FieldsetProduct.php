@@ -425,11 +425,14 @@ class FieldsetProduct
         if (!is_array($this->expression())) {
             return true;
         }
-
         //Implode array as string
-        $expr = implode("", array_map(function ($a) {
-            return implode("", $a);
-        }, $this->expression('expr')));
+        if (is_array($this->expression('expr'))) {
+            $expr = implode("", array_map(function ($a) {
+                return implode("", $a);
+            }, $this->expression('expr')));
+        } else {
+            $expr = $this->expression('expr');
+        }
 
         foreach ($this->fields() as $field) {
             if ($field->use_expression()) {

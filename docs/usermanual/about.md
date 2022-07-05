@@ -29,7 +29,7 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 
 **Maximum tested version**  
 - Wordpress v.6.0.0
-- Woocommerce v.6.5.1
+- Woocommerce v.6.6.1
 
 **Recommended version**  
 
