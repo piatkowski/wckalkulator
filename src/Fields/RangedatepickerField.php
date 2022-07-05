@@ -26,7 +26,7 @@ class RangedatepickerField extends DatepickerField
         wp_enqueue_script('jquery-ui-datepicker');
         wp_enqueue_script(
             'wck-range-date-picker',
-            Plugin::url() . '/assets/js/rangedatepicker.js',
+            Plugin::url() . '/assets/js/rangedatepicker.min.js',
             array('jquery-ui-datepicker'),
             Plugin::VERSION,
             1

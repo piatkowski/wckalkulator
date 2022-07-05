@@ -35,7 +35,7 @@ class FieldsetPostType
         '_wck_filter_price_sufix' => 'text',
         '_wck_fieldset' => 'json', //will be stored as array
         '_wck_expression' => 'json', //will be stored as array
-        '_wck_choose_expression_type' => array('oneline', 'conditional', 'off'),
+        '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
         '_wck_priority' => 'int'
     );
@@ -185,10 +185,10 @@ class FieldsetPostType
                 'title' => __('Product Fields Settings', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
-            'fields' => array(
+            /*'fields' => array(
                 'title' => __('Add Field', 'wc-kalkulator'),
                 'position' => 'advanced'
-            ),
+            ),*/
             'expression' => array(
                 'title' => __('Price Calculation', 'wc-kalkulator'),
                 'position' => 'advanced'
@@ -342,7 +342,7 @@ class FieldsetPostType
         wp_enqueue_script('jquery-ui-sortable');
         wp_enqueue_script(
             'wck-fieldset-script',
-            Plugin::url() . '/assets/js/admin.js',
+            Plugin::url() . '/assets/js/admin.min.js',
             array('jquery', 'jquery-ui-core', 'jquery-ui-sortable', 'jquery-ui-autocomplete'),
             Plugin::VERSION
         );
@@ -411,7 +411,7 @@ class FieldsetPostType
      * For each class defined in Plugin::$defined_fields do:
      *  1. crate an instance of field class
      *  2. store HTML output from render_admin() method => $fields_html
-     *  3. build $fields_dropdown array to use in the metabox => views/admin/fields.php
+     *  3. build $fields_dropdown array to use in the metabox => views/admin/fields_editor.php
      *
      * @since 1.1.0
      */
@@ -438,7 +438,7 @@ class FieldsetPostType
      */
     private static function add_styles()
     {
-        wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.css');
+        wp_register_style('wckalkulator_admin_css', Plugin::url() . '/assets/css/admin.min.css');
         wp_enqueue_style('wckalkulator_admin_css');
         wp_enqueue_style('wp-color-picker');
     }

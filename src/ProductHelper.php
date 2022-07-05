@@ -52,7 +52,7 @@ final class ProductHelper
          *
          * $this->can_add_price = $this->product->get_meta(Plugin::ADD_PRODUCT_PRICE_FIELD) === 'yes';
          */
-        
+
         if ($this->product && $this->product->is_type("variable")) {
             if ($this->variation_id > 0) {
                 $this->product = wc_get_product($this->variation_id);

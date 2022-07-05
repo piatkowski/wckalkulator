@@ -59,20 +59,22 @@ class Ajax
         if ($fieldset->has_fieldset('current')/* && $fieldset->has_expression('current')*/) {
             
             wp_enqueue_script(
-                'ajax-script',
-                Plugin::url() . '/assets/js/wookalkulator.js',
+                'wck-ajax-script',
+                Plugin::url() . '/assets/js/wckalkulator.min.js',
                 ['jquery'],
                 Plugin::VERSION
             );
             
             wp_localize_script(
-                'ajax-script',
-                'ajax_object',
+                'wck-ajax-script',
+                'wck_ajax_object',
                 array(
                     'ajax_url' => admin_url('admin-ajax.php'),
                     '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE),
                     '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
-                    '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator')
+                    '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
+                    '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
+                    'form' => Settings::get('form_css_selector')
                 )
             );
         }
@@ -99,17 +101,19 @@ class Ajax
         $product_id = absint($_POST["_wck_product_id"]);
         $variation_id = isset($_POST["variation_id"]) ? absint($_POST["variation_id"]) : 0;
         $quantity = absint($_POST["quantity"]);
-        $user_input = Product::get_user_input();
+
         
         
-        if ($product_id === 0 || $quantity === 0 || !is_array($user_input)) {
+        if ($product_id === 0 || $quantity === 0) {
             Helper::message_for_manager("Unknown product or incorrect user input!");
             wp_die("");
         }
         
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
-        if (!$fieldset->validate($user_input, true)) {
+        $user_input = $fieldset->get_user_input();
+
+        if (!$fieldset->validate($user_input, true) || !is_array($user_input)) {
             Helper::message_for_manager("Data is invalid");
             wp_die("");
         }

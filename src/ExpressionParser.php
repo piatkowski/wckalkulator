@@ -22,6 +22,7 @@ class ExpressionParser
     private const MODE_UNDEFINED = 0;
     private const MODE_ONELINE = 1;
     private const MODE_CONDITIONAL = 2;
+    private const MODE_ADDON = 3;
     /**
      * Error messages
      *
@@ -50,7 +51,7 @@ class ExpressionParser
      */
     private $var_names = array();
     /**
-     * Calculation mode: oneline|conditional|undefined
+     * Calculation mode: oneline|conditional|addon|undefined
      * @var int
      */
     private $mode = 0;
@@ -60,14 +61,14 @@ class ExpressionParser
      * @var bool
      */
     private $is_valid = false;
-    
+
     /**
      * Instance of ExpressionLanguage
      *
      * @var ExpressionLanguage|null
      */
     private $expression = null;
-    
+
     /**
      * ExpressionParser constructor.
      *
@@ -79,43 +80,48 @@ class ExpressionParser
     {
         foreach ($vars as $key => $val) {
             //if (is_numeric($val)) {
-            $this->vars[str_replace(':', '__p__', $key)] = floatval($val);
+            $var_name = str_replace(':', '__p__', $key);
+            if (substr($key, -5) === ':text') {
+                $this->vars[$var_name] = (string)$val;
+            } else {
+                $this->vars[$var_name] = floatval($val);
+            }
             //}
         }
         if (!empty($this->vars)) {
             $this->var_names = array_keys($this->vars);
         }
-        
+
         $this->expr = str_replace(':', '__p__', $expr);
         $this->base_expr = $this->expr;
-        
+
         $this->detect_mode();
         $this->expr = $this->prepare_expression();
-        
+
         if (is_array($this->expr) && $this->is_mode_valid()) {
             $has_required_vars = $this->check_required_variables();
-            
+
             if ($has_required_vars) {
                 $this->is_valid = true;
             } else {
                 $this->error .= __("-", "wc-kalkulator") . "\n";
             }
         }
-        
+
         if (!$this->is_mode_valid()) {
             $this->error .= __("ExpressionParser: Invalid calculation mode.", "wc-kalkulator") . "\n";
         }
-        
+
         if (!is_array($this->expr)) {
             $this->error .= __("ExpressionParser: Prepared expression has incorrect type.", "wc-kalkulator") . "\n";
         }
-        
+
         //Create ExpressionLanguage instance
         $this->expression = new ExpressionLanguage();
         $this->register_functions();
-        
+
     }
-    
+
     /**
      * Detect the calculation mode
      *
@@ -128,13 +134,15 @@ class ExpressionParser
             $this->mode = self::MODE_ONELINE;
         } elseif ($this->expr["mode"] === "conditional") {
             $this->mode = self::MODE_CONDITIONAL;
+        } elseif ($this->expr["mode"] === "addon") {
+            $this->mode = self::MODE_ADDON;
         } else {
             $this->mode = self::MODE_UNDEFINED;
         }
-        
+
         return $this->mode;
     }
-    
+
     /**
      * Prepare the Expression (oneline or conditional)
      *
@@ -146,12 +154,12 @@ class ExpressionParser
         if ($this->mode === self::MODE_ONELINE) {
             return $this->prepare_inline_expression();
         }
-        if ($this->mode === self::MODE_CONDITIONAL) {
+        if ($this->mode === self::MODE_CONDITIONAL || $this->mode === self::MODE_ADDON) {
             return $this->prepare_conditional_expression();
         }
         return false;
     }
-    
+
     /**
      * Prepare the single-line expression from string
      *
@@ -167,24 +175,7 @@ class ExpressionParser
         }
         return false;
     }
-    
-    /**
-     * Helper function for clearing strings
-     *
-     * @param $str
-     * @return mixed
-     * @since 1.0.0
-     */
-    private function str_clean($str)
-    {
-        return
-            str_replace(
-                array('{', '}', ',', 'constant(', ';', ':'),
-                array('', '', '.', '(', ',', '__p__'),
-                html_entity_decode($str)
-            );
-    }
-    
+
     /**
      * Prepare the Expression from the lines array
      *
@@ -208,7 +199,48 @@ class ExpressionParser
         }
         return $prepared;
     }
-    
+
+    /**
+     * Helper function for clearing strings
+     *
+     * @param $str
+     * @return mixed
+     * @since 1.0.0
+     */
+    private function str_clean($str)
+    {
+        return
+            str_replace(
+                array('{', '}', ',', 'constant(', ';', ':'),
+                array('', '', '.', '(', ',', '__p__'),
+                html_entity_decode($str)
+            );
+    }
+
+    /**
+     * Prepare the Expression from the lines array (Product Addons)
+     *
+     * @return array|bool
+     * @since 1.3.0
+     */
+    private function prepare_addon_expression()
+    {
+        $prepared = array();
+        if (is_array($this->expr["expr"])) {
+            foreach ($this->expr["expr"] as $expr) {
+                if ($expr["type"] === "condition" || $expr["type"] === "else") {
+                    $prepared[] = array(
+                        "if" => $this->str_clean($expr["if"]),
+                        "then" => $this->str_clean($expr["then"])
+                    );
+                }
+            }
+        } else {
+            return false;
+        }
+        return $prepared;
+    }
+
     /**
      * Check if the calculation mode is valid
      *
@@ -219,10 +251,11 @@ class ExpressionParser
     {
         return in_array($this->mode, array(
             self::MODE_ONELINE,
-            self::MODE_CONDITIONAL
+            self::MODE_CONDITIONAL,
+            self::MODE_ADDON
         ));
     }
-    
+
     /**
      * Check if we have passed all required Variables to calculate the Expression
      *
@@ -232,19 +265,19 @@ class ExpressionParser
     private function check_required_variables()
     {
         $expr_string = "";
-        
+
         if ($this->mode === self::MODE_ONELINE) {
             $expr_string = $this->base_expr["expr"];
         }
-        
-        if ($this->mode === self::MODE_CONDITIONAL) {
+
+        if ($this->mode === self::MODE_CONDITIONAL || $this->mode === self::MODE_ADDON) {
             foreach ($this->expr as $expr) {
                 $expr_string .= $expr["if"] . $expr["then"];
             }
         }
-        
+
         preg_match_all('/{([^}]+)}/m', $expr_string, $matched_vars);
-        
+
         if (count($matched_vars) === 2) {
             $matched_vars = array_unique($matched_vars[1]);
             if (count($matched_vars) > 0) {
@@ -261,7 +294,7 @@ class ExpressionParser
         }
         return false;
     }
-    
+
     /**
      * Extend ExpressionLanguage Component to use math functions
      *
@@ -269,12 +302,12 @@ class ExpressionParser
      */
     private function register_functions()
     {
-        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt');
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt', 'strlen');
         foreach ($functions as $function) {
             $this->expression->addFunction(ExpressionFunction::fromPhp($function));
         }
     }
-    
+
     /**
      * Checks if the instance of parser is valid - has required fields and the correct mode
      *
@@ -285,7 +318,7 @@ class ExpressionParser
     {
         return $this->is_valid;
     }
-    
+
     /**
      * Calculate the Expression
      *
@@ -297,32 +330,69 @@ class ExpressionParser
         if (!$this->is_valid) {
             return $this->calc_error("ExpressionParser: invalid data!");
         }
-        
+
+        /*
+         * 1. Evaluate single-line expression
+         */
         if ($this->mode === self::MODE_ONELINE) {
             return $this->calc_or_fail($this->expr['eq']);
         }
-        
+
+        /*
+         * 2. Evaluate conditional expression
+         */
         if ($this->mode === self::MODE_CONDITIONAL) {
-            foreach ($this->expr as $expr) {
-                
-                try {
+            try {
+                foreach ($this->expr as $expr) {
                     $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
                     if ($condition_value === true) {
                         return $this->calc_or_fail($expr['then']);
                     }
-                } catch (SyntaxError $e) {
-                    return $this->calc_error($e->getMessage());
-                } catch (\DivisionByZeroError $e) {
-                    return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
                 }
-                
+            } catch (SyntaxError $e) {
+                return $this->calc_error($e->getMessage());
+            } catch (\DivisionByZeroError $e) {
+                return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
             }
             return $this->calc_error(__("ExpressionParser: Undefined result!", "wc-kalkulator"));
-            
         }
+
+        /*
+         * 3. Evaluate price addons and return the sum of addons
+         */
+        if ($this->mode === self::MODE_ADDON) {
+            $addons_price = $this->expression->evaluate('product_price', $this->vars);
+            try {
+                foreach ($this->expr as $expr) {
+                    $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
+                    if ($condition_value === true) {
+                        $addons_price += $this->expression->evaluate($expr['then'], $this->vars);
+                    }
+                }
+            } catch (SyntaxError $e) {
+                return $this->calc_error($e->getMessage());
+            } catch (\DivisionByZeroError $e) {
+                return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
+            }
+
+            /*
+             * Return calculated addons price
+             */
+            if ($addons_price < 0) {
+                return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $addons_price);
+            } elseif ($addons_price === 0) {
+                return $this->calc_error(__('The price is equal zero.', "wc-kalkulator"));
+            }
+
+            return Ajax::response('success', $addons_price);
+        }
+
+        /*
+         * 4. Return error if calculation mode is not matching
+         */
         return $this->calc_error(__("ExpressionParser: Undefined calculation mode!", "wc-kalkulator"));
     }
-    
+
     /**
      * Return the calculation error message
      *
@@ -334,7 +404,7 @@ class ExpressionParser
     {
         return Ajax::response('error', $msg);
     }
-    
+
     /**
      * Calculate the numeric value or return error
      *
@@ -358,5 +428,5 @@ class ExpressionParser
             return $this->calc_error(__("Division by zero.", "wc-kalkulator"));
         }
     }
-    
+
 }

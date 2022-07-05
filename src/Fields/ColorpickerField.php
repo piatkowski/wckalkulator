@@ -36,7 +36,7 @@ class ColorpickerField extends TextField
         );
         wp_enqueue_script(
             'wck-color-picker',
-            Plugin::url() . '/assets/js/colorpicker.js',
+            Plugin::url() . '/assets/js/colorpicker.min.js',
             array('wp-color-picker'),
             Plugin::VERSION,
             1

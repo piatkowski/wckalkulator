@@ -18,19 +18,19 @@ use WCKalkulator\Helper;
     </div>
     <div class="body">
         <div class="half first">
+            <?php if ($view->show_title) : ?>
+                <label>* <?php _e('Title', 'wc-kalkulator'); ?>
+                    <?php echo Helper::html_help_tip(__('Title will be displayed on the product page.', 'wc-kalkulator')); ?>
+                </label>
+                <input type="text" class="param f-title" placeholder="Field Name" required>
+            <?php endif; ?>
+        </div>
+        <div class="half second">
             <label>* <?php _e('Unique Field Name', 'wc-kalkulator'); ?>
                 <?php echo Helper::html_help_tip(__('Field name must be unique and consist of letters, numbers and underscores. Correct names are: field_name, product_width.', 'wc-kalkulator')); ?>
             </label>
             <input type="text" class="param f-name" pattern="[a-zA-Z0-9_]+" title="A-Za-z0-9_" placeholder="field_name"
                    required>
-        </div>
-        <div class="half second">
-            <?php if ($view->show_title) : ?>
-            <label>* <?php _e('Title', 'wc-kalkulator'); ?>
-                <?php echo Helper::html_help_tip(__('Title will be displayed on the product page.', 'wc-kalkulator')); ?>
-            </label>
-            <input type="text" class="param f-title" placeholder="Field Name" required>
-            <?php endif; ?>
         </div>
         <div class="clear"></div>
         <?php if ($view->group !== 'static') : ?>

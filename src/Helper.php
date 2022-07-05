@@ -59,7 +59,7 @@ class Helper
      */
     public static function message_for_manager($message)
     {
-        if (current_user_can( 'manage_woocommerce' )) {
+        if (current_user_can( 'manage_woocommerce' ) && Settings::get('display_errors') === 'yes') {
             echo esc_html($message);
         }
     }

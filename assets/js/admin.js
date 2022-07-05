@@ -8,7 +8,7 @@
         $("#f-field-list").sortable({
             "handle": ".action-drag"
         });
-        $("#extra-inputs").sortable({
+        $("#extra-inputs, #addon-inputs").sortable({
             "handle": ".action-drag"
         });
 
@@ -99,6 +99,17 @@
             } else {
                 alert("You cannot remove the last condition!");
             }
+        }).on("click", ".expression_addon .input-group .action-delete", function () {
+            var $target = $(this).closest(".input-group");
+            if ($("#addon-inputs .input-group").length > 1) {
+                if (confirm("Are you sure?")) {
+                    $target.hide('slow', function () {
+                        $target.remove();
+                    });
+                }
+            } else {
+                alert("You cannot remove the last addon!");
+            }
         }).on("click", ".action-add-image", function (e) {
             e.preventDefault();
             $WK.wpMediaTarget = $(this);
@@ -170,6 +181,14 @@
             });
             $WK.colorpicker.iris('color', $(this).val());
 
+        }).on("click", "input.allowed-extensions", function () {
+            var field_id = '#' + $(this).closest('li').attr('id');
+            var ext = [];
+            $(field_id + " input.allowed-extensions:checked").each(function () {
+                console.log($(this).data('extension'));
+                ext.push($(this).data('extension'));
+            });
+            $(field_id + " input.fu-allowed-extensions").val(ext.join('|'));
         });
 
         $(".iris-square-value").on("click", function (e) {
@@ -299,7 +318,7 @@
 
                 var input_fimgwidth = $row.find('input.fimg-width');
                 if (input_fimgwidth.length > 0) {
-                    field.image_size = input_fimgwidth.val()
+                    field.image_size = input_fimgwidth.val();
                 }
 
                 var $fs_options;
@@ -395,8 +414,8 @@
                         var input_fdpdisallow_past_date = $row.find('input.fdp-disallow-past-date');
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
-                    case 'fileupload':
-                        field.max_file_count = $row.find('input.fu-max-file-count').val();
+                    case 'imageupload':
+                        //field.max_file_count = $row.find('input.fu-max-file-count').val();
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
                         break;
@@ -473,6 +492,10 @@
                     suggest.push(field.name + ":max");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
                 }
+                if (field.type === "text" || field.type === "textarea") {
+                    suggest.push(field.name + ":text");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
+                }
                 if (field.type === "rangedatepicker") {
                     suggest.push(field.name + ":date_from");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
@@ -483,6 +506,9 @@
                 } else if (field.type === "datepicker") {
                     suggest.push(field.name + ":date");
                     $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                } else if (field.type === "imageupload") {
+                    suggest.push(field.name + ":size");
+                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
                 }
             }
         };
@@ -613,16 +639,19 @@
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
-                        if (this.type === "text'") {
+                        if (this.type === "text") {
                             $("#" + field_id + " .ft-pattern").val(this.pattern);
                         }
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
-                    } else if (this.type === "fileupload") {
-                        $("#" + field_id + " .fu-max-file-count").val(this.max_file_count);
+                    } else if (this.type === "imageupload") {
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
+                        var ext = this.allowed_extensions.split("|");
+                        ext.forEach(function (e) {
+                            $("#" + field_id + " .allowed-extensions.ext-" + e).prop("checked", true);
+                        });
                     } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
                         $("#" + field_id + " .fst-content").val(this.content);
                         if (this.type === 'heading') {
@@ -645,7 +674,7 @@
         // -------- EXPRESSION EDITOR -----------
 
         $WK.showExpressionEditor = function () {
-            $("div.expression_oneline, div.expression_conditional, div.expression_off").hide();
+            $("div.expression_oneline, div.expression_conditional, div.expression_off, div.expression_addon").hide();
             $("div.expression_" + $WK.expression.mode).show();
             if ($WK.expression.mode === "off") {
                 $(".off-hide").hide();
@@ -659,7 +688,7 @@
             $WK.showExpressionEditor();
         });
 
-        $WK.addCondition = function (if_value, then_value) {
+        $WK.addCondition = function (if_value, then_value, addon = false) {
             var $html = $('<div class="input-group">' +
                 '<span class="action-drag dashicons left dashicons-move"></span>' +
                 '<span class="action-delete dashicons right dashicons-no-alt"></span>' +
@@ -672,12 +701,20 @@
                 '</div></div>');
             $(".input-if input", $html).val(if_value);
             $(".input-equation input", $html).val(then_value);
-            $("div#extra-inputs").append($html);
+            if (addon === true) {
+                $("div#addon-inputs").append($html);
+            } else {
+                $("div#extra-inputs").append($html);
+            }
             $WK.autocomplete();
         };
 
         $("button.add-condition").on("click", function () {
             $WK.addCondition();
+        });
+
+        $("button.add-addon").on("click", function () {
+            $WK.addCondition("", "", true);
         });
 
         $WK.autocomplete = function () {
@@ -736,6 +773,23 @@
                 }
             }
 
+            if (mode === "addon") {
+                var data = [];
+                $(".expression_addon .input-group").each(function () {
+                    var input_if = $(this).find(".input-if input").val();
+                    var input_eq = $(this).find(".input-equation input").val();
+                    data.push({
+                        "type": "condition",
+                        "if": input_if,
+                        "then": input_eq
+                    });
+                });
+                $WK.expression.expr = data;
+                if ($WK.expression.expr.length > 0) {
+                    $WK.expr_saved = true;
+                }
+            }
+
             if (mode === "off") {
                 $("input[name=_wck_expression]").val("off");
             } else {
@@ -760,6 +814,12 @@
                         }
                     });
                     $("input[name=_wck_choose_expression_type].expression_conditional").prop("checked", true);
+                    $WK.showExpressionEditor();
+                } else if ($WK.expression.mode === "addon") {
+                    $.each($WK.expression.expr, function () {
+                        $WK.addCondition(this.if, this.then, true);
+                    });
+                    $("input[name=_wck_choose_expression_type].expression_addon").prop("checked", true);
                     $WK.showExpressionEditor();
                 }
             } else {

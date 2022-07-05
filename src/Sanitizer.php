@@ -14,7 +14,7 @@ namespace WCKalkulator;
  */
 final class Sanitizer
 {
-    const MAX_DEPTH = 10;
+    const MAX_DEPTH = 1000;
     
     /**
      * Allowed HTML tags for wp_kses function
@@ -45,7 +45,11 @@ final class Sanitizer
                 'data-limit' => true,
                 'style' => true,
                 'pattern' => true,
-                'title' => true
+                'title' => true,
+                'data-extension' => true,
+                'accept' => true,
+                'onchange' => true,
+                'data-maxfilesize' => true,
             ),
             'textarea' => array(
                 'name' => true,
@@ -85,6 +89,9 @@ final class Sanitizer
             'label' => array(
                 'style' => true,
                 'for' => true
+            ),
+            'span' => array(
+                'data-expr' => true
             )
         );
         return array_merge($allowed, wp_kses_allowed_html('post'));

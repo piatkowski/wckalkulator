@@ -1,5 +1,5 @@
 ---
-order: -400
+order: -505
 label: "Usage"
 icon: rocket
 ---
@@ -9,6 +9,7 @@ Here we explain how to work with the plugin.
 Please read carefully whole page. 
 Feel free to contact us if something is not clear.
 
+[!ref target="blank" text="WCK YouTube tutorials"](https://www.youtube.com/channel/UCnMHay68CLmOtfRuCqlUuDg)
 !!!
 Plugin supports Wordpress Multisite feature. Fieldsets are separate for each site.
 !!!

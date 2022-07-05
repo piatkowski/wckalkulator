@@ -38,8 +38,13 @@ class HtmlField extends AbstractField
      */
     public function render_for_product($value = "")
     {
+        $content = $this->data('content');
+        preg_match('/{=(.+)}/m', $content, $matches);
+        if(!empty($matches)) {
+            $content = str_replace($matches[0], '<span class="wck-dynamic" data-expr="'.$matches[1].'"></span>', $content);
+        }
         return View::render('fields/front/' . $this->type, array(
-            'content' => $this->data('content')
+            'content' => $content
         ));
     }
 
