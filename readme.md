@@ -15,8 +15,8 @@ WooCommerce extra product fields and price calculator (formula). Absolutely FREE
 Extra product fields can be used to calculate product price and save information in order details.
 
 *	Absolutely **FREE plugin** with **PRO features**
-*	**21 field types** to get customer input
-*	Price calculation based on **formula** or **conditional expression**
+*	**22 field types** to get customer input
+*	Price calculation based on **formula**, **conditional expression** or **price add-ons**.
 
 Sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.** WooCommerce Custom Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating custom price. You can create a personalized product in your store.
 
@@ -48,6 +48,7 @@ Sell products by anything. You are not limited to sell only by length, area, vol
     19. Select
     20. Textarea
     21. Text input
+    22. Image upload
 = =
 
 ## Definitions
@@ -65,6 +66,10 @@ Sell products by anything. You are not limited to sell only by length, area, vol
 ### Formula/Expression Builder
 
 Use field's values as variables to calculate product price. Drag&drop conditional statements.
+
+### Price Add-Ons
+
+Use custom fields to make Product Add-Ons. This feature is experimental and will be continued in the next releases.
 
 ### Display Fields
 
