@@ -95,4 +95,11 @@ When you type the formula, enter "{" sign and you see the list of available fiel
 First, we have to define two **Number** or **Select** fields named *width* and *height*.
 The price of the product can be 100 USD, 200 USD or (300+area*0.05) USD.
 
+!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
+
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
+!!!
+
 ![](../images/expression_example_1.png)

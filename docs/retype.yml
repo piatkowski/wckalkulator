@@ -5,19 +5,27 @@ meta:
   title: " | Custom fields and price calculator"
 branding:
   title: WC Kalkulator
-  label: v.1.3
+  label: PRO v.1.3
 links:
 - text: Buy me a Coffee
   link: https://www.buymeacoffee.com/piatkowski
   icon: heart
-- text: Get the Plugin
-  link: https://wordpress.org/plugins/wc-kalkulator/
-  icon: download
-- text: Support
-  link: https://wordpress.org/support/plugin/wc-kalkulator/
-  icon: star
+  target: blank
 - text: Donate
   link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
   icon: heart
+  target: blank
+- text: GitHub
+  link: https://github.com/piatkowski/wckalkulator/
+  icon: git-branch
+  target: blank
+- text: Download
+  link: https://wordpress.org/plugins/wc-kalkulator/
+  icon: download
+  target: blank
+- text: Support
+  link: https://wordpress.org/support/plugin/wc-kalkulator/
+  icon: star
+  target: blank
 footer:
   copyright: "&copy; Copyright {{ year }}. All rights reserved."

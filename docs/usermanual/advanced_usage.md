@@ -32,3 +32,10 @@ Range date picker has two input fields - "from" and "to" dates. Let's add a new 
 Add Upload/Image Upload field named ``file``
 * ``{file}`` - returns field price defined in the "Price" option
 * ``{file:size}`` - returns input file size in MB
+
+!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
+
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
+!!!

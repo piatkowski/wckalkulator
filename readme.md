@@ -27,7 +27,7 @@ Sell products by anything. You are not limited to sell only by length, area, vol
 *	Documentation @ [wckalkulator.com](https://wckalkulator.com)
 *	GitHub @ [github.com/piatkowski](https://github.com/piatkowski/wckalkulator)
 
-## 21 Field Types (ALL FREE)
+## 22 Field Types (ALL FREE)
 
     1.  Attachment (URL/File)
     2.  Checkbox
