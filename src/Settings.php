@@ -49,6 +49,12 @@ class Settings
                 'desc' => __('Number of days for which files uploaded by guests will be kept. Applies to temporary files attached to the carts. This files must be deleted very frequently.'),
                 'type' => 'number',
                 'default' => 3,
+            ),
+            'upload_customer_data_dir' => array(
+                'label' => __('Upload path for Customer data', 'wc-kalkulator'),
+                'desc' => __('This path will be used to store files uploaded by customers on checkout. This setting is used by Image Upload field.'),
+                'type' => 'text',
+                'default' => wp_upload_dir()['basedir'] . '/wc-kalkulator/customer-data/'
             )
         );
     }
@@ -190,7 +196,7 @@ class Settings
                 break;
         }
 
-        echo '<p class="description">' . esc_html($args['desc']) . '</p>';
+        echo '<p class="description"><small><strong>Default: ' . esc_html($args['default']) . '</strong></small><br />' . esc_html($args['desc']) . '</p>';
     }
 
     /**
@@ -204,7 +210,7 @@ class Settings
     {
         $input['form_css_selector'] = sanitize_text_field($input['form_css_selector']);
         $input['display_errors'] = $input['display_errors'] === 'yes' ? 'yes' : 'no';
-
+        $input['upload_customer_data_dir'] = rtrim($input['upload_customer_data_dir'], '/') . '/';
         $input['upload_retain_time'] = max(1, absint($input['upload_retain_time']));
         $input['upload_temp_retain_time'] = max(1, absint($input['upload_temp_retain_time']));
         return $input;

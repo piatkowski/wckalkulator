@@ -331,9 +331,14 @@ class FieldsetProduct
 
         $user_input['_files'] = array();
 
+        /* Since v.1.3.1 upload path is defined in WCK Settings
         $customer_dir = '/wc-kalkulator/customer-data/' . date("Y/m/");
         $upload_path = wp_upload_dir()['basedir'] . $customer_dir;
         $upload_url = wp_upload_dir()['baseurl'] . $customer_dir;
+        */
+
+        $upload_path = Settings::get('upload_customer_data_dir') . date("Y/m/");
+        $upload_url = str_replace(ABSPATH, get_site_url() . '/', $upload_path);
 
         if (isset($_FILES['wck'])) {
             foreach ($_FILES['wck']['name'] as $name => $file_name) {
@@ -346,6 +351,7 @@ class FieldsetProduct
                         $user_input[$name] = $_FILES['wck']['size'][$name]; //fixed
                         $user_input['_files'][$name] = array(
                             'name' => $name,
+                            'original_name' => $file_name,
                             'type' => $_FILES['wck']['type'][$name],
                             'tmp_name' => $_FILES['wck']['tmp_name'][$name],
                             'upload_path' => $upload_path . $upload_file,

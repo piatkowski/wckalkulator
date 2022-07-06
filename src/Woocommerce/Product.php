@@ -325,7 +325,7 @@ class Product
             foreach ($fieldset->fields() as $name => $field) {
 
                 if (isset($cart_item['wckalkulator_fields'][$name])) {
-                    $value = $cart_item['wckalkulator_fields'][$name];
+                    $value = isset($cart_item['wckalkulator_fields']['_files'][$name]) ? $cart_item['wckalkulator_fields']['_files'][$name] : $cart_item['wckalkulator_fields'][$name];
                     $html .= $field->render_for_cart($value);
                 }
             }
@@ -380,8 +380,10 @@ class Product
                     if (isset($order_fields[$name])) {
                         $field_value = $field->order_item_value($order_fields[$name]);
                         if (method_exists($field, 'upload') && isset($order_fields['_files'][$name])) {
-                            if($field->upload($order_fields['_files'][$name])) {
-                                $item->add_meta_data($field->data('title'), $order_fields['_files'][$name]['upload_url'], true);
+                            if ($field->upload($order_fields['_files'][$name])) {
+                                $item->add_meta_data($field->data('title') . __(' (original name)', 'wc-kalkulator'), esc_html($order_fields['_files'][$name]['original_name']), true);
+                                $item->add_meta_data($field->data('title') . __(' (size)', 'wc-kalkulator'), round($field_value / 1000000, 2) . ' MB', true);
+                                $item->add_meta_data($field->data('title') . __(' (url)', 'wc-kalkulator'), $order_fields['_files'][$name]['upload_url'], true);
                             }
                         } else {
                             $item->add_meta_data($field->data('title'), $field_value, true);
@@ -394,7 +396,6 @@ class Product
                             ));
                         }
                     }
-
                 }
             } else {
                 wp_send_json(array(
