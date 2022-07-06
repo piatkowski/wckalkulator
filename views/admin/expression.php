@@ -48,6 +48,11 @@ use WCKalkulator\Helper;
     <label><strong>Fields:</strong> </label>
     <span class="formula-field">{product_price}</span>
     <span class="formula-field">{product_regular_price}</span>
+    <span class="formula-field">{product_weight}</span>
+    <span class="formula-field">{product_width}</span>
+    <span class="formula-field">{product_height}</span>
+    <span class="formula-field">{product_length}</span>
+    <span class="formula-field">{is_user_logged}</span>
     <span class="formula-field">{quantity}</span>
     <span id="formula_fields"> &dash; </span>
     <a href="#" class="savefields">Update list</a>

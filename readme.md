@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.0
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -141,6 +141,18 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+
+2022-07-06 v.1.3.1
+- new variables to get product's weight, width, height, length
+- new variable to determine if current visitor is logged in
+- 
+2022-07-05 v 1.3.0
+- new calculation mode - Price Add-ons
+- you can use formulas in HTML/Paragraph field, for example: {={field_a}*{field_b}/100}
+- Image upload field added – you can use file size parameter in expressions
+- cron jobs to keep uploaded files clean
+- strlen() function added to expressions – it returns text length
+- Settings page added – you can define custom product form selector, you can toggle error messages for admin/manager
 
 2022-06-15 v.1.2.3
 

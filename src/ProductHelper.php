@@ -44,7 +44,6 @@ final class ProductHelper
     {
         $this->product_id = absint($product_id);
         $this->variation_id = absint($variation_id);
-        
         $this->product = wc_get_product($this->product_id);
     
         /**
@@ -132,6 +131,50 @@ final class ProductHelper
     public function discount_price()
     {
         return $this->regular_price() - $this->sale_price();
+    }
+
+    /**
+     * Get product weight
+     *
+     * @return string
+     * @since 1.3.1
+     */
+    public function get_weight()
+    {
+        return $this->product->get_weight();
+    }
+
+    /**
+     * Get product weight
+     *
+     * @return string
+     * @since 1.3.1
+     */
+    public function get_length()
+    {
+        return $this->product->get_length();
+    }
+
+    /**
+     * Get product weight
+     *
+     * @return string
+     * @since 1.3.1
+     */
+    public function get_width()
+    {
+        return $this->product->get_width();
+    }
+
+    /**
+     * Get product weight
+     *
+     * @return string
+     * @since 1.3.1
+     */
+    public function get_height()
+    {
+        return $this->product->get_height();
     }
     
     /**

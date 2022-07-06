@@ -651,7 +651,12 @@ class FieldsetProduct
 
                 if ($product_helper->is_valid() && isset($_POST["quantity"])) {
                     $this->user_input["product_price"] = $product_helper->price();
+                    $this->user_input["product_weight"] = $product_helper->get_weight();
+                    $this->user_input["product_width"] = $product_helper->get_width();
+                    $this->user_input["product_height"] = $product_helper->get_height();
+                    $this->user_input["product_length"] = $product_helper->get_length();
                     $this->user_input["product_regular_price"] = $product_helper->regular_price();
+                    $this->user_input["is_user_logged"] = (int) is_user_logged_in();
                     $this->user_input["quantity"] = absint($_POST["quantity"]);
                 } else {
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
