@@ -24,6 +24,7 @@ class AdminNotice
      */
     public static function init()
     {
+        add_action('init', array(__CLASS__, 'schedule'));
         add_filter('cron_schedules', array(__CLASS__, 'cron_interval'));
         if ((int)get_option(AdminNotice::STATE_OPTION, 1) === 1) {
             add_action('admin_notices', array(__CLASS__, 'notice_donate'));

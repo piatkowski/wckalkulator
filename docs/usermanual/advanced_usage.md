@@ -32,3 +32,23 @@ Range date picker has two input fields - "from" and "to" dates. Let's add a new 
 Add Upload/Image Upload field named ``file``
 * ``{file}`` - returns field price defined in the "Price" option
 * ``{file:size}`` - returns input file size in MB
+
+### Product's variables
+
+Expression builder comes with several built-in variables to use in expressions. The value of that parameters is according to the current product and may be different for each product.
+
+* ``{product_price}`` - current product price (sale or regular)
+* ``{product_regular_price}`` - current product regular price
+* ``{product_weight}`` - current product weight from Product Data > Shipping
+* ``{product_width}`` - current product width from Product Data > Shipping
+* ``{product_height}`` - current product height from Product Data > Shipping
+* ``{product_length}`` - current product length from Product Data > Shipping
+* ``{is_user_logged}`` - ``1`` if current visitor is logged in, ``0`` otherwise
+
+
+!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
+
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
+!!!

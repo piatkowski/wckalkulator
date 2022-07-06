@@ -52,14 +52,14 @@ class ImageuploadField extends AbstractField
 
     /**
      * Output HTML for User's cart nad order meta
-     * @param $value
+     * @param $file
      * @return string
      */
-    public function render_for_cart($value = '')
+    public function render_for_cart($file = '')
     {
         return View::render('fields/cart', array(
             'title' => $this->data['title'],
-            'value' => __('File size:', 'wc-kalkulator') . ' ' . round($value / 1000000, 2) . ' MB'
+            'value' => esc_html($file['original_name']) . ' (' . round($file['size'] / 1000000, 2) . ' MB)'
         ));
     }
 

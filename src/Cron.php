@@ -109,8 +109,12 @@ class Cron
      */
     public static function delete_customer_uploads()
     {
-        $customer_dir = '/wc-kalkulator/customer-data/';
-        $upload_path = wp_upload_dir()['basedir'] . $customer_dir;
+
+        //Since v.1.3.1 upload path is defined in WCK Settings
+        //$customer_dir = '/wc-kalkulator/customer-data/';
+        //$upload_path = wp_upload_dir()['basedir'] . $customer_dir;
+        $upload_path = Settings::get('upload_customer_data_dir');
+
         $ext = array('jpg', 'jpeg', 'png', 'gif');
         $dir = new \RecursiveDirectoryIterator($upload_path);
         $files = new \RecursiveIteratorIterator($dir);
