@@ -18,7 +18,7 @@ class GlobalParametersPostType
 
     public static $meta_keys = array(
         '_wck_param_name' => 'text',
-        '_wck_param_value' => 'float'
+        '_wck_param_value' => 'text'
     );
 
     /**

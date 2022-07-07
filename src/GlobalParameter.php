@@ -2,6 +2,8 @@
 
 namespace WCKalkulator;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+
 /**
  * Class GlobalParameter
  * @package WCKalkulator
@@ -60,7 +62,7 @@ class GlobalParameter extends GlobalParametersPostType
         foreach (self::get_posts() as $post) {
             $name = get_post_meta($post->ID, '_wck_param_name', true);
             $value = get_post_meta($post->ID, '_wck_param_value', true);
-            $output[$name] = $value;
+            $output[$name] = (new ExpressionLanguage())->evaluate($value);
             Cache::store(self::CACHE_PREFIX . $name, $value);
         }
         return $output;

@@ -5,6 +5,11 @@ icon: git-branch
 ---
 # CHANGELOG
 
+2022-07-07
+v.1.3.2
+
+- added support for array and json objects in global parameters
+
 2022-07-06 
 v.1.3.1
 

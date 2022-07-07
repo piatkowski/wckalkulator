@@ -26,3 +26,5 @@ This plugin is absolutely FREE with PRO features. It will always be free, so ple
 [!embed](https://youtu.be/M2t0yf8ocbk)
 ### 8. How to set different price for logged/unlogged users ?
 [!embed](https://youtu.be/MFmxifI4tW4)
+### 9. How to use arrays and json objects in Global Parameters ?
+[!embed](https://youtu.be/qFA-4TJ6gvs)
