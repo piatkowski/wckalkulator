@@ -11,6 +11,8 @@ icon: code
 {field_name} - local field
 {fiel_name:function} - built-in field's function
 {global:parameter_name} - global paramter
+{global:parameter_name}[2] - access global parameter array. The value of an array at index 2
+{global:parameter_name}["foo"] - access global parameter json object. The value of key "foo"
 ```
 
 ## Arithmetic operators

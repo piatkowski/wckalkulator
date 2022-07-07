@@ -5,12 +5,18 @@ icon: git-branch
 ---
 # CHANGELOG
 
+2022-07-07
+v.1.3.2
+
+- added support for array and json objects in global parameters
+
 2022-07-06 
 v.1.3.1
 
 - bug fixes
 - new variables to get product's weight, width, height, length
 - new variable to determine if current visitor is logged in
+- upload path settings
 
 2022-07-04
 v.1.3.0

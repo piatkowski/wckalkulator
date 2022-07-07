@@ -3,7 +3,7 @@
 /**
  * Plugin Name: WC Kalkulator
  * Description: Description: Store Manager can add fieldsets to Products and Orders. WC Kalkulator allows to order and calculate the price of the product based on the values of the fields selected by the Customer.
- * Version: 1.3.0
+ * Version: 1.3.2
  * Author: Krzysztof Piątkowski
  * Author URI: https://wckalkulator.com
  * Text Domain: wc-kalkulator
@@ -24,32 +24,32 @@ if (!defined('ABSPATH')) {
 include __DIR__ . '/vendor/autoload.php';
 
 if (!class_exists('WCKalkulator\Plugin')) {
-    
+
     /**
      * The Plugin
      * @package WCKalkulator
      */
     class Plugin
     {
-        const VERSION = "1.3.0";
-        
+        const VERSION = "1.3.2";
+
         const NAME = "wc-kalkulator";
-        
+
         /**
          * @var string
          */
         private static $path = "";
-        
+
         /**
          * @var string
          */
         private static $url = "";
-        
+
         /**
          * @var Product
          */
         public static $product;
-        
+
         /**
          * @var array
          */
@@ -78,7 +78,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\ImageswatchesField::class,
             Fields\ColorswatchesField::class
         );
-        
+
         /**
          * Run the plugin
          *
@@ -91,7 +91,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
 
             self::$url = plugins_url('', __FILE__);
             self::$path = WP_PLUGIN_DIR . '/' . Plugin::NAME;
-            
+
             FieldsetPostType::init();
             GlobalParametersPostType::init();
             Ajax::init();
@@ -100,7 +100,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             AdminNotice::init();
             Cron::init();
         }
-        
+
         /**
          * Get the plugin's path
          *
@@ -111,7 +111,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
         {
             return self::$path;
         }
-        
+
         /**
          * Get the plugin's url
          *
@@ -122,7 +122,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
         {
             return self::$url;
         }
-        
+
         /**
          * Deletes ths Plugin's data
          *
@@ -135,7 +135,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             if (function_exists('is_multisite') && is_multisite()) {
                 $blog_sql = "SELECT blog_id FROM $wpdb->blogs WHERE archived = '0' AND spam = '0' AND deleted = '0'";
                 $blog_ids = $wpdb->get_col($blog_sql);
-                
+
                 if ($blog_ids) {
                     foreach ($blog_ids as $blog_id) {
                         switch_to_blog($blog_id);
@@ -149,7 +149,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
                 GlobalParametersPostType::delete_all_posts();
             }
         }
-        
+
         /**
          * Store the current version number of this plugin
          *
@@ -171,9 +171,10 @@ if (!class_exists('WCKalkulator\Plugin')) {
         {
             Cron::deactivate();
         }
-        
+
     }
-    
+
     Plugin::run();
-    
 }
+
+
