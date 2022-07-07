@@ -21,4 +21,8 @@ This plugin is absolutely FREE with PRO features. It will always be free, so ple
 ### 5. How to use text input and count text length ?
 [!embed](https://youtu.be/rTeHFh8ooeI)
 ### 6. How to set custom field template (template overriding) ?
-[!embed](cdhttps://youtu.be/HyKn-JgcHqc)
+[!embed](https://youtu.be/HyKn-JgcHqc)
+### 7. How to use product dimensions and weight in formula ?
+[!embed](https://youtu.be/M2t0yf8ocbk)
+### 8. How to set different price for logged/unlogged users ?
+[!embed](https://youtu.be/MFmxifI4tW4)

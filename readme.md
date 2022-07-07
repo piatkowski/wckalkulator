@@ -145,7 +145,8 @@ Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 2022-07-06 v.1.3.1
 - new variables to get product's weight, width, height, length
 - new variable to determine if current visitor is logged in
-- 
+- upload path settings
+
 2022-07-05 v 1.3.0
 - new calculation mode - Price Add-ons
 - you can use formulas in HTML/Paragraph field, for example: {={field_a}*{field_b}/100}
