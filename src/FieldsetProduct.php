@@ -668,6 +668,7 @@ class FieldsetProduct
                     $this->user_input["day_of_week"] = absint(current_time("w"));
                     $this->user_input["current_hour"] = absint(current_time("G"));
                     $this->user_input["quantity"] = absint($_POST["quantity"]);
+                    var_dump($this->user_input);
                 } else {
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
                 }
