@@ -82,7 +82,7 @@ class ExpressionParser
             $var_name = str_replace(':', '__p__', $key);
             if (substr($key, -5) === ':text') {
                 $this->vars[$var_name] = (string)$val;
-            } elseif(is_array($val)) {
+            } elseif (is_array($val)) {
                 $this->vars[$var_name] = $val;
             } else {
                 error_log($var_name . ' = ' . print_r($val, true));
@@ -93,7 +93,20 @@ class ExpressionParser
             $this->var_names = array_keys($this->vars);
         }
 
-        $this->expr = str_replace(':', '__p__', $expr);
+        /*
+         * Fixed issue: https://wordpress.org/support/topic/conditional-expression-expressionparser-error/#post-15814485
+         * str_replace on array in PHP8+ throws PHP Warning:  Array to string conversion
+         */
+        $this->expr = $expr;
+        array_walk_recursive(
+            $this->expr,
+            function (&$value) {
+                $value = str_replace(':', '__p__', $value);
+            }
+        );
+        /*
+         * End Fix
+         */
         $this->base_expr = $this->expr;
 
         $this->detect_mode();
