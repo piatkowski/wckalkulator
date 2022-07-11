@@ -3,6 +3,6 @@ p.wckalkulator-price {
     padding-top: 20px
 }
 
-.summary p.price, .summary span.price, .summary .woocommerce-Price-amount, .summary .reset_variations {
+.summary p.price, .summary span.price, .summary .woocommerce-Price-amount, .summary .reset_variations, .woocommerce-variation-price {
     display: none !important;
 }

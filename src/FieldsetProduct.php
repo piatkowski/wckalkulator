@@ -662,7 +662,11 @@ class FieldsetProduct
                     $this->user_input["product_height"] = $product_helper->get_height();
                     $this->user_input["product_length"] = $product_helper->get_length();
                     $this->user_input["product_regular_price"] = $product_helper->regular_price();
-                    $this->user_input["is_user_logged"] = (int) is_user_logged_in();
+                    $this->user_input["is_user_logged"] = (int)is_user_logged_in();
+                    $this->user_input["current_month"] = absint(current_time("n"));
+                    $this->user_input["day_of_month"] = absint(current_time("j"));
+                    $this->user_input["day_of_week"] = absint(current_time("w"));
+                    $this->user_input["current_hour"] = absint(current_time("G"));
                     $this->user_input["quantity"] = absint($_POST["quantity"]);
                 } else {
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));

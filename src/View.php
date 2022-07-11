@@ -46,7 +46,10 @@ class View
     
     private static function override_file($template)
     {
-        return get_template_directory() . '/' . Plugin::NAME . '/' . $template . '.php';
+        /*
+         * Using get_stylesheet_directory() to support child themes
+         */
+        return get_stylesheet_directory() . '/' . Plugin::NAME . '/' . $template . '.php';
     }
     
 }

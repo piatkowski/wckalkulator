@@ -234,7 +234,7 @@
             $WK.changeAssignType();
             $("form#post").attr("novalidate", "");
             $WK.buildTooltips("");
-            $WK.appendGlobalParameters();
+            //$WK.appendGlobalParameters();
         };
 
         $WK.buildTooltips = function (selector) {
@@ -283,6 +283,7 @@
             $("label.error").remove();
             $WK.saved = false;
             $("#formula_fields").html(" &dash; ");
+            $WK.appendGlobalParameters();
 
             if (error) {
                 alert("Please add at least one field before saving.");

@@ -54,6 +54,11 @@ use WCKalkulator\Helper;
     <span class="formula-field">{product_length}</span>
     <span class="formula-field">{is_user_logged}</span>
     <span class="formula-field">{quantity}</span>
+    <span class="formula-field">{current_month}</span> (1-12)
+    <span class="formula-field">{day_of_month}</span> (1-31)
+    <span class="formula-field">{day_of_week}</span> (0-6)
+    <span class="formula-field">{current_hour}</span> (0-23)
+
     <span id="formula_fields"> &dash; </span>
     <a href="#" class="savefields">Update list</a>
 </p>
