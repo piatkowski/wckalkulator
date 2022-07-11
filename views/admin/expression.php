@@ -45,27 +45,92 @@ use WCKalkulator\Helper;
     </label>
 </p>
 <p class="off-hide">
-    <label><strong>Fields:</strong> </label>
-    <span class="formula-field">{product_price}</span>
-    <span class="formula-field">{product_regular_price}</span>
-    <span class="formula-field">{product_weight}</span>
-    <span class="formula-field">{product_width}</span>
-    <span class="formula-field">{product_height}</span>
-    <span class="formula-field">{product_length}</span>
-    <span class="formula-field">{is_user_logged}</span>
-    <span class="formula-field">{quantity}</span>
-    <span class="formula-field">{current_month}</span> (1-12)
-    <span class="formula-field">{day_of_month}</span> (1-31)
-    <span class="formula-field">{day_of_week}</span> (0-6)
-    <span class="formula-field">{current_hour}</span> (0-23)
-
-    <span id="formula_fields"> &dash; </span>
-    <a href="#" class="savefields">Update list</a>
-</p>
-<p class="off-hide">
     <label>
         <strong><?php _e('Build the formula', 'wc-kalkulator'); ?>:</strong>
     </label>
+    <a href="http://wckalkulator.com/usermanual/expression-syntax/"
+       target="_blank"><?php _e('Read about syntax, functions and operators', 'wc-kalkulator'); ?></a>
+</p>
+<p class="off-hide">
+    <?php _e('Insert field', 'wc-kalkulator'); ?>:
+    <select id="wck-parameters">
+        <optgroup label="Defined Fields" class="defined-fields"></optgroup>
+        <optgroup label="Product">
+            <option value="{product_price}">Price</option>
+            <option value="{product_regular_price}">Regular price</option>
+            <option value="{product_weight}">Weight</option>
+            <option value="{product_width}">Width</option>
+            <option value="{product_height}">Height</option>
+            <option value="{product_length}">Length</option>
+            <option value="{quantity}">Quantity</option>
+        </optgroup>
+        <optgroup label="Current Visitor">
+            <option value="{is_user_logged}">Is logged?</option>
+        </optgroup>
+        <optgroup label="Current Date/Time">
+            <option value="{current_month}">Month (actual value: <?php echo (int)current_time("n"); ?>)</option>
+            <option value="{day_of_month}">Day of the month (actual value: <?php echo (int)current_time("j"); ?>)
+            </option>
+            <option value="{day_of_week}">Day of the week (actual value: <?php echo (int)current_time("w"); ?>)</option>
+            <option value="{current_hour}">Current hour (actual value: <?php echo (int)current_time("G"); ?>)</option>
+        </optgroup>
+        <optgroup label="Global Parameters" class="global-parameters"></optgroup>
+    </select>
+    <button type="button" class="button add-field-to-formula"><?php _e('Insert', 'wc-kalkulator'); ?></button>
+    <!---   <label><strong>Fields:</strong> </label>
+       <span class="formula-field">{product_price}</span>
+       <span class="formula-field">{product_regular_price}</span>
+       <span class="formula-field">{product_weight}</span>
+       <span class="formula-field">{product_width}</span>
+       <span class="formula-field">{product_height}</span>
+       <span class="formula-field">{product_length}</span>
+       <span class="formula-field">{is_user_logged}</span>
+       <span class="formula-field">{quantity}</span>
+       <span class="formula-field">{current_month}</span> (1-12)
+       <span class="formula-field">{day_of_month}</span> (1-31)
+       <span class="formula-field">{day_of_week}</span> (0-6)
+       <span class="formula-field">{current_hour}</span> (0-23)
+
+       <span id="formula_fields"> &dash; </span>
+       <a href="#" class="savefields">Update list</a> -->
+</p>
+<p class="off-hide">
+    <?php
+    $operators = array(
+        '+' => __('Add', 'wc-kalkulator'),
+        '-' => __('Subtract', 'wc-kalkulator'),
+        '*' => __('Multiply', 'wc-kalkulator'),
+        '/' => __('Divide', 'wc-kalkulator'),
+        '%' => __('Modulus', 'wc-kalkulator'),
+        '**' => __('Power', 'wc-kalkulator'),
+        '==' => __('Equal', 'wc-kalkulator'),
+        '!=' => __('Not equal', 'wc-kalkulator'),
+        '<' => __('Less than', 'wc-kalkulator'),
+        '<=' => __('Less or equal', 'wc-kalkulator'),
+        '>' => __('Grater than', 'wc-kalkulator'),
+        '>=' => __('Greater or equal', 'wc-kalkulator'),
+        'and' => __('Logical and', 'wc-kalkulator'),
+        'or' => __('Logical or', 'wc-kalkulator'),
+        'not' => __('Logical not', 'wc-kalkulator')
+    );
+    foreach ($operators as $op => $title) {
+        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . ' " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
+    }
+    echo ' | Functions: ';
+    $operators = array(
+        'round' => __('round(x, p) - round x with the precision of p', 'wc-kalkulator'),
+        'ceil' => __('ceil(x) - round up to the integer number', 'wc-kalkulator'),
+        'floor' => __('floor(x) - round down to the integer number', 'wc-kalkulator'),
+        'abs' => __('abs(x) - absolute number', 'wc-kalkulator'),
+        'max' => __('max(a,b,...) - maximal value', 'wc-kalkulator'),
+        'min' => __('min(a,b,...) - minimal value', 'wc-kalkulator'),
+        'sqrt' => __('sqrt(x) - square root of x', 'wc-kalkulator'),
+        'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator')
+    );
+    foreach ($operators as $op => $title) {
+        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
+    }
+    ?>
 </p>
 <div class="expression_oneline">
     <div class="input-icon input-equation">

@@ -221,6 +221,9 @@
 .wc-kalkulator-wrapper .wc-product-search, .wc-kalkulator-wrapper .wc-category-search, .wc-kalkulator-wrapper .wc-enhanced-select, .wc-kalkulator-wrapper .wc-page-search {
   width: 100%;
 }
+.wc-kalkulator-wrapper button.add-operator {
+  margin-right: 3px;
+}
 .wc-kalkulator-wrapper span.formula-field {
   padding-left: 6px;
   cursor: pointer;

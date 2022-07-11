@@ -12,8 +12,8 @@
             "handle": ".action-drag"
         });
 
-        $("a.savefields").on("click", function (e) {
-            e.preventDefault();
+        $("#wck-parameters").on("focus", function (e) {
+            //e.preventDefault();
             $WK.saveFields();
         });
         $('<input type="hidden" class="wck-global-color-picker" />').insertBefore("#wpwrap");
@@ -27,14 +27,20 @@
 
         $("body").on("focus", "#wck_expression input", function () {
             $WK.expressionLastFocusedInput = $(this);
-        }).on("click", "span.formula-field", function () {
+        }).on("click", "button.add-field-to-formula, button.add-operator", function (e) {
+            e.preventDefault();
             var $focused = $WK.expressionLastFocusedInput;
+            if (!$focused) {
+                $focused = $(".input-icon").find("input:visible").first();
+                $focused.focus();
+            }
             if ($focused && $focused.length) {
+                var value = $(this).hasClass("add-operator") ? $(this).val() : $("#wck-parameters").val();
                 var cursorPos = $focused[0].selectionStart;
                 var x = $focused.val();
-                $focused.val(x.slice(0, cursorPos) + $(this).text() + x.slice(cursorPos));
+                $focused.val(x.slice(0, cursorPos) + value + x.slice(cursorPos));
                 $focused.focus();
-                cursorPos += $(this).text().length;
+                cursorPos += value.length;
                 $focused[0].setSelectionRange(cursorPos, cursorPos);
             }
         }).on("click", ".field .pairs .action-add", function () {
@@ -282,7 +288,8 @@
             var error = $("li .field", $WK.fieldList).length === 0;
             $("label.error").remove();
             $WK.saved = false;
-            $("#formula_fields").html(" &dash; ");
+            //$("#formula_fields").html(" &dash; ");
+            $("#wck-parameters .defined-fields").html("");
             $WK.appendGlobalParameters();
 
             if (error) {
@@ -471,10 +478,24 @@
 
         $WK.appendGlobalParameters = function () {
             if (typeof wck_global_parameters !== undefined) {
+                $("#wck-parameters .global-parameters").html("");
                 $.each(wck_global_parameters, function (name, value) {
                     var name = "global:" + name;
+                    var appendChildren = "";
                     suggest.push(name);
-                    $("#formula_fields").append('<span class="formula-field">{' + name + '}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + name + '}</span> ');
+                    if (typeof value === 'object') {
+                        $.each(value, function (k, v) {
+                            var suffix = "['" + k + "']";
+                            console.log(suffix);
+                            appendChildren = appendChildren + '<option value="{' + name + '}' + suffix + '">' + name.replace('global:', '') + '[' + k + '] = ' + v + '</option>';
+                        });
+                        value = "";
+                    } else {
+                        value = " = " + value;
+                    }
+                    $("#wck-parameters .global-parameters").append('<option value="{' + name + '}">' + name.replace('global:', '') + value + '</option>');
+                    $("#wck-parameters .global-parameters").append(appendChildren);
                 });
             }
         }
@@ -484,32 +505,42 @@
             if (field.use_expression) {
                 if (field.type !== 'checkboxgroup') {
                     suggest.push(field.name);
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">Value/Price of "' + field.title + '" {' + field.name + '}' + '</option>');
                 } else {
                     suggest.push(field.name + ":sum");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':sum}">Sum of "' + field.title + '" {' + field.name + ':sum}' + '</option>');
                     suggest.push(field.name + ":min");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':min}">Min. value of "' + field.title + '" {' + field.name + ':min}' + '</option>');
                     suggest.push(field.name + ":max");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':max}">Max. value of "' + field.title + '" {' + field.name + ':max}' + '</option>');
                 }
                 if (field.type === "text" || field.type === "textarea") {
                     suggest.push(field.name + ":text");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':text}">Text value of "' + field.title + '" {' + field.name + ':text}' + '</option>');
                 }
                 if (field.type === "rangedatepicker") {
                     suggest.push(field.name + ":date_from");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date_from}">Date "from" of "' + field.title + '" {' + field.name + ':date_from}' + '</option>');
                     suggest.push(field.name + ":date_to");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_to}</span> ');
+                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_to}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date_to}">Date "to" of "' + field.title + '" {' + field.name + ':date_to}' + '</option>');
                     suggest.push(field.name + ":days");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':days}</span> ');
+                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':days}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':days}">Days between dates of "' + field.title + '" {' + field.name + ':days}' + '</option>');
                 } else if (field.type === "datepicker") {
                     suggest.push(field.name + ":date");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date}">Timestamp of "' + field.title + '" {' + field.name + ':date}' + '</option>');
                 } else if (field.type === "imageupload") {
                     suggest.push(field.name + ":size");
-                    $("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + '</option>');
                 }
             }
         };
@@ -686,6 +717,7 @@
 
         $("input.expression_type").on("change", function () {
             $WK.expression.mode = $(this).val();
+            $WK.expressionLastFocusedInput = null;
             $WK.showExpressionEditor();
         });
 
