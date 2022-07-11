@@ -128,7 +128,7 @@ class FieldsetAssignment
 
         $matching = null;
         $max_priority = -INF;
-        var_dump($posts);
+
         foreach ($posts as $post) {
 
             $assign = array(

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.710635205193">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.710849618662">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 2.3.0">
@@ -30,11 +30,11 @@
 
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="../../resources/css/retype.css?v=2.3.0.710635205193" rel="stylesheet" />
+    <link href="../../resources/css/retype.css?v=2.3.0.710849618662" rel="stylesheet" />
 
-    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.710635205193" data-turbo-eval="false" defer></script>
+    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.710849618662" data-turbo-eval="false" defer></script>
     <script type="text/javascript" src="../../resources/js/retype.js?v=2.3.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.710635205193" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.710849618662" data-turbo-eval="false" defer></script>
 </head>
 <body>
     <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -51,7 +51,7 @@
                     <div class="flex items-center px-2 md:px-6">
                         <a id="docs-site-logo" href="../../" class="flex items-center leading-snug text-xl">
                             <span class="dark:text-white font-semibold line-clamp-1 md:line-clamp-2">WC Kalkulator</span>
-                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO v.1.3.2</span>
+                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO v.1.3.3</span>
                     </div>
         
                     <span class="hidden h-8 border-r md:inline-block dark:border-dark-650"></span>
@@ -279,6 +279,7 @@ The solution is to divide value by <code v-pre>{quantity}</code>. Let&#x27;s see
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre class="language-none"><code v-pre class="language-none">= {field_1} + {field_2} / {quantity}</code></pre>
 </doc-codeblock></div>
+<hr />
 <doc-anchor-target id="2-how-to-add-price-for-every-character-in-text-field-">
     <h3>
         <doc-anchor-trigger class="header-anchor-trigger" to="#2-how-to-add-price-for-every-character-in-text-field-">#</doc-anchor-trigger>
@@ -322,6 +323,7 @@ add 500
 if strlen({my_field:text}) &gt;= 10
 add 1000</code></pre>
 </doc-codeblock></div>
+<hr />
 <doc-anchor-target id="3-each-product-has-width-and-height-user-gives-only-one-dimension-and-the-price-is-proportional-to-the-calculated-area">
     <h3>
         <doc-anchor-trigger class="header-anchor-trigger" to="#3-each-product-has-width-and-height-user-gives-only-one-dimension-and-the-price-is-proportional-to-the-calculated-area">#</doc-anchor-trigger>
@@ -329,7 +331,7 @@ add 1000</code></pre>
     </h3>
 </doc-anchor-target>
 <p>User has to input width, but the height will be calculated with proportions from product dimensions.</p>
-<p>First of all, set the product width and height in the product options, so we will be using <code v-pre>{product_width}</code> and <code v-pre>{product_height}</code> variables.
+<p>First of all, set the product width and height in the product options, so we will be using <code v-pre>{product_width}</code> and <code v-pre>{product_height}</code> variables. <a href="https://www.youtube.com/watch?v=M2t0yf8ocbk" target="_blank">Video: How to use product dimensions</a>.
 Create number field and name it <code v-pre>width</code>. The height will be calculated as proportional to the product dimensions. Look at this equations:</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre class="language-none"><code v-pre class="language-none">height = width * product_height / product_width
@@ -344,6 +346,7 @@ price = area * price_per_unit</code></pre>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre class="language-none"><code v-pre class="language-none">= 99.00 * {height} * {height} * {product_width} / {product_height}</code></pre>
 </doc-codeblock></div>
+<hr />
 <doc-anchor-target id="4-how-to-decrease-product-price-for-logged-user-by--1000-usd-or-by--5-">
     <h3>
         <doc-anchor-trigger class="header-anchor-trigger" to="#4-how-to-decrease-product-price-for-logged-user-by--1000-usd-or-by--5-">#</doc-anchor-trigger>
@@ -371,6 +374,7 @@ So the result formula will be:</p>
 <pre class="language-none"><code v-pre class="language-none">/* For -5% + limit min. price to be 0.99  */
 = max( {product_price} * (1 - 0.05 * {is_user_logged}), 0.99 )</code></pre>
 </doc-codeblock></div>
+<hr />
 
                                 
                                 <!-- Required only on API pages -->

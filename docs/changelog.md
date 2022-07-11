@@ -4,6 +4,10 @@ label: "CHANGELOG"
 icon: git-branch
 ---
 # CHANGELOG
+2022-07-11
+v 1.3.3
+- Bug fixed: str_replace on array
+- Bug fixed: missing numberposts argument on get_posts()
 
 2022-07-07
 v.1.3.2
