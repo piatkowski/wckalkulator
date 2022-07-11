@@ -75,6 +75,7 @@ class GlobalParameter extends GlobalParametersPostType
     {
         return get_posts(array(
             'post_type' => self::POST_TYPE,
+            'numberposts' => -1,
             'per_page' => -1,
             'post_status' => 'publish'
         ));

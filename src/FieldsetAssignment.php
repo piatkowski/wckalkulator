@@ -122,14 +122,15 @@ class FieldsetAssignment
         $posts = get_posts(array(
             'post_type' => FieldsetPostType::POST_TYPE,
             'per_page' => -1,
+            'numberposts' => -1,
             'post_status' => 'publish'
         ));
-        
+
         $matching = null;
         $max_priority = -INF;
-        
+        var_dump($posts);
         foreach ($posts as $post) {
-            
+
             $assign = array(
                 'type' => get_post_meta($post->ID, '_wck_assign_type', true),
                 'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
