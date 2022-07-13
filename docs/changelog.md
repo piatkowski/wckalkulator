@@ -9,6 +9,8 @@ v.1.3.4
 - new formula builder
 - apply filters on td elements in field's templates
 - new assignment type: product attribute
+- more columns on fieldset table
+- toggle button to publish/unpublish fieldsets quickly
 - bug fixes
 
 2022-07-11

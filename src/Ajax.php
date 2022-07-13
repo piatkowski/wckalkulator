@@ -15,7 +15,7 @@ use WCKalkulator\Woocommerce\Product;
  */
 class Ajax
 {
-    private const NONCE = "wckalkulator-ajax-nonce";
+    public const NONCE = "wckalkulator-ajax-nonce";
 
     /**
      * Private actions
@@ -26,6 +26,7 @@ class Ajax
         'wckalkulator_calculate_price',
         'wckalkulator_json_search_tags',
         'wckalkulator_json_search_attributes',
+        'wckalkulator_fieldset_post_type_toggle_publish'
     );
 
     /**
@@ -213,6 +214,33 @@ class Ajax
         }
 
         wp_send_json($output);
+    }
+
+    /**
+     * Toggle custom post status
+     * @return void
+     * @since 1.3.4
+     */
+    public static function wckalkulator_fieldset_post_type_toggle_publish()
+    {
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if (!wp_verify_nonce($_POST['_wck_ajax_nonce'], Ajax::NONCE) || $post_id <= 0) {
+            wp_send_json(array('status' => 'error'));
+        }
+        if (get_post_type($post_id) !== FieldsetPostType::POST_TYPE) {
+            wp_send_json(array('status' => 'error'));
+        }
+        $status = get_post_status($post_id);
+        $new_status = $status === 'publish' ? 'draft' : 'publish';
+        $new_state = $new_status === 'publish' ? 'enabled' : 'disabled';
+        $update_post = array(
+            'ID' => $post_id,
+            'post_status' => $new_status
+        );
+        if (wp_update_post($update_post) === $post_id) {
+            wp_send_json(array('status' => 'success', 'state' => $new_state));
+        }
+        wp_send_json(array('status' => 'error'));
     }
 
     /**
