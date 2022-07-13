@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.0
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -141,6 +141,11 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-07-13 v.1.3.4
+- new formula builder
+- apply filters on td elements in field's templates
+- bug fixes
+
 2022-07-11 v.1.3.3
 - Bug fixed: str_replace on array
 - Bug fixed: missing numberposts argument on get_posts()

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.710887224971">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.711022346259">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 2.3.0">
@@ -11,7 +11,7 @@
     <!-- Primary Meta Tags -->
     <title>Templates | Custom fields and price calculator</title>
     <meta name="title" content="Templates | Custom fields and price calculator">
-    <meta name="description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can be overriden." />
+    <meta name="description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can" />
 
     <!-- Canonical -->
     <link rel="canonical" href="https://wckalkulator.com/usermanual/templates/" />
@@ -20,21 +20,22 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://wckalkulator.com/usermanual/templates/">
     <meta property="og:title" content="Templates | Custom fields and price calculator">
-    <meta property="og:description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can be overriden.">
+    <meta property="og:description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://wckalkulator.com/usermanual/templates/">
     <meta property="twitter:title" content="Templates | Custom fields and price calculator">
-    <meta property="twitter:description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can be overriden.">
+    <meta property="twitter:description" content="WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in view directory can">
 
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="../../resources/css/retype.css?v=2.3.0.710887224971" rel="stylesheet" />
+    <link href="../../resources/css/retype.css?v=2.3.0.711022346259" rel="stylesheet" />
 
-    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.710887224971" data-turbo-eval="false" defer></script>
+    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.711022346259" data-turbo-eval="false" defer></script>
     <script type="text/javascript" src="../../resources/js/retype.js?v=2.3.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.710887224971" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.711022346259" data-turbo-eval="false" defer></script>
+    <script id="prism-js" type="text/javascript" src="../../resources/js/prism.js?v=2.3.0.711022346259" defer></script>
 </head>
 <body>
     <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -51,7 +52,7 @@
                     <div class="flex items-center px-2 md:px-6">
                         <a id="docs-site-logo" href="../../" class="flex items-center leading-snug text-xl">
                             <span class="dark:text-white font-semibold line-clamp-1 md:line-clamp-2">WC Kalkulator</span>
-                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO v.1.3.3</span>
+                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO v.1.3.4</span>
                     </div>
         
                     <span class="hidden h-8 border-r md:inline-block dark:border-dark-650"></span>
@@ -266,9 +267,12 @@
         <span>Templates</span>
     </h1>
 </doc-anchor-target>
-<p>WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in <code v-pre>view</code> directory can be overriden.
-Just copy file from the <code v-pre>view</code> directory to the <code v-pre>themes/your-theme/wc-kalkulator</code> directory and make your modifications.</p>
-<p>For example: <code v-pre>view/fields/front/text.php</code> should be copied to the <code v-pre>/themes/your-theme/wc-kalkulator/fields/front/text.php</code></p>
+<p>WC Kalkulator v1.1.0 brings a new approach to modifying the appearance of fields. Every file in <code v-pre>view</code> directory can
+be overriden.
+Just copy file from the <code v-pre>view</code> directory to the <code v-pre>themes/your-theme/wc-kalkulator</code> directory and make your
+modifications.</p>
+<p>For example: <code v-pre>view/fields/front/text.php</code> should be copied to
+the <code v-pre>/themes/your-theme/wc-kalkulator/fields/front/text.php</code></p>
 <doc-anchor-target id="structure-of-the-view-directory">
     <h2>
         <doc-anchor-trigger class="header-anchor-trigger" to="#structure-of-the-view-directory">#</doc-anchor-trigger>
@@ -303,6 +307,28 @@ Just copy file from the <code v-pre>view</code> directory to the <code v-pre>the
 </tbody>
 </table>
 </div>
+<doc-anchor-target id="filters-and-hooks">
+    <h2>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#filters-and-hooks">#</doc-anchor-trigger>
+        <span>Filters and Hooks</span>
+    </h2>
+</doc-anchor-target>
+<p>Example filter to change <code v-pre>&lt;td class=&quot;label&quot;&gt;</code> tag in field template</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre class="language-php"><code v-pre class="language-php">add_filter('wck_field_td_label', function($html, $field_type){
+   //... modify $html, add attributes, classes, etc. ...
+   // use var_dump to explore $html, $field_type paramters
+   return $html;
+}, 10, 2);</code></pre>
+</doc-codeblock></div>
+<p>Example filter to change <code v-pre>&lt;td class=&quot;value&quot;&gt;</code> tag in field template</p>
+<div class="codeblock-wrapper"><doc-codeblock>
+<pre class="language-php"><code v-pre class="language-php">add_filter('wck_field_td', function($html, $field_type){
+   //... modify $html, add attributes, classes, etc. ...
+   // use var_dump to explore $html, $field_type paramters
+   return $html;
+}, 10, 2);</code></pre>
+</doc-codeblock></div>
 <div class="flex mb-6">
     <div class="shrink-0 w-1 rounded-tl rounded-bl bg-blue-500 dark:bg-blue-400"></div>
     <div class="flex w-full py-4 border border-l-0 border-gray-300 rounded-tr rounded-br doc-alert bg-white dark:bg-dark-700 dark:border-dark-700" role="alert">
@@ -321,7 +347,8 @@ Just copy file from the <code v-pre>view</code> directory to the <code v-pre>the
 <p><a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY" class="no-link inline-flex items-center font-medium cursor-pointer transition-colors duration-200 ease-out focus:outline-none bg-gray-200 hover:bg-gray-300 dark:bg-dark-250 dark:hover:bg-dark-350 text-gray-900 dark:text-black px-4 h-10 text-sm rounded-md">
     <span class="docs-emoji mr-2">&#x2764;&#xFE0F;</span>
     <span>I like it!</span>
-</a> 
+</a>
+ 
 <a href="https://www.buymeacoffee.com/piatkowski" class="no-link inline-flex items-center font-medium cursor-pointer transition-colors duration-200 ease-out focus:outline-none bg-gray-200 hover:bg-gray-300 dark:bg-dark-250 dark:hover:bg-dark-350 text-gray-900 dark:text-black px-4 h-10 text-sm rounded-md">
     <span class="docs-emoji mr-2">&#x2615;</span>
     <span>Just coffee</span>
@@ -395,6 +422,6 @@ Just copy file from the <code v-pre>view</code> directory to the <code v-pre>the
 
     <div id="docs-overlay-target"></div>
 
-    <script>window.__DOCS__ = { "title": "Templates", level: 2, icon: "file", hasPrism: false, hasMermaid: false, hasMath: false }</script>
+    <script>window.__DOCS__ = { "title": "Templates", level: 2, icon: "file", hasPrism: true, hasMermaid: false, hasMath: false }</script>
 </body>
 </html>
