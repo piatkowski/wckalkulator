@@ -1,3 +1,4 @@
 .idea
 todo.txt
 assets/css/.sass-cache
+/docs/.retype/

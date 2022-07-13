@@ -159,7 +159,7 @@ class FieldsetPostType
                     echo join(", ", FieldsetAssignment::tags_readable($tags));
                 }
                 if (is_array($attributes) && count($attributes) > 0) {
-                    echo __('Product Attributes: ', 'wc-kalkulator');
+                    echo __('Attributes: ', 'wc-kalkulator');
                     echo join(", ", FieldsetAssignment::attributes_readable($attributes));
                 }
                 break;
