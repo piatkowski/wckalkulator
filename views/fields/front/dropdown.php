@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 ?>
 <tr class="<?php echo esc_html($view->css_class); ?>">
     <td class="label">
@@ -13,7 +14,7 @@ if (!defined('ABSPATH')) {
             <?php endif; ?>
         </label>
     </td>
-    <td class="value">
+    <?php echo wp_kses_post(apply_filters('wck_field_td', '<td class="value">', $view->field_type)); ?>
         <select id="<?php echo esc_html($view->id); ?>"
                 name="<?php echo esc_html($view->name); ?>" <?php echo esc_html($view->required); ?>>
         <?php foreach ($view->options_title as $i => $opt_title) : ?>
