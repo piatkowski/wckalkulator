@@ -177,16 +177,16 @@
   position: relative;
   font-family: monospace;
   width: 100%;
-  margin: 10px 0 10px 0;
+  margin: 10px 0 15px 0;
 }
 .wc-kalkulator-wrapper .input-icon i {
   font-family: monospace;
-  font-size: 15px;
+  font-size: 13px;
   position: absolute;
   display: block;
-  top: 10px;
+  top: 11px;
   pointer-events: none;
-  width: 45px;
+  width: 50px;
   text-align: right;
   font-style: normal;
   color: blue;
@@ -201,7 +201,7 @@
   content: "if";
 }
 .wc-kalkulator-wrapper .input-equation i::after {
-  content: "=";
+  content: "price";
 }
 .wc-kalkulator-wrapper #addon-inputs .input-equation i::after {
   content: "add";

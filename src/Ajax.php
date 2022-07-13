@@ -16,7 +16,7 @@ use WCKalkulator\Woocommerce\Product;
 class Ajax
 {
     private const NONCE = "wckalkulator-ajax-nonce";
-    
+
     /**
      * Private actions
      *
@@ -24,19 +24,19 @@ class Ajax
      */
     private static $actions = array(
         'wckalkulator_calculate_price',
-        'wckalkulator_json_search_tags'
+        'wckalkulator_json_search_tags',
+        'wckalkulator_json_search_attributes',
     );
-    
+
     /**
      * Public actions
      *
      * @var array
      */
     private static $actions_nopriv = array(
-        'wckalkulator_calculate_price',
-        'wckalkulator_json_search_tags'
+        'wckalkulator_calculate_price'
     );
-    
+
     public static function init()
     {
         foreach (self::$actions as $action) {
@@ -47,7 +47,7 @@ class Ajax
         }
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
     }
-    
+
     /**
      * Add Javascript files to the Product Page
      *
@@ -57,14 +57,14 @@ class Ajax
     {
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')/* && $fieldset->has_expression('current')*/) {
-            
+
             wp_enqueue_script(
                 'wck-ajax-script',
                 Plugin::url() . '/assets/js/wckalkulator.min.js',
                 ['jquery'],
                 Plugin::VERSION
             );
-            
+
             wp_localize_script(
                 'wck-ajax-script',
                 'wck_ajax_object',
@@ -79,7 +79,7 @@ class Ajax
             );
         }
     }
-    
+
     /**
      * Ajax action - calculate product price
      * POST request: product_id, hash, nonce, *fields values*, quantity
@@ -94,7 +94,7 @@ class Ajax
         if (wp_hash($_POST["_wck_product_id"]) !== $_POST["_wck_hash"]) {
             wp_die('Bad hash!');
         }
-        
+
         /**
          * Get user input
          */
@@ -102,13 +102,12 @@ class Ajax
         $variation_id = isset($_POST["variation_id"]) ? absint($_POST["variation_id"]) : 0;
         $quantity = absint($_POST["quantity"]);
 
-        
-        
+
         if ($product_id === 0 || $quantity === 0) {
             Helper::message_for_manager("Unknown product or incorrect user input!");
             wp_die("");
         }
-        
+
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
         $user_input = $fieldset->get_user_input();
@@ -127,7 +126,7 @@ class Ajax
                     $price_regular = $calc['regular_value'] * $quantity;
                     $response .= '<del>' . str_replace('woocommerce-Price-amount', '', wc_price($price_regular)) . '</del>&nbsp;';
                 }
-                
+
                 $response .= '<ins>' . str_replace('woocommerce-Price-amount', '', wc_price($price_current)) . '</ins>';
                 echo apply_filters('wck_total_price_ajax', $response, $price_regular, $price_current);
             } else {
@@ -145,7 +144,7 @@ class Ajax
         }
         wp_die();
     }
-    
+
     /**
      * Ajax action - search tags
      * POST request: term
@@ -156,29 +155,66 @@ class Ajax
     public static function wckalkulator_json_search_tags()
     {
         check_ajax_referer('search-products', 'security');
-     
-        if (empty($term) && isset($_GET['term'])) {
+
+        $term = "";
+        if (!empty($_GET['term'])) {
             $term = (string)wc_clean(wp_unslash($_GET['term']));
         }
-        
+
         if (empty($term)) {
             wp_die();
         }
-        
+
         $tags = get_terms('product_tag', array(
             'search' => $term,
             'hide_empty' => false
         ));
-        
+
         $output = array();
-  
+
         foreach ($tags as $tag) {
             $output[$tag->term_id] = $tag->name;
         }
-        
+
         wp_send_json($output);
     }
-    
+
+    /**
+     * Ajax action - search product attributes
+     * POST request: term
+     * Output: JSON
+     *
+     * @since 1.3.4
+     */
+    public static function wckalkulator_json_search_attributes()
+    {
+        check_ajax_referer('search-products', 'security');
+
+        $term = "";
+        if (!empty($_GET['term'])) {
+            $term = (string)wc_clean(wp_unslash($_GET['term']));
+        }
+
+        if (empty($term)) {
+            wp_die();
+        }
+
+        $output = array();
+        $taxonomies = get_taxonomies(null, 'objects');
+
+        foreach ($taxonomies as $taxonomy) {
+            $attributes = get_terms($taxonomy->name, array(
+                'search' => $term,
+                'hide_empty' => false
+            ));
+            foreach ($attributes as $attr) {
+                $output[$attr->term_id] = $taxonomy->label . ': ' . $attr->name;
+            }
+        }
+
+        wp_send_json($output);
+    }
+
     /**
      * Return true if it is an AJAX request
      *
@@ -189,7 +225,7 @@ class Ajax
     {
         return defined('DOING_AJAX') && DOING_AJAX;
     }
-    
+
     /**
      * Response as array
      *
@@ -205,6 +241,6 @@ class Ajax
             'value' => $value
         );
     }
-    
-    
+
+
 }

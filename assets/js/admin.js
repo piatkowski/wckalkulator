@@ -252,7 +252,7 @@
 
         $WK.changeAssignType = function () {
             var disabled = $("#assign_type").val() === "1";
-            $("#assign_products, #assign_categories, #assign_tags").prop("disabled", disabled);
+            $("#assign_products, #assign_categories, #assign_tags, #assign_attributes").prop("disabled", disabled);
         };
         $("#assign_type").on("change", $WK.changeAssignType);
 

@@ -12,11 +12,11 @@ namespace WCKalkulator;
  */
 class FieldsetAssignment
 {
-    
+
     const TYPE_ALL = 1;
     const TYPE_ALL_EXCEPT = 2;
     const TYPE_ONLY_SELECTED = 3;
-    
+
     /**
      * All defined assign types
      *
@@ -24,7 +24,7 @@ class FieldsetAssignment
      * @since 1.1.0
      */
     private static $type;
-    
+
     /**
      * Initialize value of properties ($type)
      *
@@ -38,7 +38,7 @@ class FieldsetAssignment
             self::TYPE_ONLY_SELECTED => __('Only selected below:', 'wc-kalkulator')
         );
     }
-    
+
     /**
      * Return all assignment types as an array
      *
@@ -49,7 +49,7 @@ class FieldsetAssignment
     {
         return self::$type;
     }
-    
+
     /**
      * Return title by the type's $id
      *
@@ -61,7 +61,7 @@ class FieldsetAssignment
     {
         return self::has($id) ? self::$type[$id] : null;
     }
-    
+
     /**
      * Check if $id exists in the $type array
      *
@@ -73,7 +73,7 @@ class FieldsetAssignment
     {
         return isset(self::$type[$id]);
     }
-    
+
     /**
      * This method returns Fieldset Post ID assigned to the Product
      * Returns ID with the highest priority if multiple Posts are found.
@@ -96,9 +96,9 @@ class FieldsetAssignment
          * Get categories IDs
          */
         $category_id = array();
-        
+
         $terms = get_the_terms($product_id, 'product_cat');
-        
+
         if (is_array($terms)) {
             foreach ($terms as $term) {
                 $category_id[] = $term->term_id;
@@ -108,12 +108,25 @@ class FieldsetAssignment
          * Get tags IDs
          */
         $tag_id = array();
-        
+
         $terms = get_the_terms($product_id, 'product_tag');
-        
+
         if (is_array($terms)) {
             foreach ($terms as $term) {
                 $tag_id[] = $term->term_id;
+            }
+        }
+        /*
+         * Get product attributes IDs
+         */
+        $attribute_id = array();
+        $taxonomies = get_taxonomies(null, 'objects');
+        foreach ($taxonomies as $taxonomy) {
+            $attributes = get_the_terms($product_id, $taxonomy->name);
+            if (is_array($attributes)) {
+                foreach ($attributes as $attr) {
+                    $attribute_id[] = $attr->term_id;
+                }
             }
         }
         /*
@@ -136,44 +149,47 @@ class FieldsetAssignment
                 'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
                 'categories' => (array)get_post_meta($post->ID, '_wck_assign_categories', true),
                 'tags' => (array)get_post_meta($post->ID, '_wck_assign_tags', true),
+                'attributes' => (array)get_post_meta($post->ID, '_wck_assign_attributes', true),
                 'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
             );
-            
+
             $has_match = false;
             switch ($assign['type']) {
-                
+
                 case FieldsetAssignment::TYPE_ALL:
                     $has_match = true;
                     break;
-                
+
                 case FieldsetAssignment::TYPE_ALL_EXCEPT:
                     if (!in_array($product_id, $assign['products'])
                         && count(array_intersect($category_id, $assign['categories'])) === 0
-                        && count(array_intersect($tag_id, $assign['tags'])) === 0) {
+                        && count(array_intersect($tag_id, $assign['tags'])) === 0
+                        && count(array_intersect($attribute_id, $assign['attributes'])) === 0) {
                         $has_match = true;
                     }
                     break;
-                
+
                 case FieldsetAssignment::TYPE_ONLY_SELECTED:
                     if (in_array($product_id, $assign['products'])
                         || count(array_intersect($category_id, $assign['categories'])) > 0
-                        || count(array_intersect($tag_id, $assign['tags'])) > 0) {
+                        || count(array_intersect($tag_id, $assign['tags'])) > 0
+                        || count(array_intersect($attribute_id, $assign['attributes'])) > 0) {
                         $has_match = true;
                     }
                     break;
             }
-            
+
             if ($has_match && $assign['priority'] > $max_priority) {
                 $matching = $post->ID;
                 $max_priority = $assign['priority'];
             }
-            
+
         }
-        
+
         Cache::store('FieldsetAssignment_match_' . $product_id, $matching);
         return $matching;
     }
-    
+
     /**
      * Product ids as input. Method outputs array of readable products titles, example: [16] => 'Product Title (#16)'
      *
@@ -188,7 +204,7 @@ class FieldsetAssignment
             $products = wc_get_products(array(
                 'include' => $products
             ));
-            
+
             foreach ($products as $product) {
                 $id = $product->get_id();
                 $result[$id] = $product->get_title() . ' (#' . $id . ')';
@@ -196,7 +212,7 @@ class FieldsetAssignment
         }
         return $result;
     }
-    
+
     /**
      * Category ids as input. Method outputs array of readable category titles, example: [16] => 'Category Title (2)'
      *
@@ -228,7 +244,7 @@ class FieldsetAssignment
                             }
                         }
                     }
-                    
+
                     $term->formatted_name .= $term->name . ' (' . $term->count . ')';
                     $result[$term->term_id] = $term->formatted_name;
                 }
@@ -236,8 +252,8 @@ class FieldsetAssignment
         }
         return $result;
     }
-    
-    
+
+
     /**
      * Tags ids as input. Method outputs array of readable tags titles, example: [16] => 'Custom Tag'
      *
@@ -259,12 +275,48 @@ class FieldsetAssignment
             ));
             if ($terms) {
                 foreach ($terms as $term) {
-                    $term->formatted_name = '#'.$term->name . ' (' . $term->count . ')';
+                    $term->formatted_name = '#' . $term->name . ' (' . $term->count . ')';
                     $result[$term->term_id] = $term->formatted_name;
                 }
             }
         }
         return $result;
     }
-    
+
+    /**
+     * Attributes ids as input. Method outputs array of readable attributes labels, example: [0] => 'Blue'
+     *
+     * @param $attributes
+     * @return array
+     * @since 1.3.4
+     */
+    public static function attributes_readable($attributes)
+    {
+        $result = array();
+        $taxonomies = array();
+        foreach (get_taxonomies() as $taxonomy) {
+            if (substr($taxonomy, 0, 3) === 'pa_') {
+                $taxonomies[] = $taxonomy;
+            }
+        }
+        if (is_array($attributes)) {
+            $terms = get_terms(array(
+                'taxonomy' => $taxonomies,
+                'orderby' => 'id',
+                'order' => 'ASC',
+                'hide_empty' => false,
+                'fields' => 'all',
+                'include' => $attributes
+            ));
+            if ($terms) {
+                foreach ($terms as $term) {
+                    $parent = get_taxonomy($term->taxonomy)->label;
+                    $term->formatted_name = $parent . ': ' . $term->name;
+                    $result[$term->term_id] = $term->formatted_name;
+                }
+            }
+        }
+        return $result;
+    }
+
 }

@@ -22,6 +22,7 @@ $priority = (int)get_post_meta($post->ID, '_wck_assign_priority', true);
 $products = get_post_meta($post->ID, '_wck_assign_products', true);
 $categories = get_post_meta($post->ID, '_wck_assign_categories', true);
 $tags = get_post_meta($post->ID, '_wck_assign_tags', true);
+$attributes = get_post_meta($post->ID, '_wck_assign_attributes', true);
 
 ?>
 <p class="post-attributes-label-wrapper">
@@ -71,6 +72,20 @@ $tags = get_post_meta($post->ID, '_wck_assign_tags', true);
 <select class="wc-product-search" multiple="multiple" id="assign_tags" name="_wck_assign_tags[]"
         data-action="wckalkulator_json_search_tags">
     <?php foreach (FieldsetAssignment::tags_readable($tags) as $id => $title): ?>
+        <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
+    <?php endforeach; ?>
+</select>
+
+<p class="post-attributes-label-wrapper">
+    <label for="assign_tags" class="post-attributes-label">
+        <?php _e('Choose Product Attributes', 'wc-kalkulator'); ?>
+        <?php echo Helper::html_help_tip(__('Search an attribute by name. You can choose multiple attributes.', 'wc-kalkulator')); ?>
+    </label>
+</p>
+
+<select class="wc-product-search" multiple="multiple" id="assign_attributes" name="_wck_assign_attributes[]"
+        data-action="wckalkulator_json_search_attributes">
+    <?php foreach (FieldsetAssignment::attributes_readable($attributes) as $id => $title): ?>
         <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
     <?php endforeach; ?>
 </select>

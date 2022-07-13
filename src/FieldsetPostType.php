@@ -28,6 +28,7 @@ class FieldsetPostType
         '_wck_assign_products' => 'absint_array',
         '_wck_assign_categories' => 'absint_array',
         '_wck_assign_tags' => 'absint_array',
+        '_wck_assign_attributes' => 'absint_array',
         '_wck_assign_priority' => 'absint',
         '_wck_filter_price_enabled' => 'bool',
         '_wck_filter_price_prefix' => 'text',
@@ -143,6 +144,7 @@ class FieldsetPostType
                 $products = get_post_meta($post_id, '_wck_assign_products', true);
                 $categories = get_post_meta($post_id, '_wck_assign_categories', true);
                 $tags = get_post_meta($post_id, '_wck_assign_tags', true);
+                $attributes = get_post_meta($post_id, '_wck_assign_attributes', true);
                 echo FieldsetAssignment::get($type) . "<br />";
                 if (is_array($products) && count($products) > 0) {
                     echo __('Products: ', 'wc-kalkulator');
@@ -155,6 +157,10 @@ class FieldsetPostType
                 if (is_array($tags) && count($tags) > 0) {
                     echo __('Tags: ', 'wc-kalkulator');
                     echo join(", ", FieldsetAssignment::tags_readable($tags));
+                }
+                if (is_array($attributes) && count($attributes) > 0) {
+                    echo __('Product Attributes: ', 'wc-kalkulator');
+                    echo join(", ", FieldsetAssignment::attributes_readable($attributes));
                 }
                 break;
             case 'wck_assign_priority':
@@ -250,7 +256,8 @@ class FieldsetPostType
             $can_empty = array(
                 '_wck_assign_products',
                 '_wck_assign_categories',
-                '_wck_assign_tags'
+                '_wck_assign_tags',
+                '_wck_assign_attributes'
             );
             
             /**
