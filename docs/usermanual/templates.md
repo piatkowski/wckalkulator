@@ -1,6 +1,6 @@
 ---
 order: -600
-label: "Templates"
+label: "Templates & Layouts"
 icon: file-code
 ---
 
@@ -44,6 +44,13 @@ add_filter('wck_field_td', function($html, $field_type){
    return $html;
 }, 10, 2);
 ```
+
+# Layouts
+
+Layouts has beed added in v.1.3.4. You can choose default one column layout or switch to two column layout.
+In this video I show how to use layouts feature.
+
+[!embed](https://youtu.be/b2iNp1lHxK0)
 
 !!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!

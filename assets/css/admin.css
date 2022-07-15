@@ -170,6 +170,31 @@
   display: block;
   clear: both;
 }
+.wc-kalkulator-wrapper ul#f-field-list .header .wck-toggle-colspan, .wc-kalkulator-wrapper ul#f-field-list .header .wck-toggle-colspan-label {
+  display: none;
+}
+.wc-kalkulator-wrapper ul#f-field-list.layout-two-col li {
+  width: 49.4%;
+  display: inline-block;
+  margin: 0.25%;
+  vertical-align: top;
+}
+.wc-kalkulator-wrapper ul#f-field-list.layout-two-col li.wck-layout-colspan {
+  width: 99.25%;
+}
+.wc-kalkulator-wrapper ul#f-field-list.layout-two-col .header .wck-toggle-colspan {
+  display: block;
+  box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  margin-top: 4px;
+  cursor: pointer;
+}
+.wc-kalkulator-wrapper ul#f-field-list.layout-two-col .header .wck-toggle-colspan-label {
+  line-height: 2.2em;
+  font-size: 12px;
+  padding-right: 6px;
+}
 .wc-kalkulator-wrapper .pr-20 {
   padding-right: 20px;
 }
@@ -202,6 +227,9 @@
 }
 .wc-kalkulator-wrapper .input-equation i::after {
   content: "price";
+}
+.wc-kalkulator-wrapper .input-stock i::after {
+  content: "qty * ";
 }
 .wc-kalkulator-wrapper #addon-inputs .input-equation i::after {
   content: "add";
@@ -268,6 +296,15 @@
 }
 .wc-kalkulator-wrapper .fields-section button span {
   line-height: 2;
+}
+.wc-kalkulator-wrapper hr {
+  margin: 35px 0 35px 0;
+}
+.wc-kalkulator-wrapper .align-right {
+  text-align: right;
+}
+.wc-kalkulator-wrapper .wck-toggle-layout, .wc-kalkulator-wrapper .wck-toggle-expand {
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=admin.css.map */

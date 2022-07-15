@@ -24,6 +24,46 @@
         $WK.wpMediaFrame = null;
         $WK.wpMediaTarget = null;
         $WK.iconPreloader = "data:image/gif;base64,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";
+        $WK.fieldsLayout = 'one-col';
+
+        $(".wck-toggle-layout").on("click", function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            if (btn.hasClass("woocommerce-input-toggle--disabled")) {
+                btn.removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
+                $WK.fieldsLayout = 'two-col';
+            } else {
+                btn.removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
+                $WK.fieldsLayout = 'one-col';
+            }
+            $WK.updateLayout();
+        });
+
+        $(".wck-toggle-expand").on("click", function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            if (btn.hasClass("woocommerce-input-toggle--disabled")) {
+                btn.removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
+                $(".action-toggle.dashicons-arrow-down-alt2").trigger("click");
+            } else {
+                btn.removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
+                $(".action-toggle.dashicons-arrow-up-alt2").trigger("click");
+            }
+        });
+
+        $("body").on("click", ".wck-toggle-colspan", function (e) {
+            e.preventDefault();
+            var item = $(this).parent().parent().parent();
+            if ($(this).hasClass("woocommerce-input-toggle--disabled")) {
+                $(this).removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
+                item.addClass("wck-layout-colspan");
+                item.find('.f-colspan').val(2);
+            } else {
+                $(this).removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
+                item.removeClass("wck-layout-colspan");
+                item.find('.f-colspan').val(1);
+            }
+        });
 
         $("body").on("focus", "#wck_expression input", function () {
             $WK.expressionLastFocusedInput = $(this);
@@ -240,7 +280,18 @@
             $WK.changeAssignType();
             $("form#post").attr("novalidate", "");
             $WK.buildTooltips("");
+            $WK.updateLayout();
             //$WK.appendGlobalParameters();
+        };
+
+        $WK.updateLayout = function () {
+            if ($WK.fieldsLayout === 'two-col') {
+                $WK.fieldList.addClass("layout-two-col");
+                $(".wck-toggle-colspan-label").show();
+            } else {
+                $WK.fieldList.removeClass("layout-two-col");
+                $(".wck-toggle-colspan-label").hide();
+            }
         };
 
         $WK.buildTooltips = function (selector) {
@@ -313,7 +364,9 @@
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
                     "css_class": input_css_class.val(),
-                    "required": (($row.find('input.f-required').length > 0) ? $row.find('input.f-required').is(':checked') : true)
+                    "required": (($row.find('input.f-required').length > 0) ? $row.find('input.f-required').is(':checked') : true),
+                    "layout": $WK.fieldsLayout,
+                    "colspan": $row.find('input.f-colspan').val()
                 };
 
                 var input_fprice = $row.find('input.f-price');
@@ -553,16 +606,32 @@
 
         $WK.loadJSONdata = function () {
             if (typeof wck_load_fieldset === "object") {
+                var layoutLoaded = false;
                 $.each(wck_load_fieldset, function () {
+
+                    if (!layoutLoaded) {
+                        if (this.hasOwnProperty("layout") && this.layout === 'two-col') {
+                            $(".wck-toggle-layout").trigger("click");
+                        }
+                        layoutLoaded = true;
+                    }
+
                     var field_id = $WK.addField(this.type);
                     var $field = $("#" + field_id + " .field");
                     $("#" + field_id + " .f-name").val(this.name);
+                    if (this.hasOwnProperty("colspan")) {
+                        $("#" + field_id + " .f-colspan").val(this.colspan);
+                        if (this.colspan === '2') {
+                            $("#" + field_id + " .wck-toggle-colspan").trigger("click");
+                        }
+                    }
                     $("#" + field_id + " .f-title").val(this.title);
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
                     if ($("#" + field_id + " .f-required").length > 0) {
                         $("#" + field_id + " .f-required").prop("checked", this.required);
                     }
+
 
                     var fprice = $("#" + field_id + " .f-price");
                     if (fprice.length > 0) {
@@ -822,7 +891,6 @@
                     $WK.expr_saved = true;
                 }
             }
-
             if (mode === "off") {
                 $("input[name=_wck_expression]").val("off");
             } else {
@@ -832,7 +900,8 @@
 
         $WK.loadExpression = function () {
             if (typeof wck_load_expression === "object") {
-                $WK.expression = wck_load_expression;
+                $WK.expression.mode = wck_load_expression.mode;
+                $WK.expression.expr = wck_load_expression.expr;
                 if ($WK.expression.mode === "oneline") {
                     $(".expression_oneline input").val($WK.expression.expr);
                     $("input[name=_wck_choose_expression_type].expression_oneline").prop("checked", true);

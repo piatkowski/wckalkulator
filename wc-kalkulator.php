@@ -76,7 +76,8 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\LinkField::class,
             Fields\AttachmentField::class,
             Fields\ImageswatchesField::class,
-            Fields\ColorswatchesField::class
+            Fields\ColorswatchesField::class,
+            Fields\EmptyField::class
         );
 
         /**

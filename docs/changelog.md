@@ -11,6 +11,8 @@ v.1.3.4
 - new assignment type: product attribute
 - more columns on fieldset table
 - toggle button to publish/unpublish fieldsets quickly
+- support for stock management and stock reduction multiplier
+- layouts feature - you can choose one or two column layout
 - bug fixes
 
 2022-07-11

@@ -276,17 +276,39 @@ class FieldsetProduct
     }
 
     /**
+     * Get fieldset layout (1- or 2- cols)
+     *
+     * @return int  - number of columns (1 or 2 cols layout)
+     * @since 1.3.4
+     */
+    public function layout()
+    {
+        if (!empty($this->fields) && reset($this->fields)->data('layout') === 'two-col') {
+            return 2;
+        }
+        return 1;
+    }
+
+    /**
      * Return HTML string for product page
      *
+     * @param array $html - array with keys 'hidden', 'fields', 'old_html'
      * @return string|null
      * @since 1.0.0
      */
     public function render($html)
     {
+        $_html = $html['hidden'];
+        foreach ($html['fields'] as $field) {
+            $_html .= $field['html'];
+        }
         return View::render('woocommerce/product', array(
             'product_id' => $this->product_id,
             'variation_id' => $this->variation_id,
-            'html' => $html
+            'hidden' => $html['hidden'],
+            'fields' => $html['fields'],
+            'html' => $_html, //for backward compatibility
+            'layout' => $this->layout()
         ));
     }
 
@@ -456,7 +478,7 @@ class FieldsetProduct
     /**
      * Get the expression
      *
-     * @return mixed|null
+     * @return array|string|null
      * @since 1.0.0
      */
     public function expression($key = '')
@@ -652,7 +674,7 @@ class FieldsetProduct
     public function calculate()
     {
         if ($this->is_valid) {
-            if ((int)$this->product_id > 0) {
+            if ($this->product_id > 0) {
                 $product_helper = new ProductHelper($this->product_id, $this->variation_id);
 
                 if ($product_helper->is_valid() && isset($_POST["quantity"])) {
@@ -681,6 +703,35 @@ class FieldsetProduct
         } else {
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
+    }
+
+    /**
+     * Get stock reduction multiplier.
+     *
+     * @return array|int
+     * @since 1.3.4
+     */
+    public function stock_reduction_multiplier()
+    {
+        if ($this->is_valid && $this->product_id > 0) {
+            try {
+                $parser = new ExpressionParser(array(
+                    'mode' => 'oneline',
+                    'expr' => $this->data->stock_reduction_multiplier
+                ), $this->user_input);
+                if ($parser->is_ready()) {
+                    $calc = $parser->execute();
+                    if (!$calc['is_error']) {
+                        return $calc['value'];
+                    }
+                }
+            } catch (\Exception $e) {
+                return 1;
+            } catch (\Throwable $e) {
+                return 1;
+            }
+        }
+        return 1;
     }
 
     /**

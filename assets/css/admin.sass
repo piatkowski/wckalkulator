@@ -134,6 +134,29 @@
     content: ""
     display: block
     clear: both
+  ul#f-field-list .header
+    .wck-toggle-colspan, .wck-toggle-colspan-label
+      display: none
+  ul#f-field-list.layout-two-col
+    li
+      width: 49.4%
+      display: inline-block
+      margin: 0.25%
+      vertical-align: top
+      &.wck-layout-colspan
+        width: 99.25%
+    .header
+      .wck-toggle-colspan
+        display: block
+        box-sizing: content-box
+        -moz-box-sizing: content-box
+        -webkit-box-sizing: content-box
+        margin-top: 4px
+        cursor: pointer
+      .wck-toggle-colspan-label
+        line-height: 2.2em
+        font-size: 12px
+        padding-right: 6px
   .pr-20
     padding-right: 20px
   .input-icon
@@ -165,6 +188,9 @@
     i
       &::after
         content: 'price'
+  .input-stock
+    i::after
+        content: 'qty * '
   #addon-inputs .input-equation i::after
     content: 'add'
   .input-else
@@ -217,3 +243,9 @@
       padding: 3px 8px
       span
         line-height: 2
+  hr
+    margin: 35px 0 35px 0
+  .align-right
+    text-align: right
+  .wck-toggle-layout, .wck-toggle-expand
+    cursor: pointer

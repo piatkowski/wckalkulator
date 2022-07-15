@@ -38,7 +38,8 @@ class FieldsetPostType
         '_wck_expression' => 'json', //will be stored as array
         '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
-        '_wck_priority' => 'int'
+        '_wck_priority' => 'int',
+        '_wck_stock_reduction_multiplier' => 'text'
     );
 
     /**
@@ -163,16 +164,17 @@ class FieldsetPostType
                     'off' => __('- off -', 'wc-kalkulator'),
                     'addon' => __('Price Add-Ons', 'wc-kalkulator')
                 );
-                echo esc_html($name[$mode]);
+                echo esc_html(isset($name[$mode]) ? $name[$mode] : '');
                 break;
             case 'wck_fields':
                 $fieldset = get_post_meta($post_id, '_wck_fieldset', true);
                 $names = array();
-                foreach($fieldset as $name => $field) {
-                    if(isset($field['title']))
+                if (!is_array($fieldset)) break;
+                foreach ($fieldset as $name => $field) {
+                    if (isset($field['title']))
                         $names[] = $field['title'];
                     else
-                        $names[] = $field['name'];
+                        $names[] = isset($field['name']) ? $field['name'] : '';
                 }
                 echo substr(esc_html(join(", ", $names)), 0, 100);
                 break;
@@ -242,7 +244,7 @@ class FieldsetPostType
                 'position' => 'advanced'
             ),*/
             'expression' => array(
-                'title' => __('Price Calculation', 'wc-kalkulator'),
+                'title' => __('Price Calculation & Inventory', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
             'pricefilter' => array(
@@ -372,13 +374,16 @@ class FieldsetPostType
     public static function enqueue_scripts($hook)
     {
         global $post;
+
+        if (!$post) return;
+
         if (($hook === 'post.php' || $hook === 'post-new.php') && $post->post_type === self::POST_TYPE) {
             self::add_scripts();
             self::add_styles();
         }
 
         //Scripts to handle edit- screen (i.e. toggle button)
-        if ($post->post_type === self::POST_TYPE && $hook === 'edit.php') {
+        if ($hook === 'edit.php' && $post->post_type === self::POST_TYPE) {
             wp_enqueue_script(
                 'wck-fieldset-post-type-script',
                 Plugin::url() . '/assets/js/admin-fieldset-post-type.min.js',
