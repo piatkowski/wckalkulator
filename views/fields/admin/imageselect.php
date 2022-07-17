@@ -8,9 +8,13 @@ use WCKalkulator\Helper;
 <input type="number" class="param fimg-width" step="1" min="0" value="0">
 
 <label>
-    <input type="checkbox" class="param f-required" step="any" value="1">
-    <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
+    <?php _e('Is this field required?', 'wc-kalkulator'); ?>
 </label>
+<select class="param f-required">
+    <option value="off"><?php _e('No'); ?></option>
+    <option value="on"><?php _e('Yes'); ?></option>
+</select>
+
 <label>* <?php _e('Option Items', 'wc-kalkulator'); ?></label>
 <div class="pairs fs-options">
     <div class="pair fs-option">

@@ -40,7 +40,7 @@ class CheckboxField extends AbstractField
         $args = $this->prepared_data();
         $args['value'] = $value === 1;
         $args['default_state'] = $this->data["default_state"];
-        $args['checked'] = ($value === 1) || ($value === 0 && $this->data["default_state"] === true);
+        $args['checked'] = ($value === 1) || ($value === 0 && (int)$this->data["default_state"] === 1);
         return View::render('fields/front/checkbox', $args);
     }
     

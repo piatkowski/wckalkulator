@@ -5,9 +5,13 @@ if (!defined('ABSPATH')) {
 use WCKalkulator\Helper;
 ?>
 <label>
-    <input type="checkbox" class="param f-required" value="1">
-    <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
+    <?php _e('Is this field required?', 'wc-kalkulator'); ?>
 </label>
+<select class="param f-required">
+    <option value="off"><?php _e('No'); ?></option>
+    <option value="on"><?php _e('Yes'); ?></option>
+</select>
+
 
 <label>
     <input type="checkbox" class="param fdp-disallow-past-date" value="1">

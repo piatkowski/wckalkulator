@@ -6,16 +6,16 @@
         var input_key_pressed = {};
 
         $("#f-field-list").sortable({
-            "handle": ".action-drag"
+            handle: ".action-drag",
+            placeholder: "wck-sortable-placeholder",
+            tolerance: "pointer"
         });
         $("#extra-inputs, #addon-inputs").sortable({
-            "handle": ".action-drag"
+            handle: ".action-drag",
+            placeholder: "wck-sortable-placeholder",
+            tolerance: "pointer"
         });
 
-        $("#wck-parameters").on("focus", function (e) {
-            //e.preventDefault();
-            $WK.saveFields();
-        });
         $('<input type="hidden" class="wck-global-color-picker" />').insertBefore("#wpwrap");
         $WK.colorpicker = $("input.wck-global-color-picker");
         $WK.colorpicker.iris();
@@ -26,29 +26,43 @@
         $WK.iconPreloader = "data:image/gif;base64,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";
         $WK.fieldsLayout = 'one-col';
 
-        $(".wck-toggle-layout").on("click", function (e) {
+        $WK.toggleButton = function (btn, e) {
             e.preventDefault();
-            var btn = $(this);
             if (btn.hasClass("woocommerce-input-toggle--disabled")) {
                 btn.removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
-                $WK.fieldsLayout = 'two-col';
+                return true
             } else {
                 btn.removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
-                $WK.fieldsLayout = 'one-col';
+                return false;
             }
+            return false;
+        };
+
+        $WK.fullscreenMode = function (state) {
+            if (state) {
+                $("body").css("overflow", "hidden");
+                $("#postbox-container-2").addClass("fullscreen");
+            } else {
+                $("body").css("overflow", "auto");
+                $("#postbox-container-2").removeClass("fullscreen");
+            }
+        };
+
+
+        $(".wck-toggle-layout").on("click", function (e) {
+            var state = $WK.toggleButton($(this), e);
+            $WK.fieldsLayout = state ? 'two-col' : 'one-col';
             $WK.updateLayout();
         });
 
+        $(".wck-toggle-fullscreen").on("click", function (e) {
+            var state = $WK.toggleButton($(this), e);
+            $WK.fullscreenMode(state);
+        });
+
         $(".wck-toggle-expand").on("click", function (e) {
-            e.preventDefault();
-            var btn = $(this);
-            if (btn.hasClass("woocommerce-input-toggle--disabled")) {
-                btn.removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
-                $(".action-toggle.dashicons-arrow-down-alt2").trigger("click");
-            } else {
-                btn.removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
-                $(".action-toggle.dashicons-arrow-up-alt2").trigger("click");
-            }
+            var state = $WK.toggleButton($(this), e);
+            $(".action-toggle.dashicons-arrow-" + (state ? "down" : "up") + "-alt2").trigger("click");
         });
 
         $("body").on("click", ".wck-toggle-colspan", function (e) {
@@ -65,8 +79,64 @@
             }
         });
 
-        $("body").on("focus", "#wck_expression input", function () {
+        $(".action-save-post").on("click", function (e) {
+            e.preventDefault();
+            $("#publish").trigger("click");
+            if ($("#publish").hasClass("disabled")) {
+                $(this).prop("disabled", true).addClass("disabled");
+            }
+        });
+
+        $("body").on("click", ".action-duplicate", function (e) {
+            e.preventDefault();
+            var element = $(this).parent().parent().parent();
+            var clonedElement = element.clone();
+            clonedElement.hide();
+            clonedElement.find(".f-title").val("");
+            clonedElement.find(".f-name").val("");
+            clonedElement.insertAfter(element);
+            clonedElement.fadeIn(1500, function () {
+                clonedElement.find(".dashicons-arrow-down-alt2").trigger("click");
+                $(this).find(".f-title").fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
+                $(this).find(".f-name").fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150).fadeOut(150).fadeIn(150);
+            });
+        });
+
+        $WK.shouldHideExprToolbar = false;
+        $WK.stateExprToolbar = false;
+
+        $("body").on("focusin", "#wck_expression .input-icon input", function (e) {
             $WK.expressionLastFocusedInput = $(this);
+            $WK.shouldHideExprToolbar = false;
+
+            var posA = $(this).offset();
+            var h = $(this).outerHeight();
+            var posB = $("#wck_expression").offset();
+            $("#wck-expression-toolbar").css({
+                top: posA.top - posB.top - h - $("#wck-expression-toolbar").outerHeight() - 20,
+                left: posA.left - posB.left
+            });
+
+            if (!$WK.stateExprToolbar) {
+                $WK.stateExprToolbar = true;
+                $WK.saveFields();
+                $("#wck-parameters .first-selected").prop("selected", true);
+
+                console.log(posA, posB, h);
+                $("#wck-expression-toolbar").stop(true, false).fadeIn('fast');
+
+            }
+        }).on("focusout", "#wck_expression input", function (e) {
+            $WK.shouldHideExprToolbar = !(e.relatedTarget && $("#wck-expression-toolbar").has(e.relatedTarget).length);
+            setTimeout(function () {
+                if ($WK.stateExprToolbar && $WK.shouldHideExprToolbar) {
+                    $("#wck-expression-toolbar").stop(true, false).fadeOut('fast');
+                    $WK.stateExprToolbar = false;
+                }
+            }, 200);
+        }).on("click", "#wck-expression-toolbar", function (e) {
+            if (e.target !== e.currentTarget && e.target.tagName !== "OPTION") return;
+            $WK.expressionLastFocusedInput.focus();
         }).on("click", "button.add-field-to-formula, button.add-operator", function (e) {
             e.preventDefault();
             var $focused = $WK.expressionLastFocusedInput;
@@ -76,6 +146,10 @@
             }
             if ($focused && $focused.length) {
                 var value = $(this).hasClass("add-operator") ? $(this).val() : $("#wck-parameters").val();
+                if (value === null) {
+
+                    return;
+                }
                 var cursorPos = $focused[0].selectionStart;
                 var x = $focused.val();
                 $focused.val(x.slice(0, cursorPos) + value + x.slice(cursorPos));
@@ -120,14 +194,20 @@
         }).on("click", ".field .header .action-delete", function () {
             if (confirm("Are you sure?")) {
                 var $target = $(this).closest("li");
-                $target.hide('slow', function () {
+                $target.fadeOut('slow', function () {
                     $target.remove();
                 });
             }
         }).on("click", ".field .header .action-toggle", function () {
-            $(this).closest(".field").find(".body").slideToggle(300);
+            var fieldBody = $(this).closest(".field").find(".body");
+            fieldBody.slideToggle(300);
             $(this).toggleClass("dashicons-arrow-up-alt2");
             $(this).toggleClass("dashicons-arrow-down-alt2");
+            if ($(this).hasClass("dashicons-arrow-down-alt2")) {
+                $(this).parent().find(".name").text((fieldBody.find(".f-title").length ? "- " + fieldBody.find(".f-title").val() : "") + " {" + fieldBody.find(".f-name").val() + "}");
+            } else {
+                $(this).parent().find(".name").text("");
+            }
 
         }).on("click", "#add-field-button", function (e) {
             e.preventDefault();
@@ -231,7 +311,7 @@
             var field_id = '#' + $(this).closest('li').attr('id');
             var ext = [];
             $(field_id + " input.allowed-extensions:checked").each(function () {
-                console.log($(this).data('extension'));
+                //console.log($(this).data('extension'));
                 ext.push($(this).data('extension'));
             });
             $(field_id + " input.fu-allowed-extensions").val(ext.join('|'));
@@ -281,16 +361,15 @@
             $("form#post").attr("novalidate", "");
             $WK.buildTooltips("");
             $WK.updateLayout();
+            $("#wck-parameters .first-selected").prop("selected", true);
             //$WK.appendGlobalParameters();
         };
 
         $WK.updateLayout = function () {
             if ($WK.fieldsLayout === 'two-col') {
                 $WK.fieldList.addClass("layout-two-col");
-                $(".wck-toggle-colspan-label").show();
             } else {
                 $WK.fieldList.removeClass("layout-two-col");
-                $(".wck-toggle-colspan-label").hide();
             }
         };
 
@@ -364,7 +443,7 @@
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
                     "css_class": input_css_class.val(),
-                    "required": (($row.find('input.f-required').length > 0) ? $row.find('input.f-required').is(':checked') : true),
+                    "required": (($row.find('select.f-required').length > 0) ? $row.find('select.f-required').val() === "on" : true),
                     "layout": $WK.fieldsLayout,
                     "colspan": $row.find('input.f-colspan').val()
                 };
@@ -454,8 +533,8 @@
 
                         break;
                     case 'checkbox':
-                        var input_fcb_default_state = $row.find('input.fcb-default-state');
-                        field.default_state = input_fcb_default_state.is(':checked');
+                        var input_fcb_default_state = $row.find('select.fcb-default-state');
+                        field.default_state = input_fcb_default_state.val() === "on";
                         break;
                     case 'text':
                     case 'textarea':
@@ -619,7 +698,7 @@
                     var field_id = $WK.addField(this.type);
                     var $field = $("#" + field_id + " .field");
                     $("#" + field_id + " .f-name").val(this.name);
-                    if (this.hasOwnProperty("colspan")) {
+                    if (this.hasOwnProperty("ń")) {
                         $("#" + field_id + " .f-colspan").val(this.colspan);
                         if (this.colspan === '2') {
                             $("#" + field_id + " .wck-toggle-colspan").trigger("click");
@@ -629,7 +708,7 @@
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
                     if ($("#" + field_id + " .f-required").length > 0) {
-                        $("#" + field_id + " .f-required").prop("checked", this.required);
+                        $("#" + field_id + " .f-required").val(this.required === "1" ? "on" : "off");
                     }
 
 
@@ -735,7 +814,8 @@
                         $("#" + field_id + " .fn-max-value").val(this.max);
                         $("#" + field_id + " .f-default-value").val(this.default_value);
                     } else if (this.type === "checkbox") {
-                        $("#" + field_id + " .fcb-default-state").prop("checked", this.default_state);
+                        $("#" + field_id + " .fcb-default-state").val(this.default_state === "1" ? "on" : "off");
+
                     } else if (this.type === "text" || this.type === "textarea" || this.type === "email") {
                         $("#" + field_id + " .ft-min-length").val(this.min);
                         $("#" + field_id + " .ft-max-length").val(this.max);
@@ -761,7 +841,7 @@
                             $("#" + field_id + " .fst-target").val(this.target);
                         } else if (this.type === 'attachment') {
                             $WK.preloadMedia(this.content, function (attachment) {
-                                console.log(field_id, attachment.get('url'));
+                                //console.log(field_id, attachment.get('url'));
                                 $("#" + field_id + " .wp-media-attachment-preview").attr("href", attachment.get('url')).text(attachment.get('url'));
                             });
                         }
@@ -792,15 +872,19 @@
 
         $WK.addCondition = function (if_value, then_value, addon = false) {
             var $html = $('<div class="input-group">' +
-                '<span class="action-drag dashicons left dashicons-move"></span>' +
-                '<span class="action-delete dashicons right dashicons-no-alt"></span>' +
-                '<div class="clearfix"></div>' +
+                '<div class="input-buttons">' +
+                '<span class="action-drag dashicons dashicons-move"></span>' +
+                '</div>' +
                 '<div class="input-icon input-if">' +
-                '<input type="text" placeholder="" value=""><i></i>' +
+                '<input type="text" placeholder="Logical expression..." value=""><i></i>' +
                 '</div>' +
                 '<div class="input-icon input-equation">' +
-                '<input type="text" placeholder="" value=""><i></i>' +
-                '</div></div>');
+                '<input type="text" placeholder="Price formula..." value=""><i></i>' +
+                '</div>' +
+                '<div class="input-buttons">' +
+                '<span class="action-delete dashicons dashicons-trash"></span>' +
+                '</div>' +
+                '<div class="clearfix"></div></div>');
             $(".input-if input", $html).val(if_value);
             $(".input-equation input", $html).val(then_value);
             if (addon === true) {
@@ -935,6 +1019,14 @@
 
         $("button.test-expression").on("click", function () {
             $WK.saveExpression();
+        });
+
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 100) {
+                $("#wck-toolbar").fadeIn();
+            } else if (!$("#postbox-container-2").hasClass("fullscreen")) {
+                $("#wck-toolbar").fadeOut();
+            }
         });
 
         // --------------------------------------

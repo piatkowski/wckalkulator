@@ -20,6 +20,13 @@
       -webkit-box-sizing: border-box
       -moz-box-sizing: border-box
       box-sizing: border-box
+    .wck-sortable-placeholder
+      border: 1px dashed #888
+      background-color: #eee
+      box-shadow: none
+      text-align: center
+      color: #888
+      padding: 22px
     li
       box-shadow: 0px 5px 10px #ccc
       margin-bottom: 5px
@@ -27,21 +34,30 @@
         border: 1px solid #AAA
         background-color: #FFFFFF
         .header
+          background-color: #F5F5F5
           padding: 8px
           .text
             font-size: 14px
             color: #000
             padding: 5px
+          .name
+            padding: 5px
         .body
           padding: 20px
           border-top: 1px solid #AAA
-          .half
+          .half, .third
             float: left
             width: 50%
-          .second
             padding-left: 10px
+            padding-right: 10px
+          .second, .last
+            padding-left: 10px
+            padding-right: 0
           .first
             padding-right: 10px
+            padding-left: 0
+          .third
+            width: 33%
           .fu-allowed-extensions
             margin-top: 10px
           label
@@ -106,6 +122,12 @@
     margin-right: 2px
     cursor: pointer
     color: #555
+    font-size: 16px
+    line-height: 1.5
+    &.action-drag
+      cursor: move
+      font-size: 16px
+      line-height: 1.5
   ul#f-field-list li .field .header .left, .input-group .left
     float: left
   ul#f-field-list li .field .header .right, .input-group .right
@@ -117,12 +139,13 @@
       display: inline
       margin-right: 10px
       width: auto
-  ul#f-field-list li .field .body .param.f-required, ul#f-field-list li .field .body .param.fdp-disallow-past-date, ul#f-field-list li .field .body .param[type=checkbox]
+  ul#f-field-list li .field .body .param.fdp-disallow-past-date, ul#f-field-list li .field .body .param[type=checkbox]
     margin: 10px 15px 14px 3px
   ul#f-field-list li .field .body input[type="text"].param,
   ul#f-field-list li .field .body input[type="number"].param,
   ul#f-field-list li .field .body .pair input[type="text"],
-  ul#f-field-list li .field .body .pair input[type="number"]
+  ul#f-field-list li .field .body .pair input[type="number"],
+  ul#f-field-list li .field .body select.param
     margin-bottom: 20px
     border: 1px solid #aaa
     border-radius: 0
@@ -134,7 +157,7 @@
     content: ""
     display: block
     clear: both
-  ul#f-field-list .header
+  ul#f-field-list li .header
     .wck-toggle-colspan, .wck-toggle-colspan-label
       display: none
   ul#f-field-list.layout-two-col
@@ -154,6 +177,7 @@
         margin-top: 4px
         cursor: pointer
       .wck-toggle-colspan-label
+        display: block
         line-height: 2.2em
         font-size: 12px
         padding-right: 6px
@@ -198,9 +222,8 @@
       &::after
         content: 'else'
   .input-group
-    padding: 12px
-    border: 1px solid #AAA
-    background-color: #FFFFFF
+    padding: 8px
+    background-color: #EEE
     margin-bottom: 5px
   .ui-autocomplete-loading
     background-image: none !important
@@ -249,3 +272,89 @@
     text-align: right
   .wck-toggle-layout, .wck-toggle-expand
     cursor: pointer
+  ul#f-field-list li .field .header .right
+    opacity: 0
+  ul#f-field-list li .field:hover .header .right
+    opacity: 1
+  #wck_expression
+    .wck-sortable-placeholder
+      border: 1px dashed #888
+      background-color: #eee
+      box-shadow: none
+      text-align: center
+      color: #888
+      height: 60px
+      margin-bottom: 3px
+    .input-group
+      .input-if, .input-equation
+        float: left
+        width: 46%
+        margin: 0 0.5%
+      .input-buttons
+        float: left
+        width: 2.5%
+        padding-top: 5px
+  .inventory label
+    font-size: 15px
+    margin: 55px 0 10px 0
+    border-top: 1px solid #c3c4c7
+    display: block
+    border-bottom: 1px solid #c3c4c7
+    padding: 10px 0 10px 5px
+
+
+#postbox-container-2.fullscreen
+  position: fixed
+  z-index: 999999
+  left: 0
+  top: 0
+  right: 0
+  bottom: 0
+  margin: 0
+  background-color: #FFF
+  overflow-y: scroll
+  #normal-sortables, #advanced-sortables
+    padding: 20px
+#wck-toolbar
+  display: none
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  z-index: 9999999
+  background: #F5F5F5
+  border-top: 1px solid #AAA
+  text-align: right
+  padding: 10px 20px
+  box-shadow: 0px 0px 45px #000
+  .wck-toggle-fullscreen
+    cursor: pointer
+  ul
+    margin: 0
+    li
+      vertical-align: middle
+      margin-bottom: 0
+      display: inline-block
+      li > *
+        vertical-align: middle
+      &.space
+        width: 10px
+#wck-expression-toolbar
+  &, *
+    tab-index: 0
+  display: none
+  position: absolute
+  top: 0
+  border: 1px solid #888
+  border-radius: 5px
+  box-shadow: 0 0 50px rgba(0,0,0,0.5)
+  padding: 10px 20px
+  background-color: #fff
+  margin: 0
+  width: 360px
+  vertical-align: middle
+  text-align: justify
+  .button
+    margin-bottom: 6px
+  select
+    width: 270px

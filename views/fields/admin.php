@@ -10,10 +10,12 @@ use WCKalkulator\Helper;
      data-use-expression="<?php echo esc_attr($view->use_expression); ?>"
      data-group="<?php echo esc_attr($view->group); ?>">
     <div class="header">
-        <span class="action-drag left dashicons dashicons-move"></span>
+        <span class="action-drag left dashicons dashicons-editor-justify" title="move - drag & drop"></span>
         <span class="left text"><?php echo esc_html($view->title); ?></span>
-        <span class="action-delete right dashicons dashicons-no-alt"></span>
+        <span class="left name"></span>
+        <span class="action-delete right dashicons dashicons-trash"></span>
         <span class="action-toggle right dashicons dashicons-arrow-up-alt2"></span>
+        <span class="action-duplicate right dashicons dashicons-admin-page" title="duplicate"></span>
         <span class="right wck-toggle-colspan woocommerce-input-toggle woocommerce-input-toggle--disabled"> </span>
         <span class="right wck-toggle-colspan-label"><?php _e('Full row', 'wc-kalkulator'); ?></span>
         <div class="clear"></div>

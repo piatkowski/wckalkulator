@@ -4,6 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 use WCKalkulator\Helper;
+use WCKalkulator\Cache;
 
 ?>
 <input type="hidden" name="_wck_expression" value="">
@@ -44,14 +45,103 @@ use WCKalkulator\Helper;
         <?php echo Helper::html_help_tip(__('The basic price of the product is increased by the price of the add-ons', 'wc-kalkulator')); ?>
     </label>
 </p>
-<hr />
-<p class="off-hide">
-    <a href="http://wckalkulator.com/usermanual/expression-syntax/"
-       target="_blank"><?php _e('Read about syntax, functions and operators', 'wc-kalkulator'); ?></a>
-</p>
-<p>
-    <?php _e('Insert field', 'wc-kalkulator'); ?>:
+
+<div class="expression_oneline">
+    <div class="input-icon input-equation">
+        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
+    </div>
+</div>
+
+<div class="expression_conditional">
+    <div id="extra-inputs"></div>
+    <div class="input-icon input-else">
+        <input type="text" placeholder="<?php _e('Price formula...', 'wc-kalkulator'); ?>" value=""><i></i>
+    </div>
+    <button type="button" class="button add-condition"><?php _e('Add condition', 'wc-kalkulator'); ?></button>
+</div>
+
+<div class="expression_addon">
+    <p><?php _e('If the "if" condition is met, the price from the "add" field will be added to the price of the product.
+    Unlike the conditional expression, Price Add-ons allows you to add multiple amounts to the price of a product.', 'wc-kalkulator'); ?></p>
+    <div id="addon-inputs"></div>
+    <button type="button" class="button add-addon"><?php _e('New addon', 'wc-kalkulator'); ?></button>
+</div>
+
+<div class="expression_off">
+    <p>
+        <?php _e('Price calculation has been disabled.', 'wc-kalkulator'); ?>
+    </p>
+</div>
+
+<div class="inventory">
+    <p>
+        <label>
+            <strong><?php _e('Inventory - Stock quantity reduction multiplier', 'wc-kalkulator'); ?></strong> <sup
+                    style="color:red">Beta</sup>
+        </label>
+    </p>
+    <p><?php _e('In this section you can define inventory reduction multiplier (formula or number). Reduction will be rouded up to the integer number. For example: stock quantity = 1000. Customer buys 3 pieces and the reduction is set to 10, the stock quantity will be reduced by 30 (3*10)', 'wc-kalkulator'); ?></p>
+    <?php
+    global $post;
+    $reduction_m = get_post_meta($post->ID, '_wck_stock_reduction_multiplier', true);
+    ?>
+    <div class="input-icon input-stock">
+        <input type="text" name="_wck_stock_reduction_multiplier"
+               placeholder="<?php _e('Number or formula (value will be multiplied by quantity)...', 'wc-kalkulator'); ?>"
+               value="<?php echo esc_html($reduction_m); ?>"><i></i>
+    </div>
+    <p class="description"><?php _e('You can use fields, operators and functions as above. You can modify stock quantity (i.e. add
+        unit) using filter `woocommerce_format_stock_quantity`.', 'wc-kalkulator'); ?></p>
+</div>
+
+<div id="wck-toolbar">
+    <ul>
+        <li>
+            <select id="select-field">
+                <?php foreach (Cache::get_once('FieldsetPostType_fields_dropdown') as $group => $fields): ?>
+                    <optgroup label="<?php echo esc_html($group); ?>">
+                        <?php foreach ($fields as $type => $options): ?>
+                            <option value="<?php echo esc_html($type); ?>">
+                                <?php echo esc_html($options['title']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endforeach; ?>
+            </select>
+        </li>
+        <li>
+            <button type="button" class="button"
+                    id="add-field-button"><?php _e('Add field', 'wc-kalkulator'); ?></button>
+        </li>
+        <li class="space"></li>
+        <li class="space"></li>
+        <li>
+            <span class="wck-toggle-fullscreen woocommerce-input-toggle woocommerce-input-toggle--disabled"> </span>
+            <?php _e('Fullscreen Editor', 'wc-kalkulator'); ?>
+        </li>
+        <li class="space"></li>
+        <li>
+            <span class="wck-toggle-layout woocommerce-input-toggle woocommerce-input-toggle--disabled"> </span>
+            <?php _e('Layout: 2-cols', 'wc-kalkulator'); ?>
+        </li>
+        <li class="space"></li>
+        <li>
+            <span class="wck-toggle-expand woocommerce-input-toggle woocommerce-input-toggle--enabled"> </span>
+            <?php _e('Toggle Fields', 'wc-kalkulator'); ?>
+        </li>
+        <li class="space"></li>
+        <li class="space"></li>
+        <li>
+            <a href="#" class="button button-primary action-save-post">Save</a>
+        </li>
+    </ul>
+</div>
+
+<div id="wck-expression-toolbar">
+
     <select id="wck-parameters">
+        <option value="" disabled selected
+                class="first-selected"><?php _e('Choose parameter...', 'wc-kalkulator'); ?></option>
         <optgroup label="Defined Fields" class="defined-fields"></optgroup>
         <optgroup label="Product">
             <option value="{product_price}">Price</option>
@@ -75,24 +165,6 @@ use WCKalkulator\Helper;
         <optgroup label="Global Parameters" class="global-parameters"></optgroup>
     </select>
     <button type="button" class="button add-field-to-formula"><?php _e('Insert', 'wc-kalkulator'); ?></button>
-    <!---   <label><strong>Fields:</strong> </label>
-       <span class="formula-field">{product_price}</span>
-       <span class="formula-field">{product_regular_price}</span>
-       <span class="formula-field">{product_weight}</span>
-       <span class="formula-field">{product_width}</span>
-       <span class="formula-field">{product_height}</span>
-       <span class="formula-field">{product_length}</span>
-       <span class="formula-field">{is_user_logged}</span>
-       <span class="formula-field">{quantity}</span>
-       <span class="formula-field">{current_month}</span> (1-12)
-       <span class="formula-field">{day_of_month}</span> (1-31)
-       <span class="formula-field">{day_of_week}</span> (0-6)
-       <span class="formula-field">{current_hour}</span> (0-23)
-
-       <span id="formula_fields"> &dash; </span>
-       <a href="#" class="savefields">Update list</a> -->
-</p>
-<p>
     <?php
     $operators = array(
         '+' => __('Add', 'wc-kalkulator'),
@@ -114,7 +186,6 @@ use WCKalkulator\Helper;
     foreach ($operators as $op => $title) {
         echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . ' " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
-    echo ' | Functions: ';
     $operators = array(
         'round' => __('round(x, p) - round x with the precision of p', 'wc-kalkulator'),
         'ceil' => __('ceil(x) - round up to the integer number', 'wc-kalkulator'),
@@ -129,49 +200,4 @@ use WCKalkulator\Helper;
         echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
     ?>
-</p>
-<div class="expression_oneline">
-    <div class="input-icon input-equation">
-        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
-    </div>
-</div>
-
-<div class="expression_conditional">
-    <div id="extra-inputs"></div>
-    <div class="input-icon input-else">
-        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
-    </div>
-    <button type="button" class="button add-condition"><?php _e('Add condition', 'wc-kalkulator'); ?></button>
-</div>
-
-<div class="expression_addon">
-    <p><?php _e('If the "if" condition is met, the price from the "add" field will be added to the price of the product.
-    Unlike the conditional expression, Price Add-ons allows you to add multiple amounts to the price of a product.', 'wc-kalkulator'); ?></p>
-    <div id="addon-inputs"></div>
-    <button type="button" class="button add-addon"><?php _e('New addon', 'wc-kalkulator'); ?></button>
-</div>
-
-<div class="expression_off">
-    <p>
-        <?php _e('Price calculation has been disabled.', 'wc-kalkulator'); ?>
-    </p>
-</div>
-
-<div class="inventory">
-    <hr />
-    <p>
-        <label>
-            <strong><?php _e('Inventory - Stock quantity reduction multiplier', 'wc-kalkulator'); ?></strong>  <sup style="color:red">Beta</sup>
-        </label>
-    </p>
-    <p><?php _e('In this section you can define inventory reduction multiplier (formula or number). Reduction will be rouded up to the integer number. For example: stock quantity = 1000. Customer buys 3 pieces and the reduction is set to 10, the stock quantity will be reduced by 30 (3*10)', 'wc-kalkulator'); ?></p>
-    <?php
-        global $post;
-        $reduction_m = get_post_meta($post->ID, '_wck_stock_reduction_multiplier', true);
-    ?>
-    <div class="input-icon input-stock">
-        <input type="text" name="_wck_stock_reduction_multiplier" placeholder="<?php _e('Number or formula (value will be multiplied by quantity)...', 'wc-kalkulator'); ?>"
-               value="<?php echo esc_html($reduction_m); ?>"><i></i>
-    </div>
-    <p class="description">You can use fields, operators and functions as above. You can modify stock quantity (i.e. add unit) using filter `woocommerce_format_stock_quantity`.</p>
 </div>
