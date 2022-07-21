@@ -111,7 +111,7 @@
             }
         });
 
-        $(document).on('change', _form + ' input, ' + _form + ' select', function () {
+        $(document).on('change', _form + ' input, ' + _form + ' select, ' + _form + ' textarea', function () {
             updateUI();
             clearTimeout(userTimeout);
             userTimeout = setTimeout(function () {
