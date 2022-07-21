@@ -47,7 +47,7 @@ add_filter('wck_field_td', function($html, $field_type){
 
 # Layouts
 
-Layouts has beed added in v.1.3.4. You can choose default one column layout or switch to two column layout.
+Layouts has beed added in v 1.4.0. You can choose default one column layout or switch to two column layout.
 In this video I show how to use layouts feature.
 
 [!embed](https://youtu.be/b2iNp1lHxK0)

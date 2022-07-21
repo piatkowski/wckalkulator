@@ -117,7 +117,7 @@ class Product
             $fieldset->init();
             /*
              * Get field's values from cart item (if in edit mode)
-             * $html changed from string to array since 1.3.4 (2-col layout support)
+             * $html changed from string to array since 1.4.0 (2-col layout support)
              */
             $html = array(
                 'hidden' => '',
@@ -132,7 +132,6 @@ class Product
                 }
             }
 
-
             /*
              * Get field's Html code
              */
@@ -141,9 +140,10 @@ class Product
                 $value = isset($cart_fields[$field->data('name')]) ? $cart_fields[$field->data('name')] : '';
                 $html['fields'][] = array(
                     'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
-                    //colspan since 1.3.4
-                    'colspan' => max((int)$field->data('colspan'), 1)
+                    //colspan since 1.4.0
+                    'colspan' => max((int)$field->data('colspan'), 1),
                 );
+                //$html['visibility'][$field->data('name')] = $field->data('visibility');
             }
             /*
              * Output rendered Html
@@ -459,7 +459,7 @@ class Product
      * @param $order
      * @param $item
      * @return int
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public static function reduce_inventory($quantity, $order, $item)
     {

@@ -41,6 +41,7 @@
 .wc-kalkulator-wrapper ul#f-field-list li .field .header {
   background-color: #F5F5F5;
   padding: 8px;
+  cursor: move;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .header .text {
   font-size: 14px;
@@ -87,7 +88,6 @@
   box-sizing: border-box;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pair {
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
 }
@@ -98,6 +98,10 @@
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pairs {
   margin-top: 20px;
+  margin-bottom: 20px;
+}
+.wc-kalkulator-wrapper ul#f-field-list li .field .body .pairs .pair:not(:first-child) label {
+  display: none;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pairs button {
   margin-right: 6px;
@@ -191,6 +195,7 @@
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pair input[type=text],
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pair input[type=number] {
   width: 100%;
+  margin-bottom: 10px;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .pair:after, .wc-kalkulator-wrapper .clearfix {
   content: "";
@@ -366,6 +371,17 @@
   border-bottom: 1px solid #c3c4c7;
   padding: 10px 0 10px 5px;
 }
+.wc-kalkulator-wrapper .cv-container {
+  position: relative;
+}
+.wc-kalkulator-wrapper .cv-container .action-field-visibility {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+.wc-kalkulator-wrapper .cv-container .visibility-readable {
+  background-color: #FFF;
+}
 
 #postbox-container-2.fullscreen {
   position: fixed;
@@ -435,6 +451,94 @@
 }
 #wck-expression-toolbar select {
   width: 270px;
+}
+
+#wck-cv-builder {
+  overflow: none;
+  display: none;
+  border-radius: 3px;
+  position: fixed;
+  z-index: 99999999;
+  top: 150px;
+  left: 50%;
+  margin-left: -500px;
+  bottom: 150px;
+  width: 1000px;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 200px 100px rgba(0, 0, 0, 0.4);
+  flex-direction: column;
+}
+#wck-cv-builder .template {
+  display: none;
+  visibility: hidden;
+}
+#wck-cv-builder .builder {
+  flex-basis: 100%;
+  margin: 20px 40px 0 5px;
+  overflow-y: auto;
+}
+#wck-cv-builder .builder .or-group {
+  width: 100%;
+}
+#wck-cv-builder .builder .and-condition {
+  display: flex;
+  gap: 3px;
+}
+#wck-cv-builder .builder .and-condition .validation-error {
+  border-color: red;
+}
+#wck-cv-builder .builder .and-condition, #wck-cv-builder .builder .and-condition button {
+  margin-bottom: 3px;
+}
+#wck-cv-builder .builder .and-condition .p-value {
+  flex-grow: 2;
+}
+#wck-cv-builder .builder .or-condition {
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+#wck-cv-builder .builder .or-condition:not(:first-child)::before {
+  content: "OR";
+  flex-basis: 100%;
+  display: block;
+  font-weight: 700;
+  padding: 10px;
+  margin-left: 25px;
+}
+#wck-cv-builder .builder .and-group {
+  flex-grow: 4;
+}
+#wck-cv-builder .builder .cv-remove {
+  text-decoration: none;
+  opacity: 0;
+  padding: 5px;
+}
+#wck-cv-builder .builder .cv-remove span {
+  font-size: 14px;
+  line-height: 1;
+}
+#wck-cv-builder .builder .and-condition:hover .cv-remove {
+  opacity: 1;
+}
+#wck-cv-builder .builder .cv-action-and {
+  align-self: end;
+  margin-bottom: 3px;
+}
+#wck-cv-builder .builder .cv-action-or {
+  display: block;
+  margin-top: 10px;
+  margin-left: 33px;
+}
+#wck-cv-builder h1 {
+  padding: 40px 40px 0 40px;
+}
+#wck-cv-builder p.save {
+  padding: 10px 20px 0px;
+  text-align: right;
+  border-top: 1px solid #ccc;
 }
 
 /*# sourceMappingURL=admin.css.map */

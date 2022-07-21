@@ -35,7 +35,7 @@ use WCKalkulator\Helper;
                 <label>* <?php _e('Unique Field Name', 'wc-kalkulator'); ?>
                     <?php echo Helper::html_help_tip(__('Field name must be unique and consist of letters, numbers and underscores. Correct names are: field_name, product_width.', 'wc-kalkulator')); ?>
                 </label>
-                <input type="text" class="param f-name" pattern="[a-zA-Z0-9_]+" title="A-Za-z0-9_"
+                <input type="text" class="param f-name" pattern="[a-zA-Z0-9_]+" title="A-Z a-z 0-9 _"
                        placeholder="field_name"
                        required>
             </div>
@@ -54,11 +54,22 @@ use WCKalkulator\Helper;
                     <?php _e('CSS Class', 'wc-kalkulator'); ?>
                     <?php echo Helper::html_help_tip(__('CSS class or multiple classes separated by a space.', 'wc-kalkulator')); ?>
                 </label>
-                <input type="text" class="param f-css-class" pattern="[a-zA-Z0-9_-]+" title="A-Za-z0-9_-"
+                <input type="text" class="param f-css-class" pattern="[a-z A-Z0-9_-]+" title="A-Z a-z 0-9 _ - (space)"
                        placeholder="css_class">
             </div>
             <div class="clear"></div>
         <?php endif; ?>
         <?php echo wp_kses($view->admin_fields, \WCKalkulator\Sanitizer::allowed_html()); ?>
+
+        <label>
+            <?php _e('Conditional Visibility', 'wc-kalkulator'); ?>
+            <?php echo Helper::html_help_tip(__('Set the rules for which this field will be visible.', 'wc-kalkulator')); ?>
+        </label>
+        <div class="cv-container">
+            <button type="button" class="button action-field-visibility">Edit Rules</button>
+            <input type="text" class="param visibility-readable" value="" placeholder="<?php _e('Set the rules for which this field will be visible. Click on the button --->', 'wc-kalkulator'); ?>" readonly>
+            <input type="hidden" class="param f-visibility">
+            <input type="hidden" class="param f-visibility-readable">
+        </div>
     </div>
 </div>

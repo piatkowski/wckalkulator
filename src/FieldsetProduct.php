@@ -279,7 +279,7 @@ class FieldsetProduct
      * Get fieldset layout (1- or 2- cols)
      *
      * @return int  - number of columns (1 or 2 cols layout)
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public function layout()
     {
@@ -709,7 +709,7 @@ class FieldsetProduct
      * Get stock reduction multiplier.
      *
      * @return array|int
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public function stock_reduction_multiplier()
     {
@@ -732,6 +732,24 @@ class FieldsetProduct
             }
         }
         return 1;
+    }
+
+    /**
+     * Get field's visibility rules
+     * @return string
+     * @since 1.4.0
+     */
+    public function visibility_rules()
+    {
+        if (empty($this->fields())) {
+            $this->init();
+        }
+        foreach ($this->fields() as $field) {
+            if (!empty($field->data('visibility')))
+                $rules[$field->data('name')] = json_decode(stripslashes($field->data('visibility')), true);
+        }
+
+        return $rules;
     }
 
     /**

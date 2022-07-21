@@ -1,15 +1,18 @@
 (function ($) {
     "use strict";
     var $WK = {};
+    var $CV = {};
+
     $(document).ready(function ($) {
         var suggest = [];
         var input_key_pressed = {};
 
         $("#f-field-list").sortable({
-            handle: ".action-drag",
+            handle: ".header",
             placeholder: "wck-sortable-placeholder",
             tolerance: "pointer"
         });
+
         $("#extra-inputs, #addon-inputs").sortable({
             handle: ".action-drag",
             placeholder: "wck-sortable-placeholder",
@@ -122,7 +125,6 @@
                 $WK.saveFields();
                 $("#wck-parameters .first-selected").prop("selected", true);
 
-                console.log(posA, posB, h);
                 $("#wck-expression-toolbar").stop(true, false).fadeIn('fast');
 
             }
@@ -159,7 +161,7 @@
             }
         }).on("click", ".field .pairs .action-add", function () {
             var $clone = $(this).prev(".pair").clone().insertBefore($(this));
-            $clone.children("input").val("");
+            $clone.find("input").val("");
         }).on("click", ".field .pairs .action-showimport", function () {
             $(this).parent().find("div.importer").toggle();
         }).on("click", ".field .pairs .action-import", function () {
@@ -403,6 +405,12 @@
                 "id": id
             }).append($WK.html[type].replace("{id}", id)));
             $WK.buildTooltips("#" + id + " ");
+            if( $("#" + id).find(".pairs").length > 0) {
+                $("#" + id + " .pairs").sortable({
+                    placeholder: "wck-sortable-placeholder",
+                    tolerance: "pointer"
+                });
+            }
             return id;
         };
 
@@ -445,7 +453,9 @@
                     "css_class": input_css_class.val(),
                     "required": (($row.find('select.f-required').length > 0) ? $row.find('select.f-required').val() === "on" : true),
                     "layout": $WK.fieldsLayout,
-                    "colspan": $row.find('input.f-colspan').val()
+                    "colspan": $row.find('input.f-colspan').val(),
+                    "visibility": $row.find('input.f-visibility').val(),
+                    "visibility_readable": $row.find('input.f-visibility-readable').val()
                 };
 
                 var input_fprice = $row.find('input.f-price');
@@ -619,7 +629,6 @@
                     if (typeof value === 'object') {
                         $.each(value, function (k, v) {
                             var suffix = "['" + k + "']";
-                            console.log(suffix);
                             appendChildren = appendChildren + '<option value="{' + name + '}' + suffix + '">' + name.replace('global:', '') + '[' + k + '] = ' + v + '</option>';
                         });
                         value = "";
@@ -638,7 +647,7 @@
                 if (field.type !== 'checkboxgroup') {
                     suggest.push(field.name);
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">Value/Price of "' + field.title + '" {' + field.name + '}' + '</option>');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">"' + field.title + '" value/price {' + field.name + '}' + '</option>');
                 } else {
                     suggest.push(field.name + ":sum");
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
@@ -698,7 +707,7 @@
                     var field_id = $WK.addField(this.type);
                     var $field = $("#" + field_id + " .field");
                     $("#" + field_id + " .f-name").val(this.name);
-                    if (this.hasOwnProperty("ń")) {
+                    if (this.hasOwnProperty("colspan")) {
                         $("#" + field_id + " .f-colspan").val(this.colspan);
                         if (this.colspan === '2') {
                             $("#" + field_id + " .wck-toggle-colspan").trigger("click");
@@ -711,6 +720,13 @@
                         $("#" + field_id + " .f-required").val(this.required === "1" ? "on" : "off");
                     }
 
+                    if (this.hasOwnProperty("visibility")) {
+                        $("#" + field_id + " .f-visibility").val(this.visibility);
+                        $("#" + field_id + " .f-visibility-readable").val(this.visibility_readable);
+                        if (this.visibility_readable !== "") {
+                            $("#" + field_id + " .visibility-readable").val("Rule preview: " + this.visibility_readable);
+                        }
+                    }
 
                     var fprice = $("#" + field_id + " .f-price");
                     if (fprice.length > 0) {
@@ -1029,7 +1045,187 @@
             }
         });
 
-        // --------------------------------------
+        // --------------- CONDITIONAL VISIBILITY BUILDER -------------
+
+        $CV.window = $("#wck-cv-builder");
+        $CV.builder = $CV.window.find(".builder");
+        $CV.template = $CV.window.find(".template").children();
+        $CV.context = null;
+
+        // --- Methods ---
+
+        $CV.open = function (context) {
+            $CV.context = context;
+            var fieldSelect = $CV.template.find("select.p-field");
+            fieldSelect.empty();
+            $WK.saveFields();
+            fieldSelect.append('<option value="" selected disabled>Choose field...</option>');
+            $.each($WK.fieldList.find(".field"), function () {
+                if ($(this).data("group") !== "static" && !$(this).is(context)) {
+                    var name = $(this).find(".f-name").val();
+                    fieldSelect.append('<option value="' + name + '">' + name + '</option>');
+                }
+            });
+
+            $CV.builder.append($CV.template.clone());
+            $CV.builder.find('.or-condition').remove();
+
+            var loadData = $CV.context.find(".f-visibility").val();
+            try {
+                loadData = JSON.parse(loadData);
+            } catch (e) {
+                loadData = false;
+            }
+
+            if (typeof loadData === "object") {
+                $.each(loadData, function (i, or_condition) {
+                    var first = true;
+                    $.each(or_condition, function (j, and_condition) {
+                        $CV.add(first ? "or" : "and", null, and_condition);
+                        first = false;
+                    });
+                });
+            } else {
+                $CV.add("or", null, null);
+            }
+
+            $CV.window.find("span.self-name").text(context.find(".f-name").val());
+            $CV.window.show().css({"display": "flex"});
+        };
+
+        $CV.close = function () {
+            $CV.window.hide();
+            $CV.builder.empty();
+        };
+
+        $CV.add = function (type, destination, values) {
+            if (destination === null) {
+                destination = $CV.builder.find("." + type + "-group").last();
+            }
+            destination.append($CV.window.find(".template ." + type + "-condition").clone());
+            var newCondition = destination.find(".and-condition").last();
+
+            if (values !== null && typeof values === "object") {
+                newCondition.find(".p-field").val(values.field);
+                newCondition.find(".p-comparison").val(values.comp).trigger("change");
+                newCondition.find(".p-value").val(values.value);
+            } else {
+                newCondition.find(".p-value").val("");
+            }
+        };
+
+        $CV.validate = function () {
+            var isValid = true;
+            var conditions = $CV.builder.find(".and-condition");
+
+            conditions.find(".validation-error").removeClass("validation-error");
+            conditions.each(function () {
+                var field = $(this).find(".p-field");
+                var comp = $(this).find(".p-comparison").val();
+                var value = $(this).find(".p-value");
+
+                if ([null, ""].includes(field.val())) {
+                    field.addClass("validation-error");
+                    isValid = false;
+                }
+
+                if (!value.prop("disabled") && value.val() === "") {
+                    value.addClass("validation-error");
+                    isValid = false;
+                }
+
+                if (["5", "6", "7", "8"].includes(comp) && !value.val().match(/^-?\d*[\.,]?\d+$/)) {
+                    value.addClass("validation-error");
+                    isValid = false;
+                }
+
+                if (comp === "9" && value.val() === "") {
+                    value.addClass("validation-error");
+                    isValid = false;
+                }
+
+            });
+            return isValid;
+        };
+
+        // --- Events ---
+
+        $CV.window.on("click", ".cv-action-and", function (e) {
+            e.preventDefault();
+            $CV.add("and", $(this).prev(), null);
+        });
+
+        $CV.window.on("click", ".cv-action-or", function (e) {
+            e.preventDefault();
+            $CV.add("or", $(this).prev(), null);
+        });
+
+        $CV.window.on("click", ".cv-remove", function (e) {
+            e.preventDefault();
+            var count = $(this).closest(".and-group").children().length;
+            if (count === 1) {
+                $(this).closest(".or-condition").remove();
+            } else {
+                $(this).parent().remove();
+            }
+        });
+
+        $CV.window.on("change", "select.p-comparison", function (e) {
+            var disabled = ["1", "2"].includes($(this).val());
+            var pVal = $(this).next(".p-value");
+            pVal.prop("disabled", disabled);
+            if (disabled) {
+                pVal.val("");
+            }
+        });
+
+        $CV.window.on("click", ".cv-close", function (e) {
+            e.preventDefault();
+            $CV.close();
+        });
+
+        $CV.window.on("click", ".cv-save", function (e) {
+            e.preventDefault();
+            if (!$CV.validate()) {
+                alert("Please correct the form!");
+                return false;
+            }
+            var or_conditions = [];
+            var or_readable = [];
+            $.each($CV.builder.find(".or-condition"), function () {
+                var and_conditions = [];
+                var and_readable = [];
+                $.each($(this).find(".and-condition"), function () {
+                    var item = {
+                        field: $(this).find(".p-field").val(),
+                        comp: $(this).find(".p-comparison").val(),
+                        comp_text: $(this).find(".p-comparison option:selected").text(),
+                        value: $(this).find(".p-value").val()
+                    };
+                    and_conditions.push(item);
+                    and_readable.push("{" + item.field + "} " + item.comp_text + " " + item.value);
+                });
+                or_conditions.push(and_conditions);
+                or_readable.push(" ( " + and_readable.join(" and ") + " ) ");
+            });
+            var readable = or_readable.join(" or ").replaceAll("  ", " ");
+
+            $CV.context.find(".f-visibility").val(or_conditions.length === 0 ? "" : JSON.stringify(or_conditions));
+            $CV.context.find(".f-visibility-readable").val(readable);
+            if (readable !== "") {
+                $CV.context.find(".visibility-readable").val("Rule preview: " + readable);
+            } else {
+                $CV.context.find(".visibility-readable").val("");
+            }
+            $CV.close();
+        });
+
+        $("body").on("click", ".action-field-visibility", function () {
+            var context = $(this).closest(".field");
+            $CV.open(context);
+        });
+
+        // ------------------------------------------------------------
 
         $WK.init();
         $WK.loadExpression();

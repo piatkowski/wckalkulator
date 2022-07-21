@@ -75,7 +75,8 @@ class Ajax
                     '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
                     '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
                     '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
-                    'form' => Settings::get('form_css_selector')
+                    'form' => Settings::get('form_css_selector'),
+                    '_wck_visibility_rules' => $fieldset->visibility_rules()
                 )
             );
         }
@@ -185,7 +186,7 @@ class Ajax
      * POST request: term
      * Output: JSON
      *
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public static function wckalkulator_json_search_attributes()
     {
@@ -219,7 +220,7 @@ class Ajax
     /**
      * Toggle custom post status
      * @return void
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public static function wckalkulator_fieldset_post_type_toggle_publish()
     {

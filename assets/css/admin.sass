@@ -1,9 +1,11 @@
 .wc-kalkulator-wrapper
   html
     scroll-padding-top: 100px
+
   p
     &.add-buttons
       line-height: 36px
+
   a
     &.button
       &.action-add-image
@@ -12,14 +14,18 @@
         border: 1px solid #aaa
         border-radius: 0
         padding: 5px 10px
+
       &.action-add-attachment
         margin-bottom: 10px
+
   ul#f-field-list
     width: 100%
+
     *
       -webkit-box-sizing: border-box
       -moz-box-sizing: border-box
       box-sizing: border-box
+
     .wck-sortable-placeholder
       border: 1px dashed #888
       background-color: #eee
@@ -27,95 +33,128 @@
       text-align: center
       color: #888
       padding: 22px
+
     li
       box-shadow: 0px 5px 10px #ccc
       margin-bottom: 5px
+
       .field
         border: 1px solid #AAA
         background-color: #FFFFFF
+
         .header
           background-color: #F5F5F5
           padding: 8px
+          cursor: move
           .text
             font-size: 14px
             color: #000
             padding: 5px
+
           .name
             padding: 5px
+
         .body
           padding: 20px
           border-top: 1px solid #AAA
+
           .half, .third
             float: left
             width: 50%
             padding-left: 10px
             padding-right: 10px
+
           .second, .last
             padding-left: 10px
             padding-right: 0
+
           .first
             padding-right: 10px
             padding-left: 0
+
           .third
             width: 33%
+
           .fu-allowed-extensions
             margin-top: 10px
+
           label
             font-size: 12px
             margin-bottom: 3px
             font-weight: 700
+
             &.error
               background-color: #E30000
               color: #FFF
               padding: 6px
               margin: 6px 0 6px 0
               box-sizing: border-box
+
           .pair
-            margin-bottom: 10px
             display: flex
             align-items: center
+
             span
               &.dashicons-no-alt
                 cursor: pointer
                 font-size: 28px
                 color: red
+
           .pairs
             margin-top: 20px
+            margin-bottom: 20px
+
+            .pair:not(:first-child)
+              label
+                display: none
+
             button
               margin-right: 6px
               margin-bottom: 6px
+
             .importer
               display: none
               margin-top: 20px
+
               textarea
                 display: block
                 width: 100%
                 min-height: 200px
                 margin-bottom: 10px
+
           .column
             float: left
+
           .column-1
             width: 40%
             padding-right: 20px
+
           .column-1-half
             width: 20%
             padding-right: 20px
+
           .column-2
             width: 40%
+
           .column-2-half
             text-align: center
             width: 20%
+
           .column-1-2
             width: 80%
+
           .column-3
             width: 10%
             padding-left: 20px
             text-align: center
+
           .column-4
             width: 10%
             text-align: center
+
       .clear
         clear: both
+
   ul#f-field-list li .field .header .dashicons, .input-group .dashicons
     padding: 3px
     margin-left: 2px
@@ -124,23 +163,30 @@
     color: #555
     font-size: 16px
     line-height: 1.5
+
     &.action-drag
       cursor: move
       font-size: 16px
       line-height: 1.5
+
   ul#f-field-list li .field .header .left, .input-group .left
     float: left
+
   ul#f-field-list li .field .header .right, .input-group .right
     float: right
+
   ul#f-field-list li .field .body .param:not([type=checkbox]), ul#f-field-list li .field .body label
     display: block
     width: 100%
+
     &.inline
       display: inline
       margin-right: 10px
       width: auto
+
   ul#f-field-list li .field .body .param.fdp-disallow-past-date, ul#f-field-list li .field .body .param[type=checkbox]
     margin: 10px 15px 14px 3px
+
   ul#f-field-list li .field .body input[type="text"].param,
   ul#f-field-list li .field .body input[type="number"].param,
   ul#f-field-list li .field .body .pair input[type="text"],
@@ -150,24 +196,31 @@
     border: 1px solid #aaa
     border-radius: 0
     padding: 5px 10px
+
   ul#f-field-list li .field .body .pair input[type="text"],
   ul#f-field-list li .field .body .pair input[type="number"]
     width: 100%
+    margin-bottom: 10px
+
   ul#f-field-list li .field .body .pair:after, .clearfix
     content: ""
     display: block
     clear: both
+
   ul#f-field-list li .header
     .wck-toggle-colspan, .wck-toggle-colspan-label
       display: none
+
   ul#f-field-list.layout-two-col
     li
       width: 49.4%
       display: inline-block
       margin: 0.25%
       vertical-align: top
+
       &.wck-layout-colspan
         width: 99.25%
+
     .header
       .wck-toggle-colspan
         display: block
@@ -176,18 +229,22 @@
         -webkit-box-sizing: content-box
         margin-top: 4px
         cursor: pointer
+
       .wck-toggle-colspan-label
         display: block
         line-height: 2.2em
         font-size: 12px
         padding-right: 6px
+
   .pr-20
     padding-right: 20px
+
   .input-icon
     position: relative
     font-family: monospace
     width: 100%
     margin: 10px 0 15px 0
+
     i
       font-family: monospace
       font-size: 13px
@@ -199,83 +256,110 @@
       text-align: right
       font-style: normal
       color: blue
+
     input
       border: 1px solid #aaa
       border-radius: 0
       padding: 5px 10px 5px 55px
       width: 100%
+
   .input-if
     i
       &::after
         content: 'if'
+
   .input-equation
     i
       &::after
         content: 'price'
+
   .input-stock
     i::after
-        content: 'qty * '
+      content: 'qty * '
+
   #addon-inputs .input-equation i::after
     content: 'add'
+
   .input-else
     i
       &::after
         content: 'else'
+
   .input-group
     padding: 8px
     background-color: #EEE
     margin-bottom: 5px
+
   .ui-autocomplete-loading
     background-image: none !important
+
   .wc-product-search, .wc-category-search, .wc-enhanced-select, .wc-page-search
     width: 100%
+
   button.add-operator
     margin-right: 3px
+
   span
     &.formula-field
       padding-left: 6px
       cursor: pointer
       font-weight: 700
+
       &:hover
         text-decoration: underline
+
   .wp-media-image-preview
     max-width: 80px
     max-height: 80px
     cursor: pointer
+
     &:hover
       transform: scale(1.2)
       -moz-transform: scale(1.2)
       -webkit-transform: scale(1.2)
+
   select.param
     margin-bottom: 20px
+
   .iris-picker
     position: absolute
     z-index: 9999
+
   .fields-section
     text-align: center
     padding: 50px
     margin: 0 auto
     max-width: 500px
+
     select, button
       font-size: 16px
+
     select
       width: 300px
       padding: 5px 10px
+
     button
       width: 50px
       padding: 3px 8px
+
       span
         line-height: 2
+
   hr
     margin: 35px 0 35px 0
+
   .align-right
     text-align: right
+
   .wck-toggle-layout, .wck-toggle-expand
     cursor: pointer
+
   ul#f-field-list li .field .header .right
     opacity: 0
+
   ul#f-field-list li .field:hover .header .right
     opacity: 1
+
   #wck_expression
     .wck-sortable-placeholder
       border: 1px dashed #888
@@ -285,15 +369,18 @@
       color: #888
       height: 60px
       margin-bottom: 3px
+
     .input-group
       .input-if, .input-equation
         float: left
         width: 46%
         margin: 0 0.5%
+
       .input-buttons
         float: left
         width: 2.5%
         padding-top: 5px
+
   .inventory label
     font-size: 15px
     margin: 55px 0 10px 0
@@ -301,6 +388,15 @@
     display: block
     border-bottom: 1px solid #c3c4c7
     padding: 10px 0 10px 5px
+
+  .cv-container
+    position: relative
+    .action-field-visibility
+      position: absolute
+      right: 5px
+      top: 5px
+    .visibility-readable
+      background-color: #FFF
 
 
 #postbox-container-2.fullscreen
@@ -313,8 +409,10 @@
   margin: 0
   background-color: #FFF
   overflow-y: scroll
+
   #normal-sortables, #advanced-sortables
     padding: 20px
+
 #wck-toolbar
   display: none
   position: fixed
@@ -327,18 +425,24 @@
   text-align: right
   padding: 10px 20px
   box-shadow: 0px 0px 45px #000
+
   .wck-toggle-fullscreen
     cursor: pointer
+
   ul
     margin: 0
+
     li
       vertical-align: middle
       margin-bottom: 0
       display: inline-block
+
       li > *
         vertical-align: middle
+
       &.space
         width: 10px
+
 #wck-expression-toolbar
   &, *
     tab-index: 0
@@ -347,14 +451,87 @@
   top: 0
   border: 1px solid #888
   border-radius: 5px
-  box-shadow: 0 0 50px rgba(0,0,0,0.5)
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5)
   padding: 10px 20px
   background-color: #fff
   margin: 0
   width: 360px
   vertical-align: middle
   text-align: justify
+
   .button
     margin-bottom: 6px
+
   select
     width: 270px
+
+#wck-cv-builder
+  overflow: none
+  display: none
+  border-radius: 3px
+  position: fixed
+  z-index: 99999999
+  top: 150px
+  left: 50%
+  margin-left: -500px
+  bottom: 150px
+  width: 1000px
+  background-color: #FFFFFF
+  box-shadow: 0 0 200px 100px rgba(0, 0, 0, 0.4)
+  flex-direction: column
+  .template
+    display: none
+    visibility: hidden
+  .builder
+    flex-basis: 100%
+    margin: 20px 40px 0 5px
+    overflow-y: auto
+    .or-group
+      width: 100%
+    .and-condition
+      display: flex
+      gap: 3px
+      .validation-error
+        border-color: red
+      &, button
+        margin-bottom: 3px
+      .p-value
+        flex-grow: 2
+    .or-condition
+      display: flex
+      flex-direction: row
+      align-content: stretch
+      gap: 3px
+      flex-wrap: wrap
+      &:not(:first-child)::before
+        content: 'OR'
+        flex-basis: 100%
+        display: block
+        font-weight: 700
+        padding: 10px
+        margin-left: 25px
+    .and-group
+      flex-grow: 4
+    .cv-remove
+      text-decoration: none
+      opacity: 0
+      padding: 5px
+      span
+        font-size: 14px
+        line-height: 1
+    .and-condition:hover
+      .cv-remove
+        opacity: 1
+    .cv-action-and
+      align-self: end
+      margin-bottom: 3px
+    .cv-action-or
+      display: block
+      margin-top: 10px
+      margin-left: 33px
+  h1
+    padding: 40px 40px 0 40px
+  p.save
+    padding: 10px 20px 0px
+    text-align: right
+    border-top: 1px solid #ccc

@@ -288,7 +288,7 @@ class FieldsetAssignment
      *
      * @param $attributes
      * @return array
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public static function attributes_readable($attributes)
     {

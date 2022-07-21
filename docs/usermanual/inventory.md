@@ -6,7 +6,7 @@ icon: package
 
 # Stock Management / Inventory
 
-WC Kalkulator v1.3.4 brings support for stock management and stock quantity reduction. This feature is available for single and variable products.
+WC Kalkulator v 1.4.0 brings support for stock management and stock quantity reduction. This feature is available for single and variable products.
 The idea is to reduce a stock quantity by custom value, which is ``Quantity x Multiplier``.
 
 ``Multiplier`` is what you can set in Fieldset's Settings. This value can be a numer or math formula. You can use all available fields, operators and functions.

@@ -72,7 +72,7 @@ class FieldsetPostType
      * Sort by custom column - priority
      * @param $cols
      * @return array
-     * @since 1.3.4
+     * @since 1.4.0
      */
     public static function add_sortable_columns($cols)
     {
