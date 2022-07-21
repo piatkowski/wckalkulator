@@ -55,7 +55,7 @@ class GlobalParametersPostType
         register_post_type(self::POST_TYPE,
             array(
                 'labels' => array(
-                    'name' => __('Parameters', 'wc-kalkulator'),
+                    'name' => __('WCK Global Parameters', 'wc-kalkulator'),
                     'singular_name' => __('Parameter', 'wc-kalkulator'),
                     'menu_name' => __('Parameter', 'wc-kalkulator'),
                     'all_items' => __('WCK Global Params', 'wc-kalkulator'),

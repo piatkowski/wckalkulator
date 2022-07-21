@@ -11,6 +11,16 @@ This plugin is absolutely FREE with PRO features. It will always be free, so ple
 [!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!
+## Version 1.4.0 has been released
+*Update: 2022-07-18*
+
+[x] new formula builder
+[x] apply filters on td elements in field's templates
+[x] new assignment type: product attribute
+[x] toggle button to publish/unpublish fieldsets quickly
+[x] support for stock management and stock reduction multiplier
+[x] layouts feature - you can choose one or two column layout
+
 ## Version 1.3.0 has been released
 *Update: 2022-07-04*
 

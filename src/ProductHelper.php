@@ -16,23 +16,23 @@ final class ProductHelper
      * @var \WC_Product
      */
     protected $product;
-    
+
     /**
      * @var int
      */
     protected $product_id;
-    
+
     /**
      * @var int
      */
     protected $variation_id;
-    
+
     /**
      * @deprecated from 1.1.0
      * @var bool
      * private $can_add_price;
      */
-    
+
     /**
      * ProductHelper constructor.
      *
@@ -45,7 +45,7 @@ final class ProductHelper
         $this->product_id = absint($product_id);
         $this->variation_id = absint($variation_id);
         $this->product = wc_get_product($this->product_id);
-    
+
         /**
          * Removed in 1.1.0
          *
@@ -60,7 +60,7 @@ final class ProductHelper
             }
         }
     }
-    
+
     /**
      * If property "product" is valid
      *
@@ -74,7 +74,7 @@ final class ProductHelper
         }
         return false;
     }
-    
+
     /**
      * Get actual price, regular or sale
      *
@@ -88,7 +88,7 @@ final class ProductHelper
         }
         return $this->regular_price();
     }
-    
+
     /**
      * Get sale price of the product or variation
      *
@@ -97,9 +97,9 @@ final class ProductHelper
      */
     public function sale_price()
     {
-        return $this->product->get_sale_price();
+        return floatval($this->product->get_sale_price());
     }
-    
+
     /**
      * Get regular price of the product or variation
      *
@@ -108,9 +108,9 @@ final class ProductHelper
      */
     public function regular_price()
     {
-        return $this->product->get_regular_price();
+        return floatval($this->product->get_regular_price());
     }
-    
+
     /**
      * Check if the product is on sale
      *
@@ -121,12 +121,12 @@ final class ProductHelper
     {
         return $this->product->is_on_sale();
     }
-    
+
     /**
      * Get discount price
      *
-     * @since 1.0.0
      * @return mixed
+     * @since 1.0.0
      */
     public function discount_price()
     {
@@ -141,7 +141,7 @@ final class ProductHelper
      */
     public function get_weight()
     {
-        return $this->product->get_weight();
+        return floatval($this->product->get_weight());
     }
 
     /**
@@ -152,7 +152,7 @@ final class ProductHelper
      */
     public function get_length()
     {
-        return $this->product->get_length();
+        return floatval($this->product->get_length());
     }
 
     /**
@@ -163,7 +163,7 @@ final class ProductHelper
      */
     public function get_width()
     {
-        return $this->product->get_width();
+        return floatval($this->product->get_width());
     }
 
     /**
@@ -174,9 +174,9 @@ final class ProductHelper
      */
     public function get_height()
     {
-        return $this->product->get_height();
+        return floatval($this->product->get_height());
     }
-    
+
     /**
      *
      * [DEPRECATED]
@@ -191,5 +191,5 @@ final class ProductHelper
     {
         return false; //$this->can_add_price;
     }
-    
+
 }

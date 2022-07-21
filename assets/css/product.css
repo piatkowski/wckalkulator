@@ -1,4 +1,14 @@
 /* Product fields */
+.single-product div.product table.variations.wck-layout-two-col td.table-cell, table.variations.wck-layout-two-col td.table-cell {
+  display: table-cell;
+}
+.single-product div.product table.variations.wck-layout-two-col td.table-cell.col-1, table.variations.wck-layout-two-col td.table-cell.col-1 {
+  padding-right: 10px;
+}
+.single-product div.product table.variations.wck-layout-two-col td.table-cell table.wck-inner-table, table.variations.wck-layout-two-col td.table-cell table.wck-inner-table {
+  padding: 0;
+  margin: 0;
+}
 .single-product div.product table.variations td.label, table.variations td.label {
   margin-bottom: 10px;
 }

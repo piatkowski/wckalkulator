@@ -2,15 +2,24 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-use WCKalkulator\Helper;
-?>
-<label>* <?php _e('Thumbnail size [px]', 'wc-kalkulator'); ?></label>
-<input type="number" class="param fimg-width" step="1" min="0" value="0">
 
-<label>
-    <input type="checkbox" class="param f-required" step="any" value="1">
-    <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
-</label>
+use WCKalkulator\Helper;
+
+?>
+<div class="half first">
+    <label>
+        <?php _e('Is this field required?', 'wc-kalkulator'); ?>
+    </label>
+    <select class="param f-required">
+        <option value="off"><?php _e('No'); ?></option>
+        <option value="on"><?php _e('Yes'); ?></option>
+    </select>
+</div>
+<div class="half second">
+    <label>* <?php _e('Thumbnail size [px]', 'wc-kalkulator'); ?></label>
+    <input type="number" class="param fimg-width" step="1" min="0" value="0">
+</div>
+<div class="clear"></div>
 
 <label>* <?php _e('Option Items', 'wc-kalkulator'); ?></label>
 <div class="pairs fs-options">
@@ -42,7 +51,7 @@ use WCKalkulator\Helper;
         <?php _e("Import options", "wc-kalkulator"); ?>
     </button>
     <div class="importer">
-        <?php echo Helper::html_help_tip( __('Import: each option in new line, format: value;title', 'wc-kalkulator') ); ?>
+        <?php echo Helper::html_help_tip(__('Import: each option in new line, format: value;title', 'wc-kalkulator')); ?>
         <textarea placeholder="value;title"></textarea>
         <button type="button" class="button action-import">
             <?php _e("Add", "wc-kalkulator"); ?>

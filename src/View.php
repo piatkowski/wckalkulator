@@ -30,23 +30,32 @@ class View
     {
         if (preg_match('/^([a-z0-9_]+\/?)+$/', $template)) {
             $view = (object)$view;
+
+            // Add field type information to the $view object
+            if( substr($template, 0, 12) === 'fields/front' ) {
+                $view->field_type = substr($template, 13);
+            }
+
             ob_start();
-            
+
             $override = self::override_file($template);
             if (file_exists($override)) {
                 include $override;
             } else {
                 include Plugin::path() . '/views/' . $template . '.php';
             }
-            
+
             return ob_get_clean();
         }
         return;
     }
-    
+
     private static function override_file($template)
     {
-        return get_template_directory() . '/' . Plugin::NAME . '/' . $template . '.php';
+        /*
+         * Using get_stylesheet_directory() to support child themes
+         */
+        return get_stylesheet_directory() . '/' . Plugin::NAME . '/' . $template . '.php';
     }
-    
+
 }

@@ -33,6 +33,7 @@ class Product
         add_filter('woocommerce_cart_item_name', array(__CLASS__, 'cart_item_name'), 10, 3);
         add_action('woocommerce_checkout_create_order_line_item', array(__CLASS__, 'checkout_create_order_line_item'), 10, 4);
         add_action('woocommerce_after_add_to_cart_button', array(__CLASS__, 'price_block'));
+        add_filter('woocommerce_order_item_quantity', array(__CLASS__, 'reduce_inventory'), 10, 3);
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
 
         PriceFilter::getInstance();
@@ -116,17 +117,20 @@ class Product
             $fieldset->init();
             /*
              * Get field's values from cart item (if in edit mode)
+             * $html changed from string to array since 1.4.0 (2-col layout support)
              */
-            $html = '';
+            $html = array(
+                'hidden' => '',
+                'fields' => array()
+            );
             $cart_fields = null;
             if (isset($_GET['wck_edit'])) {
                 $cart_item = WC()->cart->get_cart_item($_GET['wck_edit']);
                 if (!empty($cart_item)) {
                     $cart_fields = isset($cart_item['wckalkulator_fields']) ? $cart_item['wckalkulator_fields'] : null;
-                    $html .= '<input type="hidden" name="_wck_edit" value="' . esc_html($cart_item['key']) . '" />' . "\n";
+                    $html['hidden'] .= '<input type="hidden" name="_wck_edit" value="' . esc_html($cart_item['key']) . '" />' . "\n";
                 }
             }
-
 
             /*
              * Get field's Html code
@@ -134,7 +138,12 @@ class Product
             foreach ($fieldset->fields() as $field) {
                 //Try to get value of the field from cart item
                 $value = isset($cart_fields[$field->data('name')]) ? $cart_fields[$field->data('name')] : '';
-                $html .= wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n";
+                $html['fields'][] = array(
+                    'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
+                    //colspan since 1.4.0
+                    'colspan' => max((int)$field->data('colspan'), 1),
+                );
+                //$html['visibility'][$field->data('name')] = $field->data('visibility');
             }
             /*
              * Output rendered Html
@@ -238,6 +247,7 @@ class Product
                     $calc = $fieldset->calculate();
                     if (!$calc['is_error']) {
                         $cart_item_data['wckalkulator_price'] = $calc['value'];
+                        $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
                         $success = true;
                     } else {
                         wp_die('Bad request (3)!');
@@ -374,6 +384,7 @@ class Product
 
                 // Add hidden field with all parameters. This is for cart editing.
                 $item->add_meta_data('_wck_fields', $order_fields);
+                $item->add_meta_data('_wck_stock_reduction_multiplier', $values['wckalkulator_stock_reduction_multiplier']);
 
                 foreach ($fieldset->fields() as $name => $field) {
 
@@ -440,6 +451,23 @@ class Product
         Cache::store('Product_get_id', $product_id);
 
         return $product_id;
+    }
+
+    /**
+     * Reduce inventory
+     * @param $quantity
+     * @param $order
+     * @param $item
+     * @return int
+     * @since 1.4.0
+     */
+    public static function reduce_inventory($quantity, $order, $item)
+    {
+        if ($item->meta_exists('_wck_stock_reduction_multiplier')) {
+            $multiplier = floatval( $item->get_meta('_wck_stock_reduction_multiplier', true) );
+            return ceil($multiplier * $quantity);
+        }
+        return $quantity;
     }
 
 }

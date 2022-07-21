@@ -5,9 +5,13 @@ if (!defined('ABSPATH')) {
 use WCKalkulator\Helper;
 ?>
 <label>
-    <input type="checkbox" class="param f-required" step="any" value="1">
-    <?php _e('Select an option to make the field required ', 'wc-kalkulator'); ?>
+    <?php _e('Is this field required?', 'wc-kalkulator'); ?>
 </label>
+<select class="param f-required">
+    <option value="off"><?php _e('No'); ?></option>
+    <option value="on"><?php _e('Yes'); ?></option>
+</select>
+
 <label>* <?php _e('Max. number of files', 'wc-kalkulator'); ?>
     <?php echo Helper::html_help_tip( __('Maximum numer of files that Customer can upload.', 'wc-kalkulator')); ?></label>
 <input type="number" class="param fu-max-file-count" step="1" min="1" value="1">

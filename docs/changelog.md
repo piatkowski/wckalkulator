@@ -4,6 +4,18 @@ label: "CHANGELOG"
 icon: git-branch
 ---
 # CHANGELOG
+2022-07-18
+v.1.4.0
+- new formula builder
+- apply filters on td elements in field's templates
+- new assignment type: product attribute
+- more columns on fieldset table
+- toggle button to publish/unpublish fieldsets quickly
+- support for stock management and stock reduction multiplier
+- layouts feature - you can choose one or two column layout
+- conditional visibility (set rules to show/hide fields)
+- bug fixes
+
 2022-07-11
 v 1.3.3
 - Bug fixed: str_replace on array

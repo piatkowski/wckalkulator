@@ -1,13 +1,13 @@
 === Custom Fields and Price Calculator for WooCommerce ===
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
-Tested up to: 6.0.0
-Stable tag: 1.3.3
+Tested up to: 6.0.1
+Stable tag: 1.4.2
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
 
-WooCommerce extra product fields and price calculator (formula). Absolutely FREE - 21 different field types on your product and order page.
+WooCommerce extra product fields and price calculator (formula). Absolutely FREE - 22 different field types on your product and order page.
 
 == Description ==
 
@@ -141,6 +141,17 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-07-21 v.1.4.0
+- new formula builder
+- apply filters on td elements in field's templates
+- new assignment type: product attribute
+- more columns on fieldset table
+- toggle button to publish/unpublish fieldsets quickly
+- support for stock management and stock reduction multiplier
+- layouts feature - you can choose one or two column layout
+- conditional visibility (set rules to show/hide fields)
+- bug fixes
+
 2022-07-11 v.1.3.3
 - Bug fixed: str_replace on array
 - Bug fixed: missing numberposts argument on get_posts()

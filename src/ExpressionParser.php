@@ -72,7 +72,7 @@ class ExpressionParser
     /**
      * ExpressionParser constructor.
      *
-     * @param string $expr
+     * @param array $expr
      * @param array $vars
      * @since 1.0.0
      */
@@ -85,7 +85,7 @@ class ExpressionParser
             } elseif (is_array($val)) {
                 $this->vars[$var_name] = $val;
             } else {
-                error_log($var_name . ' = ' . print_r($val, true));
+                //error_log($var_name . ' = ' . print_r($val, true));
                 $this->vars[$var_name] = floatval($val);
             }
         }
