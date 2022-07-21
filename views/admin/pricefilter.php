@@ -43,7 +43,7 @@ $sufix = get_post_meta($post->ID, '_wck_filter_price_sufix', true);
         <?php echo Helper::html_help_tip( __('For example the lowest price', 'wc-kalkulator') ); ?>
     </label>
 </p>
-<input type="text" name="_wck_filter_price_value" id="wck_filter_price_value" value="<?php echo esc_html($value); ?>">
+<input type="text" name="_wck_filter_price_value" id="wck_filter_price_value" value="<?php echo esc_html($value); ?>" autocomplete="off">
 
 <p class="post-attributes-label-wrapper">
     <label for="wck_filter_price_sufix" class="post-attributes-label">
@@ -51,4 +51,4 @@ $sufix = get_post_meta($post->ID, '_wck_filter_price_sufix', true);
         <?php echo Helper::html_help_tip( __('For example: "per m2"', 'wc-kalkulator') ); ?>
     </label>
 </p>
-<input type="text" name="_wck_filter_price_sufix" id="wck_filter_price_sufix" value="<?php echo esc_html($sufix); ?>">
+<input type="text" name="_wck_filter_price_sufix" id="wck_filter_price_sufix" value="<?php echo esc_html($sufix); ?>" autocomplete="off">

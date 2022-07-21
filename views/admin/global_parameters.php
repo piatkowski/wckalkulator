@@ -20,14 +20,14 @@ $value = get_post_meta($post->ID, '_wck_param_value', true);
     </label>
 </p>
 <input type="text" name="_wck_param_name" pattern="[a-zA-Z0-9_]+" title="a-z A-Z 0-9 _" id="param_name"
-       value="<?php echo esc_html($name); ?>" required>
+       value="<?php echo esc_html($name); ?>" autocomplete="off" required>
 <p class="post-attributes-label-wrapper">
     <label for="param_value" class="post-attributes-label">
         <?php _e('Value (numeric)', 'wc-kalkulator'); ?>
     </label>
 </p>
 <input type="text" name="_wck_param_value" id="param_value"
-       value="<?php echo esc_html($value); ?>" required>
+       value="<?php echo esc_html($value); ?>" autocomplete="off" required>
 
 <p>
     <?php _e('Example values:', 'wc-kalkulator'); ?><br/>

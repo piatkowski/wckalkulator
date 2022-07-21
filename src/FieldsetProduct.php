@@ -93,7 +93,7 @@ class FieldsetProduct
     public function init($product_id = null, $variation_id = null)
     {
         $this->product_id = ($product_id === null) ? Product::get_id() : $product_id;
-        $this->variation_id = ($product_id === null) ? null : $variation_id;
+        $this->variation_id = ($variation_id === null) ? null : $variation_id;
 
         //if ($this->has_fieldset()) {
         $this->data = $this->get_data();
@@ -741,6 +741,8 @@ class FieldsetProduct
      */
     public function visibility_rules()
     {
+        $rules = array();
+
         if (empty($this->fields())) {
             $this->init();
         }
@@ -748,7 +750,6 @@ class FieldsetProduct
             if (!empty($field->data('visibility')))
                 $rules[$field->data('name')] = json_decode(stripslashes($field->data('visibility')), true);
         }
-
         return $rules;
     }
 

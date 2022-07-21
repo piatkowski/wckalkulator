@@ -34,17 +34,6 @@
             });
         }
 
-        /*
-        <option value="1"><?php _e('is empty', 'wc-kalkulator'); ?></option>
-        <option value="2"><?php _e('has any value', 'wc-kalkulator'); ?></option>
-        <option value="3">==</option>
-        <option value="4">!=</option>
-        <option value="5">&lt;</option>
-        <option value="6">&lt;=</option>
-        <option value="7">&gt;</option>
-        <option value="8">&gt;=</option>
-        <option value="9"><?php _e('contains', 'wc-kalkulator'); ?></option>
-         */
         function toggleField(fieldName, rules) {
             var state = null;
             $.each(rules, function (i, or_rule) {
@@ -53,7 +42,6 @@
                     if(field.length) {
                         state = compare(field.val(), and_rule.comp, and_rule.value);
                     }
-                    console.log("state", fieldName, and_rule.field, state);
                     return state !== false;
                 });
                 if (state === true) {

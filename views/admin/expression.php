@@ -48,14 +48,14 @@ use WCKalkulator\Cache;
 
 <div class="expression_oneline">
     <div class="input-icon input-equation">
-        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""><i></i>
+        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value="" autocomplete="off"><i></i>
     </div>
 </div>
 
 <div class="expression_conditional">
     <div id="extra-inputs"></div>
     <div class="input-icon input-else">
-        <input type="text" placeholder="<?php _e('Price formula...', 'wc-kalkulator'); ?>" value=""><i></i>
+        <input type="text" placeholder="<?php _e('Price formula...', 'wc-kalkulator'); ?>" value="" autocomplete="off"><i></i>
     </div>
     <button type="button" class="button add-condition"><?php _e('Add condition', 'wc-kalkulator'); ?></button>
 </div>
@@ -88,7 +88,9 @@ use WCKalkulator\Cache;
     <div class="input-icon input-stock">
         <input type="text" name="_wck_stock_reduction_multiplier"
                placeholder="<?php _e('Number or formula (value will be multiplied by quantity)...', 'wc-kalkulator'); ?>"
-               value="<?php echo esc_html($reduction_m); ?>"><i></i>
+               value="<?php echo esc_html($reduction_m); ?>"
+               autocomplete="off"
+               role="presentation"><i></i>
     </div>
     <p class="description"><?php _e('You can use fields, operators and functions as above. You can modify stock quantity (i.e. add
         unit) using filter `woocommerce_format_stock_quantity`.', 'wc-kalkulator'); ?></p>

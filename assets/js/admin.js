@@ -317,6 +317,42 @@
                 ext.push($(this).data('extension'));
             });
             $(field_id + " input.fu-allowed-extensions").val(ext.join('|'));
+        }).on('change', 'input.f-name', function () {
+            var target = $(this);
+            var newName = $(this).val().trim();
+            if (newName !== "") {
+                $("#wck_fields_editor input.f-name").each(function () {
+                    if ($(this).val() === newName && !$(this).is(target)) {
+                        alert("The name {" + newName + "} is already in use! Choose another name.");
+                        target.val("");
+                        return false;
+                    }
+                });
+            }
+
+            if ($(this)[0].checkValidity() && typeof $(this).data('lastValid') !== "undefined") {
+                var oldName = $(this).data('lastValid');
+                if (oldName !== newName) {
+                    var oldNameInUse = false;
+                    $("#wck_expression input[type=text], #wck_fields_editor input.f-visibility, #wck_fields_editor input.f-visibility-readable, #wck_fields_editor input.visibility-readable").each(function () {
+                        if ($(this).val().includes(oldName)) {
+                            oldNameInUse = true;
+                            return false; //break
+                        }
+                    });
+                    if (oldNameInUse && confirm("Wait! Seems like {" + oldName + "} is used in formulas! Do you want to replace {" + oldName + "} in all formulas? {" + oldName + "} will be changed to {" + newName + "}")) {
+                        $("#wck_expression input[type=text], #wck_fields_editor input.f-visibility, #wck_fields_editor input.f-visibility-readable, #wck_fields_editor input.visibility-readable").each(function () {
+                            $(this).val($(this).val().replaceAll("{" + oldName + "}", "{" + newName + "}").replaceAll("{" + oldName + ":", "{" + newName + ":").replaceAll('"field":"' + oldName + '"', '"field":"' + newName + '"'));
+                        });
+                        $(this).data('lastValid', newName);
+                    }
+                }
+            }
+
+        }).on('focusin', 'input.f-name', function () {
+            if ($(this)[0].checkValidity()) {
+                $(this).data('lastValid', $(this).val());
+            }
         });
 
         $(".iris-square-value").on("click", function (e) {
@@ -405,7 +441,7 @@
                 "id": id
             }).append($WK.html[type].replace("{id}", id)));
             $WK.buildTooltips("#" + id + " ");
-            if( $("#" + id).find(".pairs").length > 0) {
+            if ($("#" + id).find(".pairs").length > 0) {
                 $("#" + id + " .pairs").sortable({
                     placeholder: "wck-sortable-placeholder",
                     tolerance: "pointer"
@@ -603,7 +639,7 @@
             var wkform = $("form#post");
             if (!wkform[0].checkValidity()) {
                 error = true;
-                $("input:invalid").parent().show();
+                $("input:invalid").closest('.field').find('.action-toggle.dashicons-arrow-down-alt2').trigger('click');
                 $("input:invalid").each(function () {
                     $('<label class="error"><span class="dashicons dashicons-warning"></span> ' + $(this)[0].validationMessage + "</label>").insertBefore($(this));
                 });
@@ -1037,11 +1073,23 @@
             $WK.saveExpression();
         });
 
+        $WK.toolbarOnTop = false;
+
         $(window).scroll(function () {
             if ($(this).scrollTop() > 100) {
-                $("#wck-toolbar").fadeIn();
+                if (!$WK.toolbarOnTop) {
+                    $("#wck-toolbar").fadeOut(function () {
+                        $WK.toolbarOnTop = true;
+                        $("#wck-toolbar").css({"top": "0px", "bottom": "auto"}).fadeIn();
+                    });
+                }
             } else if (!$("#postbox-container-2").hasClass("fullscreen")) {
-                $("#wck-toolbar").fadeOut();
+                if ($WK.toolbarOnTop) {
+                    $("#wck-toolbar").fadeOut(function () {
+                        $WK.toolbarOnTop = false;
+                        $("#wck-toolbar").css({"top": "auto", "bottom": "0px"}).fadeIn();
+                    });
+                }
             }
         });
 

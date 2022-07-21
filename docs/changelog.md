@@ -13,6 +13,7 @@ v.1.4.0
 - toggle button to publish/unpublish fieldsets quickly
 - support for stock management and stock reduction multiplier
 - layouts feature - you can choose one or two column layout
+- conditional visibility (set rules to show/hide fields)
 - bug fixes
 
 2022-07-11

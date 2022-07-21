@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
                             <option value="8">&gt;=</option>
                             <option value="9"><?php _e('contains', 'wc-kalkulator'); ?></option>
                         </select>
-                        <input type="text" class="p-value" disabled placeholder="Value...">
+                        <input type="text" class="p-value" disabled placeholder="Value..." autocomplete="off">
                     </div>
                 </div>
                 <button type="button" class="button cv-action-and"><?php _e('AND', 'wc-kalkulator'); ?></button>
