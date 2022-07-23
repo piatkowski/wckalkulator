@@ -9,7 +9,7 @@
 
         if (wck_ajax_object.hasOwnProperty("_wck_visibility_rules") && wck_ajax_object._wck_visibility_rules !== null) {
             $.each(wck_ajax_object._wck_visibility_rules, function (fieldName, options) {
-                $("#wck_" + fieldName).hide().closest('tr').hide();
+                $("[name*='wck[" + fieldName + "]']").hide().closest('tr').hide();
                 CV[fieldName] = options;
             });
         }
@@ -18,7 +18,7 @@
             //wck-dynamic support, conditional visibility support
             var formFields = {};
             jQuery(_form + " [name^=wck").each(function () {
-                var fieldName = $(this).attr("name").replace("wck[", "").replace("]", "");
+                var fieldName = $(this).attr("name").replace("wck[", "").replace("]", "").replace("[]", "");
                 formFields["{" + fieldName + "}"] = $(this).val();
                 if (CV.hasOwnProperty(fieldName)) {
                     toggleField(fieldName, CV[fieldName]);
@@ -37,7 +37,12 @@
 
         function getFieldValue(field) {
             if (field.prop("type") === "checkbox" || field.prop("type") === "radio") {
-                return field.is(":checked") ? field.val() : "";
+                var value = field.is(":checked") ? field.val() : "";
+                var n = value.indexOf(':');
+                if (n !== -1) {
+                    value = value.substring(0, n);
+                }
+                return value;
             }
             return field.val();
         }
@@ -46,19 +51,25 @@
             var state = null;
             $.each(rules, function (i, or_rule) {
                 $.each(or_rule, function (j, and_rule) {
-                    var field = $("#wck_" + and_rule.field);
-                    if (field.length) {
-                        state = compare(getFieldValue(field), and_rule.comp, and_rule.value);
+                    var fields = $("[name*='wck[" + and_rule.field + "]']");
+                    if (fields.length) {
+                        fields.each(function () {
+                            var s = compare(getFieldValue($(this)), and_rule.comp, and_rule.value);
+                            if (s === true) {
+                                state = true;
+                            }
+                            return state !== false;
+                        });
                     }
                     return state !== false;
                 });
                 if (state === true) {
-                    $("#wck_" + fieldName).show().closest('tr').show();
+                    $("[name*='wck[" + fieldName + "]']").show().closest('tr').show();
                     return false;
                 }
             });
             if (state !== true) {
-                $("#wck_" + fieldName).hide().closest('tr').hide();
+                $("[name*='wck[" + fieldName + "]']").hide().closest('tr').hide();
                 return false;
             }
         }

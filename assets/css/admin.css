@@ -34,6 +34,14 @@
   box-shadow: 0px 5px 10px #ccc;
   margin-bottom: 5px;
 }
+.wc-kalkulator-wrapper ul#f-field-list li.welcome {
+  box-shadow: none;
+  padding: 30px;
+  text-align: center;
+  font-size: 16px;
+  border: 1px dashed #aaa;
+  margin: 30px;
+}
 .wc-kalkulator-wrapper ul#f-field-list li .field {
   border: 1px solid #AAA;
   background-color: #FFFFFF;
