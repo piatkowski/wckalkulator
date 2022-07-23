@@ -5,7 +5,6 @@
         var _form = wck_ajax_object.form;
 
         var shouldCalculatePrice = wck_ajax_object._wck_has_expression === "1";
-        console.log(shouldCalculatePrice);
         var CV = {};
 
         if (wck_ajax_object.hasOwnProperty("_wck_visibility_rules") && wck_ajax_object._wck_visibility_rules !== null) {
@@ -36,13 +35,20 @@
             });
         }
 
+        function getFieldValue(field) {
+            if (field.prop("type") === "checkbox" || field.prop("type") === "radio") {
+                return field.is(":checked") ? field.val() : "";
+            }
+            return field.val();
+        }
+
         function toggleField(fieldName, rules) {
             var state = null;
             $.each(rules, function (i, or_rule) {
                 $.each(or_rule, function (j, and_rule) {
                     var field = $("#wck_" + and_rule.field);
-                    if(field.length) {
-                        state = compare(field.val(), and_rule.comp, and_rule.value);
+                    if (field.length) {
+                        state = compare(getFieldValue(field), and_rule.comp, and_rule.value);
                     }
                     return state !== false;
                 });

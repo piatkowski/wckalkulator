@@ -41,7 +41,11 @@ if (!defined('ABSPATH')) {
 </div>
 
 
-<ul id="f-field-list"></ul>
+<ul id="f-field-list">
+    <li class="welcome">
+        <?php _e('Add your first field. Select the field type from the dropdown list on the toolbar and click "Add field".', 'wc-kalkulator'); ?>
+    </li>
+</ul>
 <div class="clearfix"></div>
 <input type="hidden" name="_wck_fieldset" value="">
 

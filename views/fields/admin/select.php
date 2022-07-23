@@ -4,6 +4,14 @@ if (!defined('ABSPATH')) {
 }
 use WCKalkulator\Helper;
 ?>
+<label>
+    <?php _e('Is this field required?', 'wc-kalkulator'); ?>
+</label>
+<select class="param f-required">
+    <option value="off"><?php _e('No'); ?></option>
+    <option value="on"><?php _e('Yes'); ?></option>
+</select>
+
 <label>* <?php _e('Option Items', 'wc-kalkulator'); ?></label>
 <div class="pairs fs-options">
     <div class="pair fs-option">
