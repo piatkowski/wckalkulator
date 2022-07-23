@@ -80,6 +80,10 @@ class SelectField extends AbstractField
      */
     public function validate($value)
     {
+        if (!$this->is_required() && empty($value)) {
+            return true;
+        }
+
         return in_array($value, $this->data["options_name"]);
     }
     

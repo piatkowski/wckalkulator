@@ -71,6 +71,9 @@ class NumberField extends AbstractField
      */
     public function validate($value)
     {
+        if (!$this->is_required() && empty($value)) {
+            return true;
+        }
         $is_greater_than_min = $value >= $this->data["min"];
         $is_less_than_max = $value <= $this->data["max"];
         $is_numeric = is_numeric($value);
