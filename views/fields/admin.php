@@ -66,7 +66,7 @@ use WCKalkulator\Helper;
             <?php echo Helper::html_help_tip(__('Set the rules for which this field will be visible.', 'wc-kalkulator')); ?>
         </label>
         <div class="cv-container">
-            <button type="button" class="button action-field-visibility">Edit Rules</button>
+            <button type="button" class="button action-field-visibility"><?php _e('Edit Rules', 'wc-kalkulator'); ?></button>
             <input type="text" class="param visibility-readable" value="" placeholder="<?php _e('Set the rules for which this field will be visible. Click on the button --->', 'wc-kalkulator'); ?>" readonly>
             <input type="hidden" class="param f-visibility">
             <input type="hidden" class="param f-visibility-readable">

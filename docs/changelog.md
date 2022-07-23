@@ -3,9 +3,22 @@ order: -2000
 label: "CHANGELOG"
 icon: git-branch
 ---
+
 # CHANGELOG
-2022-07-18
+
+2022-07-22
+v.1.4.3
+
+- bug fixes
+
+2022-07-22
+v.1.4.1, 1.4.2
+
+- bug fixes
+
+2022-07-21
 v.1.4.0
+
 - new formula builder
 - apply filters on td elements in field's templates
 - new assignment type: product attribute
@@ -18,6 +31,7 @@ v.1.4.0
 
 2022-07-11
 v 1.3.3
+
 - Bug fixed: str_replace on array
 - Bug fixed: missing numberposts argument on get_posts()
 
@@ -26,7 +40,7 @@ v.1.3.2
 
 - added support for array and json objects in global parameters
 
-2022-07-06 
+2022-07-06
 v.1.3.1
 
 - bug fixes
@@ -62,7 +76,8 @@ v.1.2.1
 2022-06-13
 v.1.2.0
 
-- New fields: image select, image swatches, color swatches, checkbox group (multicheckbox), HTML, Heading, Paragraph, Hidden, Link, Attachment
+- New fields: image select, image swatches, color swatches, checkbox group (multicheckbox), HTML, Heading, Paragraph,
+  Hidden, Link, Attachment
 - Math functions to use in the expression
 - Additional functions for radio group, checkbox group (sum, max, min), range date picker (days between dated)
 - Global parameters can be defined and used in formula
@@ -71,14 +86,16 @@ v.1.2.0
 - text field has new option: pattern (regexp)
 - bug fixes
 
-2022-05-08 
+2022-05-08
 v.1.1.2
+
 - Added new fields: email, radio
 - fixed field builder (js script issue)
 - fixed typo in HTML code for dropdown and select fields
 
-2022-04-20 
+2022-04-20
 v.1.1.1
+
 - Bug fix
 
 2022-02-18

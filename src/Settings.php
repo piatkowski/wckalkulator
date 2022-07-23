@@ -55,6 +55,12 @@ class Settings
                 'desc' => __('This path will be used to store files uploaded by customers on checkout. This setting is used by Image Upload field.'),
                 'type' => 'text',
                 'default' => wp_upload_dir()['basedir'] . '/wc-kalkulator/customer-data/'
+            ),
+            'dismiss_notices' => array(
+                'label' => __('Do you supported this plugin?', 'wc-kalkulator'),
+                'desc' => __('The plugin shows notices twice a week, but you can hide it forever by turning on this setting.'),
+                'type' => 'checkbox',
+                'default' => 'no'
             )
         );
     }

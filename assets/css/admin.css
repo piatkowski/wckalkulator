@@ -175,9 +175,11 @@
   width: 100%;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .param:not([type=checkbox]).inline, .wc-kalkulator-wrapper ul#f-field-list li .field .body label.inline {
-  display: inline;
+  display: inline-block;
   margin-right: 10px;
   width: auto;
+  line-height: 2;
+  margin-bottom: 20px;
 }
 .wc-kalkulator-wrapper ul#f-field-list li .field .body .param.fdp-disallow-past-date, .wc-kalkulator-wrapper ul#f-field-list li .field .body .param[type=checkbox] {
   margin: 10px 15px 14px 3px;
