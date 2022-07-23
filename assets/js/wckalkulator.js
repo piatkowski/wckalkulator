@@ -3,7 +3,9 @@
     $(document).ready(function ($) {
         var userTimeout;
         var _form = wck_ajax_object.form;
+
         var shouldCalculatePrice = wck_ajax_object._wck_has_expression === "1";
+        console.log(shouldCalculatePrice);
         var CV = {};
 
         if (wck_ajax_object.hasOwnProperty("_wck_visibility_rules") && wck_ajax_object._wck_visibility_rules !== null) {

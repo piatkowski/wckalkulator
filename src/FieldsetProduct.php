@@ -188,7 +188,7 @@ class FieldsetProduct
      */
     public function has_fieldset($current = '')
     {
-        if (is_product() && $current === 'current') {
+        if ($current === 'current' && (is_product() || Product::get_id() > 0)) {
             return FieldsetAssignment::match(Product::get_id()) !== null;
         } elseif ((int)$current > 0) {
             return FieldsetAssignment::match((int)$current) !== null;
@@ -209,7 +209,7 @@ class FieldsetProduct
     public function has_expression($current = '')
     {
         $id = 0;
-        if (is_product() && $current === 'current') {
+        if ($current === 'current' && (is_product() || Product::get_id() > 0)) {
             $id = FieldsetAssignment::match(Product::get_id());
         } elseif ((int)$current > 0) {
             $id = FieldsetAssignment::match((int)$current) !== null;

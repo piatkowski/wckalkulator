@@ -49,7 +49,6 @@ class Product
     {
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')) {
-
             if ($fieldset->has_expression('current')) {
                 wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.min.css');
                 wp_enqueue_style('wckalkulator_price_css');

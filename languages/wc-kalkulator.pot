@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2.
 msgid ""
 msgstr ""
-"Project-Id-Version: WC Kalkulator 1.4.0\n"
+"Project-Id-Version: WC Kalkulator 1.4.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/WC Kalkulator\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2022-07-21T20:03:44+00:00\n"
+"POT-Creation-Date: 2022-07-22T11:47:12+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: wc-kalkulator\n"
@@ -30,12 +30,12 @@ msgstr ""
 msgid "https://wckalkulator.com"
 msgstr ""
 
-#: src/AdminNotice.php:144
-msgid "Thank you for using <strong>WC Kalkulator</strong>! Please <a href=\"https://wordpress.org/support/plugin/wc-kalkulator/reviews/#new-post\" target=\"_blank\">rate us &#9733;&#9733;&#9733;&#9733;&#9733;</a> and remember that WCK will always be for free!"
+#: src/AdminNotice.php:147
+msgid "Thank you for using <strong>WC Kalkulator</strong>! Please %1$s rate us &#9733;&#9733;&#9733;&#9733;&#9733;%2$s and remember that WCK will always be for free!."
 msgstr ""
 
-#: src/AdminNotice.php:159
-msgid "Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - <a href=\"https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY\"><strong>Yes, I'd like to support!</strong></a>"
+#: src/AdminNotice.php:170
+msgid "Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - %1$s<strong>Yes, I'd like to support!</strong>%2$s"
 msgstr ""
 
 #: src/Ajax.php:76
@@ -475,11 +475,15 @@ msgstr ""
 msgid "Upload path for Customer data"
 msgstr ""
 
-#: src/Settings.php:132
+#: src/Settings.php:60
+msgid "Do you supported this plugin?"
+msgstr ""
+
+#: src/Settings.php:138
 msgid "Settings Saved"
 msgstr ""
 
-#: src/Settings.php:142
+#: src/Settings.php:148
 msgid "Save settings"
 msgstr ""
 
@@ -637,37 +641,37 @@ msgstr ""
 msgid "Number or formula (value will be multiplied by quantity)..."
 msgstr ""
 
-#: views/admin/expression.php:93
+#: views/admin/expression.php:95
 msgid ""
 "You can use fields, operators and functions as above. You can modify stock quantity (i.e. add\n"
 "        unit) using filter `woocommerce_format_stock_quantity`."
 msgstr ""
 
-#: views/admin/expression.php:114
+#: views/admin/expression.php:116
 msgid "Add field"
 msgstr ""
 
-#: views/admin/expression.php:120
+#: views/admin/expression.php:122
 msgid "Fullscreen Editor"
 msgstr ""
 
-#: views/admin/expression.php:125
+#: views/admin/expression.php:127
 msgid "Layout: 2-cols"
 msgstr ""
 
-#: views/admin/expression.php:130
+#: views/admin/expression.php:132
 msgid "Toggle Fields"
 msgstr ""
 
-#: views/admin/expression.php:144
+#: views/admin/expression.php:146
 msgid "Choose parameter..."
 msgstr ""
 
-#: views/admin/expression.php:167
+#: views/admin/expression.php:169
 msgid "Insert"
 msgstr ""
 
-#: views/admin/expression.php:170
+#: views/admin/expression.php:172
 #: views/fields/admin/colorswatches.php:57
 #: views/fields/admin/dropdown.php:49
 #: views/fields/admin/imageselect.php:56
@@ -675,91 +679,91 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: views/admin/expression.php:171
+#: views/admin/expression.php:173
 msgid "Subtract"
 msgstr ""
 
-#: views/admin/expression.php:172
+#: views/admin/expression.php:174
 msgid "Multiply"
 msgstr ""
 
-#: views/admin/expression.php:173
+#: views/admin/expression.php:175
 msgid "Divide"
 msgstr ""
 
-#: views/admin/expression.php:174
+#: views/admin/expression.php:176
 msgid "Modulus"
 msgstr ""
 
-#: views/admin/expression.php:175
+#: views/admin/expression.php:177
 msgid "Power"
 msgstr ""
 
-#: views/admin/expression.php:176
+#: views/admin/expression.php:178
 msgid "Equal"
 msgstr ""
 
-#: views/admin/expression.php:177
+#: views/admin/expression.php:179
 msgid "Not equal"
 msgstr ""
 
-#: views/admin/expression.php:178
+#: views/admin/expression.php:180
 msgid "Less than"
 msgstr ""
 
-#: views/admin/expression.php:179
+#: views/admin/expression.php:181
 msgid "Less or equal"
 msgstr ""
 
-#: views/admin/expression.php:180
+#: views/admin/expression.php:182
 msgid "Grater than"
 msgstr ""
 
-#: views/admin/expression.php:181
+#: views/admin/expression.php:183
 msgid "Greater or equal"
 msgstr ""
 
-#: views/admin/expression.php:182
+#: views/admin/expression.php:184
 msgid "Logical and"
 msgstr ""
 
-#: views/admin/expression.php:183
+#: views/admin/expression.php:185
 msgid "Logical or"
 msgstr ""
 
-#: views/admin/expression.php:184
+#: views/admin/expression.php:186
 msgid "Logical not"
 msgstr ""
 
-#: views/admin/expression.php:190
+#: views/admin/expression.php:192
 msgid "round(x, p) - round x with the precision of p"
 msgstr ""
 
-#: views/admin/expression.php:191
+#: views/admin/expression.php:193
 msgid "ceil(x) - round up to the integer number"
 msgstr ""
 
-#: views/admin/expression.php:192
+#: views/admin/expression.php:194
 msgid "floor(x) - round down to the integer number"
 msgstr ""
 
-#: views/admin/expression.php:193
+#: views/admin/expression.php:195
 msgid "abs(x) - absolute number"
 msgstr ""
 
-#: views/admin/expression.php:194
+#: views/admin/expression.php:196
 msgid "max(a,b,...) - maximal value"
 msgstr ""
 
-#: views/admin/expression.php:195
+#: views/admin/expression.php:197
 msgid "min(a,b,...) - minimal value"
 msgstr ""
 
-#: views/admin/expression.php:196
+#: views/admin/expression.php:198
 msgid "sqrt(x) - square root of x"
 msgstr ""
 
-#: views/admin/expression.php:197
+#: views/admin/expression.php:199
 msgid "strlen(x) - Text length of x"
 msgstr ""
 
@@ -792,7 +796,7 @@ msgid " is visible if"
 msgstr ""
 
 #: views/admin/global_parameters.php:19
-msgid "Name"
+msgid "Unique Name"
 msgstr ""
 
 #: views/admin/global_parameters.php:26
@@ -877,6 +881,10 @@ msgstr ""
 
 #: views/fields/admin.php:66
 msgid "Set the rules for which this field will be visible."
+msgstr ""
+
+#: views/fields/admin.php:69
+msgid "Edit Rules"
 msgstr ""
 
 #: views/fields/admin.php:70

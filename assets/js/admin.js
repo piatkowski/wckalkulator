@@ -4,6 +4,7 @@
     var $CV = {};
 
     $(document).ready(function ($) {
+
         var suggest = [];
         var input_key_pressed = {};
 

@@ -15,7 +15,7 @@ class AdminNotice
     const NONCE = "wckalkulator-ajax-admin-notice-nonce";
     const TASK = "wck_admin_notice_schedule";
     const STATE_OPTION = "wck_admin_notice_state";
-    
+
     /**
      * Add actions and filters
      *
@@ -34,7 +34,7 @@ class AdminNotice
         add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
         add_action(AdminNotice::TASK, array(__CLASS__, 'set_notice_option'));
     }
-    
+
     /**
      * Schedula an event
      *
@@ -43,11 +43,11 @@ class AdminNotice
      */
     public static function schedule()
     {
-        if (!wp_next_scheduled(AdminNotice::TASK)) {
+        if (Settings::get('dismiss_notices') === 'no' && !wp_next_scheduled(AdminNotice::TASK)) {
             wp_schedule_event(time(), 'twice_a_week', AdminNotice::TASK);
         }
     }
-    
+
     /**
      * Add js script and set ajax object
      *
@@ -62,7 +62,7 @@ class AdminNotice
             ['jquery'],
             Plugin::VERSION
         );
-        
+
         wp_localize_script(
             'wck-admin-notice-script',
             'wck_ajax_object',
@@ -72,7 +72,7 @@ class AdminNotice
             )
         );
     }
-    
+
     /**
      * Add custom cron interval
      *
@@ -87,7 +87,7 @@ class AdminNotice
             'display' => esc_html__('Twice a week'),);
         return $schedules;
     }
-    
+
     /**
      * Set notice option to "1" (enable)
      *
@@ -98,7 +98,7 @@ class AdminNotice
     {
         update_option(AdminNotice::STATE_OPTION, 1);
     }
-    
+
     /**
      * Ajax action to dismiss notice
      *
@@ -112,14 +112,14 @@ class AdminNotice
                 'status' => 'bad request'
             ));
         }
-        
+
         self::unset_notice_option();
-        
+
         wp_send_json(array(
             'status' => 'success'
         ));
     }
-    
+
     /**
      * Set notice option to "0" (disable)
      *
@@ -130,7 +130,7 @@ class AdminNotice
     {
         update_option(AdminNotice::STATE_OPTION, 0);
     }
-    
+
     /**
      * Display Html for notice (rate us)
      *
@@ -141,11 +141,19 @@ class AdminNotice
     {
         ?>
         <div class="notice notice-info is-dismissible wck-rate wck-notice">
-            <p><?php _e('Thank you for using <strong>WC Kalkulator</strong>! Please <a href="https://wordpress.org/support/plugin/wc-kalkulator/reviews/#new-post" target="_blank">rate us &#9733;&#9733;&#9733;&#9733;&#9733;</a> and remember that WCK will always be for free!', 'wc-kalkulator'); ?></p>
+            <p>
+                <?php
+                printf(
+                    __('Thank you for using <strong>WC Kalkulator</strong>! Please %1$s rate us &#9733;&#9733;&#9733;&#9733;&#9733;%2$s and remember that WCK will always be for free!.', 'wc-kalkulator'),
+                    '<a href="https://wordpress.org/support/plugin/wc-kalkulator/reviews/#new-post" target="_blank">',
+                    '</a>'
+                );
+                ?>
+            </p>
         </div>
         <?php
     }
-    
+
     /**
      * Display Html for notice (donate)
      *
@@ -156,7 +164,15 @@ class AdminNotice
     {
         ?>
         <div class="notice notice-info is-dismissible wck-donate wck-notice">
-            <p><?php _e('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - <a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY"><strong>Yes, I\'d like to support!</strong></a>', 'wc-kalkulator'); ?></p>
+            <p>
+                <?php
+                printf(
+                    __('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
+                    '<a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY">',
+                    '</a>'
+                );
+                ?>
+            </p>
         </div>
         <?php
     }

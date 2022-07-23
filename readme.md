@@ -1,8 +1,8 @@
-=== Custom Fields and Price Calculator for WooCommerce ===
+=== Product Fields and Price Calculator for WooCommerce ===
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -20,7 +20,7 @@ Extra product fields can be used to calculate product price and save information
 
 If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
 
-Sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.** WooCommerce Custom Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating custom price. You can create a personalized product in your store.
+Sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.** WooCommerce Product Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating custom price. You can create a personalized product in your store.
 
 ## Documentation
 
@@ -141,6 +141,12 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-07-23 v.1.4.3
+- bug fixes
+
+2022-07-22 v.1.4.1, 1.4.2
+- bug fixes
+
 2022-07-21 v.1.4.0
 - new formula builder
 - apply filters on td elements in field's templates

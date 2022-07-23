@@ -36,7 +36,7 @@ class Helper
      */
     public static function get_id_from_shortcode_tag( $content, $tag ) {
         if ( shortcode_exists( $tag ) ) {
-            preg_match_all( '/' . get_shortcode_regex([$tag]) . '/', $content, $matches, PREG_SET_ORDER );
+            preg_match_all( '/' . get_shortcode_regex(array($tag)) . '/', $content, $matches, PREG_SET_ORDER );
             if ( empty( $matches ) ) {
                 return 0;
             }
