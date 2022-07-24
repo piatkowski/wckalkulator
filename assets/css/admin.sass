@@ -1,3 +1,7 @@
+::placeholder, ::-moz-placeholder, ::-webkit-input-placeholder
+  color: #9b9b9b !important
+  font-size: 12px !important
+
 .wc-kalkulator-wrapper
   html
     scroll-padding-top: 100px
@@ -37,6 +41,7 @@
     li
       box-shadow: 0px 5px 10px #ccc
       margin-bottom: 5px
+
       &.welcome
         box-shadow: none
         padding: 30px
@@ -44,6 +49,7 @@
         font-size: 16px
         border: 1px dashed #aaa
         margin: 30px
+
       .field
         border: 1px solid #AAA
         background-color: #FFFFFF
@@ -52,6 +58,7 @@
           background-color: #F5F5F5
           padding: 8px
           cursor: move
+
           .text
             font-size: 14px
             color: #000
@@ -396,10 +403,12 @@
 
   .cv-container
     position: relative
+
     .action-field-visibility
       position: absolute
       right: 5px
       top: 5px
+
     .visibility-readable
       background-color: #FFF
 
@@ -483,30 +492,39 @@
   background-color: #FFFFFF
   box-shadow: 0 0 200px 100px rgba(0, 0, 0, 0.4)
   flex-direction: column
+
   .template
     display: none
     visibility: hidden
+
   .builder
     flex-basis: 100%
     margin: 20px 40px 0 5px
     overflow-y: auto
+
     .or-group
       width: 100%
+
     .and-condition
       display: flex
       gap: 3px
+
       .validation-error
         border-color: red
+
       &, button
         margin-bottom: 3px
+
       .p-value
         flex-grow: 2
+
     .or-condition
       display: flex
       flex-direction: row
       align-content: stretch
       gap: 3px
       flex-wrap: wrap
+
       &:not(:first-child)::before
         content: 'OR'
         flex-basis: 100%
@@ -514,28 +532,42 @@
         font-weight: 700
         padding: 10px
         margin-left: 25px
+
     .and-group
       flex-grow: 4
+
     .cv-remove
       text-decoration: none
       opacity: 0
       padding: 5px
+
       span
         font-size: 14px
         line-height: 1
+
     .and-condition:hover
       .cv-remove
         opacity: 1
+
     .cv-action-and
       align-self: end
       margin-bottom: 3px
+
     .cv-action-or
       display: block
       margin-top: 10px
       margin-left: 33px
+
   h1
     padding: 40px 40px 0 40px
+
   p.save
     padding: 10px 20px 0px
     text-align: right
     border-top: 1px solid #ccc
+
+.postbox.closed
+  border: 1px solid #c3c4c7
+
+  .inside
+    display: block

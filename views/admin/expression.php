@@ -48,14 +48,16 @@ use WCKalkulator\Cache;
 
 <div class="expression_oneline">
     <div class="input-icon input-equation">
-        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value="" autocomplete="off"><i></i>
+        <input type="text" placeholder="<?php _e('equation...', 'wc-kalkulator'); ?>" value=""
+               autocomplete="off"><i></i>
     </div>
 </div>
 
 <div class="expression_conditional">
     <div id="extra-inputs"></div>
     <div class="input-icon input-else">
-        <input type="text" placeholder="<?php _e('Price formula...', 'wc-kalkulator'); ?>" value="" autocomplete="off"><i></i>
+        <input type="text" placeholder="<?php _e('Price formula...', 'wc-kalkulator'); ?>" value=""
+               autocomplete="off"><i></i>
     </div>
     <button type="button" class="button add-condition"><?php _e('Add condition', 'wc-kalkulator'); ?></button>
 </div>
@@ -200,8 +202,22 @@ use WCKalkulator\Cache;
         'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator'),
         'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator')
     );
+
+    $ending = array(
+        'round' => ' ; ... )',
+        'ceil' => ' )',
+        'floor' => ' )',
+        'abs' => ' )',
+        'max' => ' ; ... )',
+        'min' => ' ; ... )',
+        'sqrt' => ' )',
+        'strlen' => ' )',
+        'in_array' => ' ; array )',
+        'is_selected' => ' ; value )'
+    );
+
     foreach ($operators as $op => $title) {
-        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
+        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " data-ending="' . esc_attr($ending[$op]) . '" title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
     ?>
 </div>

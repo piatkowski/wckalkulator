@@ -155,7 +155,7 @@
                 }
                 var cursorPos = $focused[0].selectionStart;
                 var x = $focused.val();
-                $focused.val(x.slice(0, cursorPos) + value + x.slice(cursorPos));
+                $focused.val(x.slice(0, cursorPos) + value + ($(this).data("ending") || "") + x.slice(cursorPos));
                 $focused.focus();
                 cursorPos += value.length;
                 $focused[0].setSelectionRange(cursorPos, cursorPos);
