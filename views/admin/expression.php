@@ -197,7 +197,8 @@ use WCKalkulator\Cache;
         'min' => __('min(a; b,...) - minimal value', 'wc-kalkulator'),
         'sqrt' => __('sqrt(x) - square root of x', 'wc-kalkulator'),
         'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator'),
-        'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator')
+        'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator'),
+        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator')
     );
     foreach ($operators as $op => $title) {
         echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';

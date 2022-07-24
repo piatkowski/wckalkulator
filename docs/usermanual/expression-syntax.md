@@ -64,6 +64,7 @@ pow(x; p)        - "x" raised to the power of "p" (x^p)
 sqrt(x)         - square root of "x"
 strlen(x)       - get length of a text; use with text fields
 in_array(v; arr) - true if value "v" in in array "arr"
+is_selected(field; v) - true if value "v" is checked (used for multi checkbox field)
 ```
 
 !!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
