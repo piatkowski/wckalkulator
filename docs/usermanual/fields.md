@@ -180,6 +180,7 @@ This field is required by default.
 ## Checkbox Group (Multi Checkbox)
 
 **Checkbox Group** is used to display a group of checkboxes. It is possible to define selection limit (i.e. customer can choose max 2 options).
+Multi Checkbox can be used in the expression, for example: `is_selected({multi_cb}; 10)` checks if user selected the option with value "10". You can also use built-in variables `{multi_cb:min}` (minimal selected value), `{multi_cb:max}` (maximal selected value), `{multi_cb:sum}` (sum of selected values)
 
 ## Color Swatches
 

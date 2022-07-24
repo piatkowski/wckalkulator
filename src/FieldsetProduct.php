@@ -338,10 +338,8 @@ class FieldsetProduct
         $user_input = array();
         $allowed_names = $this->fields_names();
 
-        if (isset($_POST['wck']) && is_array($_POST['wck'])) {
-
+        //if (isset($_POST['wck']) && is_array($_POST['wck'])) {
             $filtered_post = array();
-
             foreach ($allowed_names as $name) {
                 if (isset($_POST['wck'][$name])) {
                     $filtered_post[$name] = $_POST['wck'][$name];
@@ -354,6 +352,17 @@ class FieldsetProduct
             }
 
             $user_input = Sanitizer::sanitize($filtered_post, 'array');
+        //}
+
+        foreach ($allowed_names as $name) {
+            if (isset($_POST['wck'][$name])) {
+                $filtered_post[$name] = $_POST['wck'][$name];
+            } else {
+                /* Set Default values if the field is not in POST data */
+                if($this->field($name)['type'] === 'checkboxgroup') {
+                    $filtered_post[$name] = array();
+                }
+            }
         }
 
         $user_input['_files'] = array();
