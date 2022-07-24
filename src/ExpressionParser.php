@@ -316,10 +316,16 @@ class ExpressionParser
      */
     private function register_functions()
     {
-        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt', 'strlen');
+        $functions = array('round', 'ceil', 'floor', 'abs', 'max', 'min', 'pow', 'sqrt', 'strlen', 'in_array');
         foreach ($functions as $function) {
             $this->expression->addFunction(ExpressionFunction::fromPhp($function));
         }
+
+        $this->expression->register('is_selected', function ($array, $value) {
+            return sprintf('\WCKalkulator\ExpressionParser::func_is_selected(%1$s, %2$s)', $array, $value);
+        }, function ($arguments, $array, $value) {
+            return \WCKalkulator\ExpressionParser::func_is_selected($array, $value);
+        });
     }
 
     /**
@@ -441,6 +447,29 @@ class ExpressionParser
         } catch (\DivisionByZeroError $e) {
             return $this->calc_error(__("Division by zero.", "wc-kalkulator"));
         }
+    }
+
+    /**
+     * Function for ExpressionLanguage
+     * Checks if value is in array (for multi checkbox field)
+     *
+     * @param $array
+     * @param $value
+     * @return bool
+     * @since 1.4.6
+     */
+    public static function func_is_selected($array, $value)
+    {
+        if (is_array($array)) {
+            $value = floatval($value);
+            foreach ($array as $val) {
+                if (floatval($val) === $value)
+                    return true;
+            }
+        } else {
+            return $array === $value;
+        }
+        return false;
     }
 
 }

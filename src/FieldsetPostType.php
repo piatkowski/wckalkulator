@@ -232,7 +232,7 @@ class FieldsetPostType
                 'position' => 'side'
             ),
             'assignment' => array(
-                'title' => __('Assign to', 'wc-kalkulator'),
+                'title' => __('Assign this fieldset to:', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
             'fields_editor' => array(

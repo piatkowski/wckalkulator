@@ -189,14 +189,16 @@ use WCKalkulator\Cache;
         echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . ' " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
     $operators = array(
-        'round' => __('round(x, p) - round x with the precision of p', 'wc-kalkulator'),
+        'round' => __('round(x; p) - round x with the precision of p', 'wc-kalkulator'),
         'ceil' => __('ceil(x) - round up to the integer number', 'wc-kalkulator'),
         'floor' => __('floor(x) - round down to the integer number', 'wc-kalkulator'),
         'abs' => __('abs(x) - absolute number', 'wc-kalkulator'),
-        'max' => __('max(a,b,...) - maximal value', 'wc-kalkulator'),
-        'min' => __('min(a,b,...) - minimal value', 'wc-kalkulator'),
+        'max' => __('max(a; b,...) - maximal value', 'wc-kalkulator'),
+        'min' => __('min(a; b,...) - minimal value', 'wc-kalkulator'),
         'sqrt' => __('sqrt(x) - square root of x', 'wc-kalkulator'),
-        'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator')
+        'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator'),
+        'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator'),
+        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator')
     );
     foreach ($operators as $op => $title) {
         echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';

@@ -54,15 +54,17 @@ or
 ## Math Functions
 
 ```
-round(x,p)      - round "x" with the precision of "p"
+round(x; p)      - round "x" with the precision of "p"
 ceil(x)         - round up to the integer number
 floor(x)        - round down to the integer number
 abs(x)          - absolute number
-max(a,b,...)    - maximal value
-min(a,b,...)    - minimal value
-pow(x,p)        - "x" raised to the power of "p" (x^p) 
+max(a; b,...)    - maximal value
+min(a; b,...)    - minimal value
+pow(x; p)        - "x" raised to the power of "p" (x^p) 
 sqrt(x)         - square root of "x"
 strlen(x)       - get length of a text; use with text fields
+in_array(v; arr) - true if value "v" in in array "arr"
+is_selected(field; v) - true if value "v" is checked (used for multi checkbox field)
 ```
 
 !!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:

@@ -422,6 +422,7 @@
         $WK.changeAssignType = function () {
             var disabled = $("#assign_type").val() === "1";
             $("#assign_products, #assign_categories, #assign_tags, #assign_attributes").prop("disabled", disabled);
+            $(".hide-if-disabled").toggle(!disabled);
         };
         $("#assign_type").on("change", $WK.changeAssignType);
 
@@ -686,6 +687,9 @@
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
                     $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">"' + field.title + '" value/price {' + field.name + '}' + '</option>');
                 } else {
+                    suggest.push(field.name);
+                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">Array of selected values {' + field.name + '}' + '</option>');
                     suggest.push(field.name + ":sum");
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
                     $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':sum}">Sum of "' + field.title + '" {' + field.name + ':sum}' + '</option>');
