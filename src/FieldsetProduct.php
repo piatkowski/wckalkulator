@@ -633,9 +633,9 @@ class FieldsetProduct
                 break;
             case 'checkboxgroup':
                 $input = array_map('floatval', $input);
-                $this->user_input[$name . ':max'] = max($input);
-                $this->user_input[$name . ':min'] = min($input);
-                $this->user_input[$name . ':sum'] = array_sum($input);
+                $this->user_input[$name . ':max'] = count($input) > 0 ? max($input) : 0;
+                $this->user_input[$name . ':min'] = count($input) > 0 ? min($input) : 0;
+                $this->user_input[$name . ':sum'] = count($input) > 0 ? array_sum($input) : 0;
                 break;
             case 'text':
             case 'textarea':
