@@ -63,6 +63,10 @@ class CheckboxgroupField extends SelectField
      */
     public function validate($value)
     {
+        if (!$this->is_required() && empty($value)) {
+            return true;
+        }
+
         if (is_array($value)) {
 
             if (((int)$this->data('select_limit') > 0 && count($value) > $this->data('select_limit')) || ($this->is_required() && count($value) === 0)) {

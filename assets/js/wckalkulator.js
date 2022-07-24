@@ -9,7 +9,7 @@
 
         if (wck_ajax_object.hasOwnProperty("_wck_visibility_rules") && wck_ajax_object._wck_visibility_rules !== null) {
             $.each(wck_ajax_object._wck_visibility_rules, function (fieldName, options) {
-                $("[name*='wck[" + fieldName + "]']").hide().closest('tr').hide();
+                $("[name*='wck[" + fieldName + "]']").prop("disabled", true).hide().closest('tr').hide();
                 CV[fieldName] = options;
             });
         }
@@ -64,12 +64,12 @@
                     return state !== false;
                 });
                 if (state === true) {
-                    $("[name*='wck[" + fieldName + "]']").show().closest('tr').show();
+                    $("[name*='wck[" + fieldName + "]']").prop("disabled", false).show().closest('tr').show();
                     return false;
                 }
             });
             if (state !== true) {
-                $("[name*='wck[" + fieldName + "]']").hide().closest('tr').hide();
+                $("[name*='wck[" + fieldName + "]']").prop("disabled", true).hide().closest('tr').hide();
                 return false;
             }
         }
