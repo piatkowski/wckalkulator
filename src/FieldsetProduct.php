@@ -322,7 +322,7 @@ class FieldsetProduct
     public function field($name)
     {
         if (array_key_exists($name, $this->fields)) {
-            return $this->fields[$name]->data;
+            return $this->fields[$name]->data();
         }
         return false;
     }
@@ -345,6 +345,11 @@ class FieldsetProduct
             foreach ($allowed_names as $name) {
                 if (isset($_POST['wck'][$name])) {
                     $filtered_post[$name] = $_POST['wck'][$name];
+                } else {
+                    /* Set Default values if the field is not in POST data */
+                    if($this->field($name)['type'] === 'checkboxgroup') {
+                        $filtered_post[$name] = array();
+                    }
                 }
             }
 
@@ -615,7 +620,6 @@ class FieldsetProduct
     public function register_extra_input_parameters($field, $input)
     {
         $name = $field->data("name");
-
         switch ($field->type()) {
             case 'rangedatepicker':
                 $date_from = strtotime($input['from']);
@@ -629,9 +633,9 @@ class FieldsetProduct
                 break;
             case 'checkboxgroup':
                 $input = array_map('floatval', $input);
-                $this->user_input[$name . ':max'] = is_null($input) ? 0 : max($input);
-                $this->user_input[$name . ':min'] = is_null($input) ? 0 : min($input);
-                $this->user_input[$name . ':sum'] = is_null($input) ? 0 : array_sum($input);
+                $this->user_input[$name . ':max'] = max($input);
+                $this->user_input[$name . ':min'] = min($input);
+                $this->user_input[$name . ':sum'] = array_sum($input);
                 break;
             case 'text':
             case 'textarea':

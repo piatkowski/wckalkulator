@@ -103,12 +103,12 @@ or
 You must be careful when decreasing prices, because it may be 0 or negative. To protect this, use ``max()`` function.
 ```
 /* For -10,00 USD + limit min. price to be 0.99 */
-= max( {product_price} - 10.00 * {is_user_logged}, 0.99 )
+= max( {product_price} - 10.00 * {is_user_logged}; 0.99 )
 ```
 or
 ```
 /* For -5% + limit min. price to be 0.99  */
-= max( {product_price} * (1 - 0.05 * {is_user_logged}), 0.99 )
+= max( {product_price} * (1 - 0.05 * {is_user_logged}); 0.99 )
 ```
 
 ---
