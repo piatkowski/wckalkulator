@@ -53,6 +53,10 @@ or
 
 ## Math Functions
 
+!!!warning
+Use semicolon `;` to separate arguments in functions
+!!!
+
 ```
 round(x; p)      - round "x" with the precision of "p"
 ceil(x)         - round up to the integer number

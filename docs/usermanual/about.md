@@ -28,11 +28,11 @@ If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatk
 
 **Minimum tested version, but not recommended**  
 - Wordpress v.5.0
-- Woocommerce v.3.5.0
+- Woocommerce v.3.5
 
 **Maximum tested version**  
-- Wordpress v.6.0.0
-- Woocommerce v.6.6.1
+- Wordpress v.6.0
+- Woocommerce v.6.7
 
 **Recommended version**  
 
