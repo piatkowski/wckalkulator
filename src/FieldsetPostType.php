@@ -39,7 +39,8 @@ class FieldsetPostType
         '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
         '_wck_priority' => 'int',
-        '_wck_stock_reduction_multiplier' => 'text'
+        '_wck_stock_reduction_multiplier' => 'text',
+        '_wck_variation_prices_visible' => 'bool'
     );
 
     /**
@@ -235,6 +236,10 @@ class FieldsetPostType
                 'title' => __('Assign this fieldset to:', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
+            'options' => array(
+                'title' => __('Options', 'wc-kalkulator'),
+                'position' => 'side'
+            ),
             'fields_editor' => array(
                 'title' => __('Product Fields Settings', 'wc-kalkulator'),
                 'position' => 'advanced'
@@ -244,7 +249,11 @@ class FieldsetPostType
                 'position' => 'advanced'
             ),*/
             'expression' => array(
-                'title' => __('Price Calculation & Inventory', 'wc-kalkulator'),
+                'title' => __('Price Calculation', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'inventory' => array(
+                'title' => __('Inventory & Stock Management', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
             'pricefilter' => array(
@@ -279,8 +288,8 @@ class FieldsetPostType
     public static function metabox_order($order)
     {
         return array(
-            'normal' => 'slugdiv,wck_assignment,wck_fields_editor,wck_expression',
-            'side' => 'submitdiv,wck_fields,wck_pricefilter,wck_docs'
+            'normal' => 'slugdiv,wck_assignment,wck_fields_editor,wck_expression,wck_inventory',
+            'side' => 'submitdiv,wck_pricefilter,wck_options,wck_docs'
         );
     }
 

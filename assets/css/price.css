@@ -1,8 +1,3 @@
-p.wckalkulator-price {
-    font-size: 20px;
-    padding-top: 20px
-}
-
 .summary p.price, .summary span.price, .summary .woocommerce-Price-amount, .summary .reset_variations, .woocommerce-variation-price {
     display: none !important;
 }

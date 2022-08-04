@@ -41,7 +41,7 @@ use WCKalkulator\Helper;
             </div>
             <div class="clear"></div>
         <?php endif; ?>
-        <?php if ($view->group !== 'static') : ?>
+        <?php if ($view->group !== 'static' && $view->group !== 'special') : ?>
             <div class="half first">
                 <label>
                     <?php _e('Hint for Customer (tooltip)', 'wc-kalkulator'); ?>
@@ -61,6 +61,7 @@ use WCKalkulator\Helper;
         <?php endif; ?>
         <?php echo wp_kses($view->admin_fields, \WCKalkulator\Sanitizer::allowed_html()); ?>
 
+        <?php if ($view->type !== 'hidden' && $view->group !== 'special') : ?>
         <label>
             <?php _e('Conditional Visibility', 'wc-kalkulator'); ?>
             <?php echo Helper::html_help_tip(__('Set the rules for which this field will be visible.', 'wc-kalkulator')); ?>
@@ -71,5 +72,6 @@ use WCKalkulator\Helper;
             <input type="hidden" class="param f-visibility">
             <input type="hidden" class="param f-visibility-readable">
         </div>
+        <?php endif; ?>
     </div>
 </div>

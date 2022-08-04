@@ -109,7 +109,7 @@
         $WK.shouldHideExprToolbar = false;
         $WK.stateExprToolbar = false;
 
-        $("body").on("focusin", "#wck_expression .input-icon input", function (e) {
+        $("body").on("focusin", "#wck_expression .input-icon input, #wck_inventory .input-icon input, input.expression-editor-enabled", function (e) {
             $WK.expressionLastFocusedInput = $(this);
             $WK.shouldHideExprToolbar = false;
 
@@ -129,7 +129,11 @@
                 $("#wck-expression-toolbar").stop(true, false).fadeIn('fast');
 
             }
-        }).on("focusout", "#wck_expression input", function (e) {
+            $("#wck-parameters .total-price").toggle($(this).hasClass("show-total-price"));
+            if(!$(this).hasClass("show-total-price") && $("#wck-parameters").val() === '{total_price}') {
+                $("#wck-parameters").val("");
+            }
+        }).on("focusout", "#wck_expression input, #wck_inventory input, input.expression-editor-enabled", function (e) {
             $WK.shouldHideExprToolbar = !(e.relatedTarget && $("#wck-expression-toolbar").has(e.relatedTarget).length);
             setTimeout(function () {
                 if ($WK.stateExprToolbar && $WK.shouldHideExprToolbar) {
@@ -613,6 +617,10 @@
                     case 'attachment':
                         field.content = $row.find('.fst-content').val();
                         break;
+                    case 'formula':
+                        field.content = $row.find('.fst-content').val();
+                        field.display_on_user_cart = $row.find('.fst-display-on-user-cart').val() === "on";
+                        break;
                     case 'link':
                         field.content = $row.find('.fst-content').val();
                         field.target = $row.find('.fst-target').val();
@@ -890,7 +898,7 @@
                         ext.forEach(function (e) {
                             $("#" + field_id + " .allowed-extensions.ext-" + e).prop("checked", true);
                         });
-                    } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment'].indexOf(this.type) >= 0) {
+                    } else if (['html', 'paragraph', 'heading', 'hidden', 'link', 'attachment', 'formula'].indexOf(this.type) >= 0) {
                         $("#" + field_id + " .fst-content").val(this.content);
                         if (this.type === 'heading') {
                             $("#" + field_id + " .fst-level").val(this.level);
@@ -901,6 +909,8 @@
                                 //console.log(field_id, attachment.get('url'));
                                 $("#" + field_id + " .wp-media-attachment-preview").attr("href", attachment.get('url')).text(attachment.get('url'));
                             });
+                        } else if (this.type === 'formula') {
+                            $("#" + field_id + " .fst-display-on-user-cart").val(this.display_on_user_cart === "1" ? "on" : "off");
                         }
                     }
                 });

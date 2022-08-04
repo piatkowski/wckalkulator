@@ -453,6 +453,7 @@
   width: 360px;
   vertical-align: middle;
   text-align: justify;
+  z-index: 999999;
 }
 #wck-expression-toolbar, #wck-expression-toolbar * {
   tab-index: 0;

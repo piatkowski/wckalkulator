@@ -28,6 +28,7 @@ abstract class AbstractField
             'picker' => __('Picker Fields', 'wc-kalkulator'),
             'upload' => __('Upload Fields', 'wc-kalkulator'),
             'static' => __('Static Fields', 'wc-kalkulator'),
+            'special' => __('Special Fields', 'wc-kalkulator'),
             'other' => __('Other Fields', 'wc-kalkulator')
         );
         
@@ -113,7 +114,7 @@ abstract class AbstractField
      */
     public function is_required()
     {
-        return $this->group() === 'static' ? false : $this->data["required"];
+        return ($this->group() === 'static' || $this->type() === 'formula') ? false : $this->data["required"];
     }
     
     /**

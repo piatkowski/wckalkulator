@@ -265,6 +265,17 @@ class FieldsetProduct
     }
 
     /**
+     * Get state of variation prices visibility
+     *
+     * @return bool
+     * @since 1.4.7
+     */
+    public function is_variation_prices_visible()
+    {
+        return isset($this->data->variation_prices_visible) && (int)$this->data->variation_prices_visible === 1;
+    }
+
+    /**
      * Get fieldset id
      *
      * @return mixed|null
@@ -292,7 +303,7 @@ class FieldsetProduct
     /**
      * Return HTML string for product page
      *
-     * @param array $html - array with keys 'hidden', 'fields', 'old_html'
+     * @param array $html - array with keys 'hidden', 'fields'
      * @return string|null
      * @since 1.0.0
      */
@@ -339,19 +350,19 @@ class FieldsetProduct
         $allowed_names = $this->fields_names();
 
         //if (isset($_POST['wck']) && is_array($_POST['wck'])) {
-            $filtered_post = array();
-            foreach ($allowed_names as $name) {
-                if (isset($_POST['wck'][$name])) {
-                    $filtered_post[$name] = $_POST['wck'][$name];
-                } else {
-                    /* Set Default values if the field is not in POST data */
-                    if($this->field($name)['type'] === 'checkboxgroup') {
-                        $filtered_post[$name] = array();
-                    }
+        $filtered_post = array();
+        foreach ($allowed_names as $name) {
+            if (isset($_POST['wck'][$name])) {
+                $filtered_post[$name] = $_POST['wck'][$name];
+            } else {
+                /* Set Default values if the field is not in POST data */
+                if ($this->field($name)['type'] === 'checkboxgroup') {
+                    $filtered_post[$name] = array();
                 }
             }
+        }
 
-            $user_input = Sanitizer::sanitize($filtered_post, 'array');
+        $user_input = Sanitizer::sanitize($filtered_post, 'array');
         //}
 
         foreach ($allowed_names as $name) {
@@ -359,7 +370,7 @@ class FieldsetProduct
                 $filtered_post[$name] = $_POST['wck'][$name];
             } else {
                 /* Set Default values if the field is not in POST data */
-                if($this->field($name)['type'] === 'checkboxgroup') {
+                if ($this->field($name)['type'] === 'checkboxgroup') {
                     $filtered_post[$name] = array();
                 }
             }
@@ -709,6 +720,10 @@ class FieldsetProduct
             }
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
+                $result = $parser->execute();
+                if (isset($result['value']) && $result['is_error'] === false) {
+                    $this->user_input['total_price'] = $result['value'] * $this->user_input["quantity"];
+                }
                 return $parser->execute();
             } else {
                 return Ajax::response('error', $parser->error);
@@ -716,6 +731,41 @@ class FieldsetProduct
         } else {
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
+    }
+
+    /**
+     * Calculates the value of formula fields
+     *
+     * @return array
+     * @since 1.4.7
+     */
+    public function calculate_formula_fields()
+    {
+        $result = array();
+        try {
+            foreach ($this->fields() as $field) {
+                if ($field->is_type("formula")) {
+                    $expression = array(
+                        'mode' => 'oneline',
+                        'expr' => $field->data("content")
+                    );
+                    $parser = new ExpressionParser($expression, $this->user_input);
+                    if ($parser->is_ready()) {
+                        $calc = $parser->execute();
+                        $result[$field->data("name")] = array(
+                            'title' => $field->data("title"),
+                            'name' => $field->data("name"),
+                            'value' => $calc['is_error'] === false ? $calc['value'] : ' - error - '
+                        );
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            error_log($e);
+        } catch (\Throwable $e) {
+            error_log($e);
+        }
+        return $result;
     }
 
     /**
@@ -764,6 +814,17 @@ class FieldsetProduct
                 $rules[$field->data('name')] = json_decode(stripslashes($field->data('visibility')), true);
         }
         return $rules;
+    }
+
+    /**
+     * Return user input array
+     *
+     * @return array
+     * @since 1.4.7
+     */
+    public function user_input()
+    {
+        return $this->user_input;
     }
 
     /**

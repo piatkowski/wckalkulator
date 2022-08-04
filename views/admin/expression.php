@@ -75,29 +75,6 @@ use WCKalkulator\Cache;
     </p>
 </div>
 
-<div class="inventory">
-    <p>
-        <label>
-            <strong><?php _e('Inventory - Stock quantity reduction multiplier', 'wc-kalkulator'); ?></strong> <sup
-                    style="color:red">Beta</sup>
-        </label>
-    </p>
-    <p><?php _e('In this section you can define inventory reduction multiplier (formula or number). Reduction will be rouded up to the integer number. For example: stock quantity = 1000. Customer buys 3 pieces and the reduction is set to 10, the stock quantity will be reduced by 30 (3*10)', 'wc-kalkulator'); ?></p>
-    <?php
-    global $post;
-    $reduction_m = get_post_meta($post->ID, '_wck_stock_reduction_multiplier', true);
-    ?>
-    <div class="input-icon input-stock">
-        <input type="text" name="_wck_stock_reduction_multiplier"
-               placeholder="<?php _e('Number or formula (value will be multiplied by quantity)...', 'wc-kalkulator'); ?>"
-               value="<?php echo esc_html($reduction_m); ?>"
-               autocomplete="off"
-               role="presentation"><i></i>
-    </div>
-    <p class="description"><?php _e('You can use fields, operators and functions as above. You can modify stock quantity (i.e. add
-        unit) using filter `woocommerce_format_stock_quantity`.', 'wc-kalkulator'); ?></p>
-</div>
-
 <div id="wck-toolbar">
     <ul>
         <li>
@@ -146,6 +123,7 @@ use WCKalkulator\Cache;
     <select id="wck-parameters">
         <option value="" disabled selected
                 class="first-selected"><?php _e('Choose parameter...', 'wc-kalkulator'); ?></option>
+        <option value="{total_price}" class="total-price">Total Price (calculated by this plugin)</option>
         <optgroup label="Defined Fields" class="defined-fields"></optgroup>
         <optgroup label="Product">
             <option value="{product_price}">Price</option>
