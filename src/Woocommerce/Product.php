@@ -183,9 +183,8 @@ class Product
             $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
 
             $fieldset->init($product_id, $variation_id);
-            $user_input = $fieldset->get_user_input();
-
-            $validation = $fieldset->validate($user_input);
+            $fieldset->get_user_input();
+            $validation = $fieldset->validate();
             if (!$validation) {
                 foreach ($fieldset->validation_notices() as $notice) {
                     wc_add_notice($notice, 'error');
@@ -200,8 +199,10 @@ class Product
                         $validation = false;
                     }
                 } catch (\Exception $e) {
+                    error_log($e);
                     return false;
                 } catch (\Throwable $e) {
+                    error_log($e);
                     return false;
                 }
             }
@@ -247,9 +248,8 @@ class Product
 
             $fieldset = FieldsetProduct::getInstance();
             $fieldset->init($product_id, $variation_id);
-
             $user_input = $fieldset->get_user_input();
-            if (!$fieldset->validate($user_input)) {
+            if (!$fieldset->validate()) {
                 wp_die('Bad request (2)!');
             }
 
@@ -260,9 +260,6 @@ class Product
                     $calc = $fieldset->calculate();
                     if (!$calc['is_error']) {
                         $cart_item_data['wckalkulator_price'] = $calc['value'];
-                        $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
-                        $cart_item_data['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
-
                         $success = true;
                     } else {
                         wp_die('Bad request (3)!');
@@ -297,9 +294,12 @@ class Product
                 $cart_item_data['wckalkulator_fields'] = $user_input;
                 $cart_item_data['wckalkulator_fieldset_version_hash'] = $fieldset->version_hash();
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
+                $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
+                $cart_item_data['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
             }
 
         }
+
         return $cart_item_data;
     }
 

@@ -112,9 +112,9 @@ class Ajax
 
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
-        $user_input = $fieldset->get_user_input();
+        $fieldset->get_user_input();
 
-        if (!$fieldset->validate($user_input, true) || !is_array($user_input)) {
+        if (!$fieldset->validate(true)) {
             Helper::message_for_manager("Data is invalid");
             wp_die("");
         }

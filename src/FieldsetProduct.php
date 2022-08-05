@@ -414,7 +414,7 @@ class FieldsetProduct
 
         $this->user_input = $user_input;
 
-        return $user_input;
+        return $this->user_input;
     }
 
     /**
@@ -438,14 +438,13 @@ class FieldsetProduct
     /**
      * Validate user input
      *
-     * @param array $input
      * @param bool $is_ajax_cart
      * @return bool
      * @since 1.0.0
      */
-    public function validate($input, $is_ajax_cart = false)
+    public function validate($is_ajax_cart = false)
     {
-        $this->user_input = $input;
+        //$this->user_input = $input;
 
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
@@ -458,11 +457,7 @@ class FieldsetProduct
             return false;
         }
 
-        $this->add_static_prices($input);
-
-        foreach (GlobalParameter::get_all() as $name => $value) {
-            $this->user_input['global:' . $name] = $value;
-        }
+        $this->set_additional_input_variables();
 
         return $this->is_valid;
     }
@@ -600,7 +595,7 @@ class FieldsetProduct
      * @return void
      * @since 1.2.0
      */
-    public function add_static_prices($input)
+    public function set_additional_input_variables()
     {
         if (!is_array($this->user_input)) {
             return;
@@ -624,9 +619,34 @@ class FieldsetProduct
                 $this->user_input[$name] = $static_price;
             }
 
-            if ($field->group() !== 'static' && isset($input[$name])) {
-                $this->register_extra_input_parameters($field, $input[$name]);
+            if ($field->group() !== 'static' && isset($this->user_input[$name])) {
+                $this->set_additional_field_parameters($field, $this->user_input[$name]);
             }
+        }
+
+        if ($this->product_id > 0) {
+            $product_helper = new ProductHelper($this->product_id, $this->variation_id);
+            if ($product_helper->is_valid()) {
+                $this->user_input["product_price"] = $product_helper->price();
+                $this->user_input["product_weight"] = $product_helper->get_weight();
+                $this->user_input["product_width"] = $product_helper->get_width();
+                $this->user_input["product_height"] = $product_helper->get_height();
+                $this->user_input["product_length"] = $product_helper->get_length();
+                $this->user_input["product_regular_price"] = $product_helper->regular_price();
+            }
+        }
+
+        $this->user_input["is_user_logged"] = (int)is_user_logged_in();
+        $this->user_input["current_month"] = absint(current_time("n"));
+        $this->user_input["day_of_month"] = absint(current_time("j"));
+        $this->user_input["day_of_week"] = absint(current_time("w"));
+        $this->user_input["current_hour"] = absint(current_time("G"));
+        if (isset($_POST["quantity"])) {
+            $this->user_input["quantity"] = absint($_POST["quantity"]);
+        }
+        
+        foreach (GlobalParameter::get_all() as $name => $value) {
+            $this->user_input['global:' . $name] = $value;
         }
     }
 
@@ -637,7 +657,7 @@ class FieldsetProduct
      * @param $input
      * @since 1.2.0
      */
-    public function register_extra_input_parameters($field, $input)
+    public function set_additional_field_parameters($field, $input)
     {
         $name = $field->data("name");
         switch ($field->type()) {
@@ -700,21 +720,7 @@ class FieldsetProduct
         if ($this->is_valid) {
             if ($this->product_id > 0) {
                 $product_helper = new ProductHelper($this->product_id, $this->variation_id);
-
-                if ($product_helper->is_valid() && isset($_POST["quantity"])) {
-                    $this->user_input["product_price"] = $product_helper->price();
-                    $this->user_input["product_weight"] = $product_helper->get_weight();
-                    $this->user_input["product_width"] = $product_helper->get_width();
-                    $this->user_input["product_height"] = $product_helper->get_height();
-                    $this->user_input["product_length"] = $product_helper->get_length();
-                    $this->user_input["product_regular_price"] = $product_helper->regular_price();
-                    $this->user_input["is_user_logged"] = (int)is_user_logged_in();
-                    $this->user_input["current_month"] = absint(current_time("n"));
-                    $this->user_input["day_of_month"] = absint(current_time("j"));
-                    $this->user_input["day_of_week"] = absint(current_time("w"));
-                    $this->user_input["current_hour"] = absint(current_time("G"));
-                    $this->user_input["quantity"] = absint($_POST["quantity"]);
-                } else {
+                if (!$product_helper->is_valid()) {
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
                 }
             }
@@ -776,7 +782,7 @@ class FieldsetProduct
      */
     public function stock_reduction_multiplier()
     {
-        if ($this->is_valid && $this->product_id > 0) {
+        if ($this->product_id > 0) {
             try {
                 $parser = new ExpressionParser(array(
                     'mode' => 'oneline',
