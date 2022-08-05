@@ -493,12 +493,28 @@
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
                     "css_class": input_css_class.val(),
-                    "required": (($row.find('select.f-required').length > 0) ? $row.find('select.f-required').val() === "on" : true),
+                    //"required": (($row.find('select.f-required').length > 0) ? $row.find('select.f-required').val() === "on" : true),
                     "layout": $WK.fieldsLayout,
                     "colspan": $row.find('input.f-colspan').val(),
                     "visibility": $row.find('input.f-visibility').val(),
                     "visibility_readable": $row.find('input.f-visibility-readable').val()
                 };
+
+                if ($row.find('select.f-required').length > 0) {
+                    switch($row.find('select.f-required').val()) {
+                        case "on":
+                            field.required = "1"; //true
+                            break;
+                        case "if-visible":
+                            field.required = "2"; //if visible
+                            break;
+                        case "off":
+                            field.required = "0"; //false
+                            break;
+                    }
+                } else {
+                    field.required = "1"; //true
+                }
 
                 var input_fprice = $row.find('input.f-price');
                 if (input_fprice.length > 0) {
@@ -766,7 +782,7 @@
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
                     if ($("#" + field_id + " .f-required").length > 0) {
-                        $("#" + field_id + " .f-required").val(this.required === "1" ? "on" : "off");
+                        $("#" + field_id + " .f-required").val(this.required === "1" ? "on" : (this.required === "2" ? "if-visible" : "off"));
                     }
 
                     if (this.hasOwnProperty("visibility")) {

@@ -823,17 +823,6 @@ class FieldsetProduct
     }
 
     /**
-     * Return user input array
-     *
-     * @return array
-     * @since 1.4.7
-     */
-    public function user_input()
-    {
-        return $this->user_input;
-    }
-
-    /**
      * Cannot clone singleton
      *
      * @since 1.1.0

@@ -69,8 +69,9 @@ abstract class AbstractField
             'name' => "wck[" . $this->data("name") . "]",
             'id' => 'wck_' . $this->data("name"),
             'css_class' => $this->data("css_class"),
-            'required' => $this->is_required() ? ' required' : '',
-            'is_required' => $this->is_required() ? '1' : '0'
+            'required' => ($this->is_required() || $this->is_required_when_visible() ? ' required' : ''),
+            'is_required' => $this->is_required() ? '1' : '0',
+            'show_required_asterisk' => $this->is_required() || $this->is_required_when_visible()
         );
     }
     
@@ -108,13 +109,21 @@ abstract class AbstractField
             return '<span class="dashicons dashicons-editor-help wck-field-tip" title="' . esc_html($this->data("hint")) . '"></span>';
         return '';
     }
-    
+
     /**
      * @return mixed
      */
     public function is_required()
     {
-        return ($this->group() === 'static' || $this->type() === 'formula') ? false : $this->data["required"];
+        return !($this->group() === 'static' || $this->type() === 'formula') && $this->data["required"] === '1';
+    }
+
+    /**
+     * @return mixed
+     */
+    public function is_required_when_visible()
+    {
+        return $this->data["required"] === '2';
     }
     
     /**
