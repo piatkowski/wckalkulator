@@ -233,6 +233,10 @@ Customer files will be deleted after 360 days (default option), but you can set 
 You can use ``file size [MB]`` parameter in formulas.
 !!!
 
+## Special: Formula Value
+
+This field is not showed on the product page. You can write your own formula and save the value in order item meta data. Value of the field may be displayed on user's cart. Hint: you can use ``{total_price}`` in your formula to get total product price calculated by WCK plugin.
+
 !!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 

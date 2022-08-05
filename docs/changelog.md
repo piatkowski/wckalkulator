@@ -5,6 +5,24 @@ icon: git-branch
 ---
 
 # CHANGELOG
+2022-08-05
+v.1.4.7
+- fieldset's options (toggle default price blocks)
+- new field: formula value
+- bug fixes
+
+2022-07-23
+v.1.4.6
+- added is_selected() function
+- bug fixes in multi checkbox
+
+2022-07-23
+v.1.4.5
+- conditional visibility support for multi checkbox
+
+2022-07-23
+v.1.4.4
+- bug fixes
 
 2022-07-22
 v.1.4.3
