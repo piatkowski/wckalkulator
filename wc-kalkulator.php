@@ -3,7 +3,7 @@
 /**
  * Plugin Name: WC Kalkulator
  * Description: Description: Store Manager can add fieldsets to Products and Orders. WC Kalkulator allows to order and calculate the price of the product based on the values of the fields selected by the Customer.
- * Version: 1.4.6
+ * Version: 1.5.0
  * Author: Krzysztof Piątkowski
  * Author URI: https://wckalkulator.com
  * Text Domain: wc-kalkulator
@@ -15,6 +15,7 @@
 
 namespace WCKalkulator;
 
+use WCKalkulator\Woocommerce\Attribute;
 use WCKalkulator\Woocommerce\Product;
 
 if (!defined('ABSPATH')) {
@@ -31,7 +32,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
      */
     class Plugin
     {
-        const VERSION = "1.4.6";
+        const VERSION = "1.5.0";
 
         const NAME = "wc-kalkulator";
 
@@ -72,12 +73,13 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\HtmlField::class,
             Fields\HeadingField::class,
             Fields\ParagraphField::class,
-            Fields\HiddenField::class,
+            Fields\FormulaField::class,
             Fields\LinkField::class,
             Fields\AttachmentField::class,
             Fields\ImageswatchesField::class,
             Fields\ColorswatchesField::class,
-            Fields\EmptyField::class
+            Fields\EmptyField::class,
+            Fields\HiddenField::class
         );
 
         /**
@@ -100,8 +102,11 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Settings::init();
             AdminNotice::init();
             Cron::init();
+            Attribute::init();
 
             add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
+            add_action('admin_footer', array(__CLASS__, 'admin_footer'));
+            add_action('current_screen', array(__CLASS__, 'current_screen'));
         }
 
         /**
@@ -115,6 +120,62 @@ if (!class_exists('WCKalkulator\Plugin')) {
                 false,
                 dirname(plugin_basename(__FILE__)) . '/languages'
             );
+        }
+
+        /**
+         * Enqueue scripts
+         *
+         * @return void
+         * @since 1.5.0
+         */
+        public static function admin_footer()
+        {
+            $screen = get_current_screen();
+
+            if ($screen->base === 'plugins') {
+                wp_enqueue_script(
+                    'wck-deactivation-script',
+                    Plugin::url() . '/assets/js/deactivation.min.js',
+                    array(),
+                    Plugin::VERSION
+                );
+            }
+        }
+
+        /**
+         * Adds actions and filters on admin screens
+         *
+         * @param $screen
+         * @return void
+         * @since 1.5.0
+         */
+        public static function current_screen($screen)
+        {
+            $pages = array(
+                'product_page_wck_settings'
+            );
+            $post_types = array(
+                FieldsetPostType::POST_TYPE,
+                GlobalParametersPostType::POST_TYPE
+            );
+            if (isset($screen->post_type) && in_array($screen->post_type, $post_types) || in_array($screen->base, $pages)) {
+                add_action('in_admin_header', array(__CLASS__, 'in_admin_header'));
+                wp_register_style('wckalkulator_admin_nav_css', Plugin::url() . '/assets/css/admin.nav.min.css');
+                wp_enqueue_style('wckalkulator_admin_nav_css');
+            }
+        }
+
+        /**
+         * Renders admin naviation toolbar
+         *
+         * @return void
+         * @since 1.5.0
+         */
+        public static function in_admin_header()
+        {
+            echo View::render('admin/navigation', array(
+                'items' => apply_filters('wck_admin_navigation', array())
+            ));
         }
 
         /**

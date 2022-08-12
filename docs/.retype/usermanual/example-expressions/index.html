@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.711998754141">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="2.3.0.713601965991">
 
     <!-- See retype.com -->
     <meta name="generator" content="Retype 2.3.0">
@@ -30,11 +30,11 @@
 
     <script>(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
-    <link href="../../resources/css/retype.css?v=2.3.0.711998754141" rel="stylesheet" />
+    <link href="../../resources/css/retype.css?v=2.3.0.713601965991" rel="stylesheet" />
 
-    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.711998754141" data-turbo-eval="false" defer></script>
+    <script type="text/javascript" src="../../resources/js/config.js?v=2.3.0.713601965991" data-turbo-eval="false" defer></script>
     <script type="text/javascript" src="../../resources/js/retype.js?v=2.3.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.711998754141" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" type="text/javascript" src="../../resources/js/lunr.js?v=2.3.0.713601965991" data-turbo-eval="false" defer></script>
 </head>
 <body>
     <div id="docs-app" class="relative text-base antialiased text-gray-700 bg-white font-body dark:bg-dark-850 dark:text-dark-300">
@@ -51,7 +51,7 @@
                     <div class="flex items-center px-2 md:px-6">
                         <a id="docs-site-logo" href="../../" class="flex items-center leading-snug text-xl">
                             <span class="dark:text-white font-semibold line-clamp-1 md:line-clamp-2">WC Kalkulator</span>
-                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO 1.4</span>
+                        </a><span class="hidden px-2 py-1 ml-4 text-sm font-semibold leading-none text-root-logo-label-text bg-root-logo-label-bg rounded-sm md:inline-block">PRO 1.5</span>
                     </div>
         
                     <span class="hidden h-8 border-r md:inline-block dark:border-dark-650"></span>
@@ -375,6 +375,25 @@ So the result formula will be:</p>
 = max( {product_price} * (1 - 0.05 * {is_user_logged}); 0.99 )</code></pre>
 </doc-codeblock></div>
 <hr />
+<doc-anchor-target id="5-how-to-use-multicheckbox-and-conditional-number-fields-">
+    <h3>
+        <doc-anchor-trigger class="header-anchor-trigger" to="#5-how-to-use-multicheckbox-and-conditional-number-fields-">#</doc-anchor-trigger>
+        <span>5. How to use multicheckbox and conditional number fields ?</span>
+    </h3>
+</doc-anchor-target>
+<p>In this example we define multicheckbox field named <code v-pre>{multi_cb}</code> and three number fields <code v-pre>{num_a}, {num_b}, {num_c}</code>.</p>
+<p>Multicheckbox <code v-pre>{multi_cb}</code> has three options:</p>
+<ul>
+<li>value: 1, option title: Option A</li>
+<li>value: 2, option title: Option B</li>
+<li>value: 3, option title: Option C</li>
+</ul>
+<p>Each of number fields <code v-pre>{num_a}, {num_b}, {num_c}</code> are visible for one of three <code v-pre>{multi_cb}</code> options. So, we need to define visibility rules. For example field <code v-pre>{num_a}</code> has rule <code v-pre>{multi_cb} == 1</code>, which means that this field will be visible if user checked &quot;Option A&quot;.</p>
+<p>Next, we need to go to &quot;Price Add-ons&quot; to set formulas. To check if user has selected certain option we use <code v-pre>is_selected()</code> function. This is example how to calculate price based on selected option and number field value:</p>
+<p><code v-pre>if is_selected( {multi_cb}; 1 )</code> <code v-pre>add {num_a} * 100</code></p>
+<p><code v-pre>if is_selected( {multi_cb}; 2 )</code> <code v-pre>add {num_b} * 250</code></p>
+<p><code v-pre>if is_selected( {multi_cb}; 3 )</code> <code v-pre>add {num_c} * 500</code></p>
+<img src="../../images/example-multi-checkbox-and-visibility.png" style="display:block; margin: 0 auto; max-width:500px" alt="" />
 
                                 
                                 <!-- Required only on API pages -->

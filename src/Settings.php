@@ -63,6 +63,24 @@ class Settings
                 'default' => 'no'
             )
         );
+        add_filter('wck_admin_navigation', array(__CLASS__, 'wck_admin_navigation'));
+    }
+
+    /**
+     * Add admin navigation item
+     *
+     * @param $items
+     * @return mixed
+     * @since 1.5.0
+     */
+    public static function wck_admin_navigation($items)
+    {
+        $items[] = array(
+            'label' => __('Settings', 'wc-kalkulator'),
+            'url' => 'edit.php?post_type=product&page=wck_settings',
+            'slug' => 'wck_settings'
+        );
+        return $items;
     }
 
     /**
@@ -113,9 +131,9 @@ class Settings
     public static function add_menu_page()
     {
         add_submenu_page(
-            'edit.php?post_type=product',
+            '',//'edit.php?post_type=product',
             'Settings',
-            'WCK Settings',
+            'Settings',
             'manage_options',
             self::PAGE,
             array(__CLASS__, 'html_page')

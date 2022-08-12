@@ -11,7 +11,8 @@ use WCKalkulator\Helper;
 </label>
 <select class="param f-required">
     <option value="off"><?php _e('No'); ?></option>
-    <option value="on"><?php _e('Yes'); ?></option>
+    <option value="on"><?php _e('Always require'); ?></option>
+    <option value="if-visible"><?php _e('Only if visible'); ?></option>
 </select>
 <label><?php _e('Price', 'wc-kalkulator'); ?>
     <?php echo Helper::html_help_tip(__('The price value to use in a expression/formula. If the user does not fill in the field, the price is 0.', 'wc-kalkulator')); ?></label>

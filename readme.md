@@ -1,13 +1,13 @@
-=== Product Fields and Price Calculator for WooCommerce ===
+=== Product Fields, Addons and Price Calculator for WooCommerce ===
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.4.6
+Stable tag: 1.5.0
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
 
-WooCommerce extra product fields and price calculator (formula). Absolutely FREE - 22 different field types on your product and order page.
+WooCommerce product fields, product addons and formula price calculator. Absolutely FREE - 23 different field types on your product and order page.
 
 == Description ==
 
@@ -15,8 +15,8 @@ WooCommerce extra product fields and price calculator (formula). Absolutely FREE
 Extra product fields can be used to calculate product price and save information in order details. 
 
 *	Absolutely **FREE plugin** with **PRO features**
-*	**22 field types** to get customer input
-*	Price calculation based on **formula**, **conditional expression** or **price add-ons**.
+*	**23 field types** to get customer input
+*	Price calculation based on **formula**, **conditional expression** or **price add-ons** (product addons).
 
 If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
 
@@ -51,6 +51,7 @@ Sell products by anything. You are not limited to sell only by length, area, vol
     20. Textarea
     21. Text input
     22. Image upload
+    23. Formula Value
 = =
 
 [youtube https://www.youtube.com/watch?v=Jrc1dXof_pw]
@@ -61,7 +62,7 @@ Sell products by anything. You are not limited to sell only by length, area, vol
 
 - **Fieldset** - store manager can create the fieldset (set of custom product fields) which consists of different **Fields**. Fieldset must have at least one **Field** and the expression (formula) to calculate the product price
 
-- **Expression/Formula** - mathematical and/or logical expression using to calculate the woocommerce custom price. The expression can be single-line (one-line) or conditional. **Expression** is protected and calculated only server-side.
+- **Expression/Formula** - mathematical and/or logical expression using to calculate the woocommerce custom price. The expression can be single-line, conditional price addons (product addons). **Expression** is protected and calculated only server-side.
 
 - **Validation** - each **Field** has specific requirements to be met. Incorrect values make it impossible to calculate the woocommerce custom price and add the product to the cart.
 
@@ -70,10 +71,11 @@ Sell products by anything. You are not limited to sell only by length, area, vol
 ### Formula/Expression Builder
 
 Use field's values as variables to calculate product price. Drag&drop conditional statements.
+You can use product addons to add extra price to the product regular price.
 
 ### Price Add-Ons
 
-Use custom fields to make Product Add-Ons. This feature is experimental and will be continued in the next releases.
+Use custom fields to make Product Addons.
 
 ### Display Fields
 
@@ -104,18 +106,24 @@ You can define numeric variable across all fieldsets. You can modify all prices 
 
 The customer can edit product options after adding to cart.
 
+### Integration with ACF
+
+You can use `acf('field_name')` function to get ACF field value in custom price formula.
+
 ## Compatibility
 
-*	multisite mode is supported
-*	product shortcodes
-*	translation
-*	virtual and variable products are supported
-*	product regular and sale prices are supported
-*	product tags
+* multisite mode is supported
+* product shortcodes
+* translation
+* virtual and variable products are supported
+* product regular and sale prices are supported
+* product tags and attributes
+* use product attributes in formulas
+* ACF supported
 
 ## More Features
 
-*   define unlimited fieldsets with unlimited fields
+*    define unlimited fieldsets with unlimited fields
 *    fields are displayed in product page, cart and order details,
 *    **expression builder**
 *    define single-line expression to calculate the price
@@ -141,6 +149,16 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-08-11 v.1.5.0
+- fieldset's options (toggle default price blocks)
+- new field: formula value
+- make fields required: always/only if visible/not required
+- if the field is hidden, default value will be 0
+- you can assign numeric value to the WC Product Attributes and use it in a formula
+- added ACF integration. You can use ACF field value in a formula
+- you can use custom JavaScript code
+- bug fixes
+
 2022-07-23 v.1.4.6
 - added is_selected() function
 - bug fixes in multi checkbox

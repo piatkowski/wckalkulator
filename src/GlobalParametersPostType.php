@@ -39,6 +39,24 @@ class GlobalParametersPostType
         add_action('load-edit.php', function () {
             add_filter('views_edit-' . self::POST_TYPE, array(__CLASS__, 'help'));
         });
+        add_filter('wck_admin_navigation', array(__CLASS__, 'wck_admin_navigation'));
+    }
+
+    /**
+     * Add admin navigation item
+     *
+     * @param $items
+     * @return mixed
+     * @since 1.5.0
+     */
+    public static function wck_admin_navigation($items)
+    {
+        $items[] = array(
+            'label' => __('Global Parameters', 'wc-kalkulator'),
+            'url' => 'edit.php?post_type=wck_global_parameter',
+            'slug' => 'wck_global_parameter'
+        );
+        return $items;
     }
 
     /**
@@ -55,10 +73,10 @@ class GlobalParametersPostType
         register_post_type(self::POST_TYPE,
             array(
                 'labels' => array(
-                    'name' => __('WCK Global Parameters', 'wc-kalkulator'),
+                    'name' => __('Global Parameters', 'wc-kalkulator'),
                     'singular_name' => __('Parameter', 'wc-kalkulator'),
                     'menu_name' => __('Parameter', 'wc-kalkulator'),
-                    'all_items' => __('WCK Global Params', 'wc-kalkulator'),
+                    'all_items' => __('Global Params', 'wc-kalkulator'),
                     'view_item' => __('View Parameter', 'wc-kalkulator'),
                     'add_new_item' => __('Add new Parameter', 'wc-kalkulator'),
                     'add_new' => __('Add new', 'wc-kalkulator'),
@@ -68,7 +86,7 @@ class GlobalParametersPostType
                     'not_found' => __('Parameter not found', 'wc-kalkulator'),
                     'not_found_in_trash' => __('There is no Parameter in the trash', 'wc-kalkulator')
                 ),
-                'description' => __('Global Parameters for WCK Fieldset', 'wc-kalkulator'),
+                'description' => __('Global Parameters for Fieldsets', 'wc-kalkulator'),
                 'public' => false,
                 'hierarchical' => false,
                 'show_ui' => true,
@@ -80,7 +98,7 @@ class GlobalParametersPostType
                 'exclude_from_search' => true,
                 'query_var' => true,
                 'show_in_nav_menus' => false,
-                'show_in_menu' => 'edit.php?post_type=product',
+                'show_in_menu' => false,
                 'delete_with_user' => false,
                 'supports' => array('title'),
                 'register_meta_box_cb' => array(__CLASS__, 'meta_boxes')

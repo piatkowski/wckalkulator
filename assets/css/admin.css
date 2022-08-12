@@ -19,6 +19,9 @@
 .wc-kalkulator-wrapper a.button.action-add-attachment {
   margin-bottom: 10px;
 }
+.wc-kalkulator-wrapper .lh-5 {
+  line-height: 5;
+}
 .wc-kalkulator-wrapper ul#f-field-list {
   width: 100%;
 }
@@ -453,6 +456,7 @@
   width: 360px;
   vertical-align: middle;
   text-align: justify;
+  z-index: 999999;
 }
 #wck-expression-toolbar, #wck-expression-toolbar * {
   tab-index: 0;

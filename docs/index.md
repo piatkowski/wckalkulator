@@ -11,7 +11,7 @@ WC Kalkulator (WCK) is a WordPress plugin which extends the WooCommerce to use c
 Extra product fields can be used to calculate product price and save information in order details.
 
 * Absolutely FREE plugin with PRO features
-* 22 field types to get customer input
+* 23 field types to get customer input
 * Price calculation based on formula, conditional expression or price add-ons.
 
 
@@ -61,6 +61,7 @@ If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatk
     20. Textarea
     21. Text input
     22. Image upload
+    23. Formula Value
 
 ## Definitions
 
@@ -111,14 +112,20 @@ You can define numeric variable across all fieldsets. You can modify all prices 
 
 The customer can edit product options after adding to cart.
 
+### Integration with ACF
+
+You can use `acf('field_name')` function to get ACF field value in custom price formula.
+
 ## Compatibility
 
-*	multisite mode is supported
-*	product shortcodes
-*	translation
-*	virtual and variable products are supported
-*	product regular and sale prices are supported
-*	product tags
+* multisite mode is supported
+* product shortcodes
+* translation
+* virtual and variable products are supported
+* product regular and sale prices are supported
+* product tags and attributes
+* use product attributes in formulas
+* ACF supported
 
 ## More Features
 

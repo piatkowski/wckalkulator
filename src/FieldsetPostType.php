@@ -39,7 +39,9 @@ class FieldsetPostType
         '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
         '_wck_priority' => 'int',
-        '_wck_stock_reduction_multiplier' => 'text'
+        '_wck_stock_reduction_multiplier' => 'text',
+        '_wck_variation_prices_visible' => 'bool',
+        '_wck_javascript' => 'textarea'
     );
 
     /**
@@ -66,6 +68,24 @@ class FieldsetPostType
         add_action('admin_action_wck_duplicate_post', array(__CLASS__, 'duplicate_post'));
         add_filter('admin_body_class', array(__CLASS__, 'add_css_class_to_body'));
         add_action('manage_edit-' . self::POST_TYPE . '_sortable_columns', array(__CLASS__, 'add_sortable_columns'));
+        add_filter('wck_admin_navigation', array(__CLASS__, 'wck_admin_navigation'));
+    }
+
+    /**
+     * Add admin navigation item
+     *
+     * @param $items
+     * @return mixed
+     * @since 1.5.0
+     */
+    public static function wck_admin_navigation($items)
+    {
+        $items[] = array(
+            'label' => __('Fieldsets', 'wc-kalkulator'),
+            'url' => 'edit.php?post_type=wck_fieldset',
+            'slug' => 'wck_fieldset'
+        );
+        return $items;
     }
 
     /**
@@ -94,7 +114,7 @@ class FieldsetPostType
         register_post_type(self::POST_TYPE,
             array(
                 'labels' => array(
-                    'name' => __('WCK Fieldsets', 'wc-kalkulator'),
+                    'name' => __('Fieldsets', 'wc-kalkulator'),
                     'singular_name' => __('Fieldset', 'wc-kalkulator'),
                     'menu_name' => __('Fieldset', 'wc-kalkulator'),
                     'all_items' => __('WCK Fieldsets', 'wc-kalkulator'),
@@ -235,6 +255,10 @@ class FieldsetPostType
                 'title' => __('Assign this fieldset to:', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
+            'options' => array(
+                'title' => __('Options', 'wc-kalkulator'),
+                'position' => 'side'
+            ),
             'fields_editor' => array(
                 'title' => __('Product Fields Settings', 'wc-kalkulator'),
                 'position' => 'advanced'
@@ -244,7 +268,15 @@ class FieldsetPostType
                 'position' => 'advanced'
             ),*/
             'expression' => array(
-                'title' => __('Price Calculation & Inventory', 'wc-kalkulator'),
+                'title' => __('Price Calculation', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'inventory' => array(
+                'title' => __('Inventory & Stock Management', 'wc-kalkulator'),
+                'position' => 'advanced'
+            ),
+            'javascript' => array(
+                'title' => __('Custom JavaScript', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
             'pricefilter' => array(
@@ -279,8 +311,8 @@ class FieldsetPostType
     public static function metabox_order($order)
     {
         return array(
-            'normal' => 'slugdiv,wck_assignment,wck_fields_editor,wck_expression',
-            'side' => 'submitdiv,wck_fields,wck_pricefilter,wck_docs'
+            'normal' => 'slugdiv,wck_assignment,wck_fields_editor,wck_expression,wck_inventory',
+            'side' => 'submitdiv,wck_pricefilter,wck_options,wck_docs'
         );
     }
 
@@ -305,7 +337,8 @@ class FieldsetPostType
                 '_wck_assign_products',
                 '_wck_assign_categories',
                 '_wck_assign_tags',
-                '_wck_assign_attributes'
+                '_wck_assign_attributes',
+                '_wck_javascript'
             );
 
             /**
@@ -390,13 +423,15 @@ class FieldsetPostType
                 array('jquery'),
                 Plugin::VERSION
             );
-            wp_localize_script(
+
+            wp_add_inline_script(
                 'wck-fieldset-post-type-script',
-                'wck_ajax_fieldset',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE)
-                )
+                'var wck_ajax_fieldset = ' . wp_json_encode(
+                    array(
+                        'ajax_url' => admin_url('admin-ajax.php'),
+                        '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE)
+                    )
+                ) . ';'
             );
         }
     }
@@ -447,21 +482,21 @@ class FieldsetPostType
         self::cache_fields_data();
 
         /**
-         * This wp_localize_script must be used after self::cache_fields_data()
+         * This wp_add_inline_script must be used after self::cache_fields_data()
          */
-        wp_localize_script(
+        wp_add_inline_script(
             'wck-fieldset-script',
-            'wck_fields_html',
-            Cache::get_once('FieldsetPostType_fields_html')
+            'var wck_fields_html = ' . wp_json_encode(
+                Cache::get_once('FieldsetPostType_fields_html')
+            ) . ';'
         );
 
         /**
          * Add global parameters for auto-suggestion feature
          */
-        wp_localize_script(
+        wp_add_inline_script(
             'wck-fieldset-script',
-            'wck_global_parameters',
-            GlobalParameter::get_all()
+            'var wck_global_parameters = ' . wp_json_encode(GlobalParameter::get_all()) . ';'
         );
 
         $constants = array(
@@ -472,14 +507,29 @@ class FieldsetPostType
             $meta = get_post_meta($post->ID, $key, true);
 
             if (is_array($meta)) {
-                wp_localize_script(
+                wp_add_inline_script(
                     'wck-fieldset-script',
-                    $const,
-                    self::decode_array($meta)
+                    'var ' . $const . ' = ' . wp_json_encode(self::decode_array($meta)) . ';'
                 );
             }
         }
 
+        wp_enqueue_code_editor(
+            array(
+                'type' => 'text/javascript',
+                'lint' => true
+            )
+        );
+        wp_add_inline_script(
+            'code-editor',
+            'jQuery( function() { wp.CodeMirror.fromTextArea( document.getElementById("wck_js_editor"), wp.codeEditor.defaultSettings.codemirror ); jsInit(); } );'
+        );
+        wp_enqueue_script(
+            'code-editor-js',
+            Plugin::url() . '/assets/js/javascript.cm.min.js',
+            array('jquery', 'code-editor'),
+            Plugin::VERSION
+        );
     }
 
     /**

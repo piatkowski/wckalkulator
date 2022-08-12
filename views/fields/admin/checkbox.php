@@ -19,7 +19,8 @@ use WCKalkulator\Helper;
     </label>
     <select class="param f-required">
         <option value="off"><?php _e('No'); ?></option>
-        <option value="on"><?php _e('Yes'); ?></option>
+        <option value="on"><?php _e('Always require'); ?></option>
+        <option value="if-visible"><?php _e('Only if visible'); ?></option>
     </select>
 </div>
 <div class="clear"></div>

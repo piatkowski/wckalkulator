@@ -28,3 +28,7 @@ This plugin is absolutely FREE with PRO features. It will always be free, so ple
 [!embed](https://youtu.be/MFmxifI4tW4)
 ### 9. How to use arrays and json objects in Global Parameters ?
 [!embed](https://youtu.be/qFA-4TJ6gvs)
+### 10. Stock Management (Reduction Multiplier)
+[!embed](https://youtu.be/5wCkgBbynCI)
+### 11. Layouts, two-column layout
+[!embed](https://youtu.be/b2iNp1lHxK0)

@@ -111,8 +111,11 @@
         function calculatePrice() {
             if (shouldCalculatePrice) {
                 var data = $(_form).serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + wck_ajax_object._wck_ajax_nonce;
-                $.each($(_form + " input[type=file].wck_imageupload"), function () {
+                $.each($(_form + " input[type=file].wck_imageupload:enabled"), function () {
                     data += "&" + $(this).attr("name") + "=" + (($(this)[0].files.length === 1) ? $(this)[0].files[0].size : 0);
+                });
+                $("form.cart [name^=wck]:disabled").each(function(){
+                    data += "&" + $(this).attr("name") + "=0";
                 });
                 $.post(wck_ajax_object.ajax_url, data, function (response) {
                     if (response) {
@@ -184,10 +187,19 @@
                 }
                 lastGroup = group;
             });
+            $("form.cart [name^=wck]:disabled").each(function(){
+                var input = $("<input>").attr("type", "hidden").attr("name", $(this).attr("name")).val("");
+                $(_form).append($(input));
+            });
         });
 
     });
+
 })(jQuery);
+
+var wck = function(fieldName) {
+    return jQuery("[name*='wck[" + fieldName + "]']");
+}
 
 /*
 https://github.com/bugwheels94/math-expression-evaluator/

@@ -2,6 +2,7 @@
 
 namespace WCKalkulator;
 
+use WCKalkulator\Woocommerce\Attribute;
 use WCKalkulator\Woocommerce\Product;
 
 /**
@@ -265,6 +266,17 @@ class FieldsetProduct
     }
 
     /**
+     * Get state of variation prices visibility
+     *
+     * @return bool
+     * @since 1.5.0
+     */
+    public function is_variation_prices_visible()
+    {
+        return isset($this->data->variation_prices_visible) && (int)$this->data->variation_prices_visible === 1;
+    }
+
+    /**
      * Get fieldset id
      *
      * @return mixed|null
@@ -292,7 +304,7 @@ class FieldsetProduct
     /**
      * Return HTML string for product page
      *
-     * @param array $html - array with keys 'hidden', 'fields', 'old_html'
+     * @param array $html - array with keys 'hidden', 'fields'
      * @return string|null
      * @since 1.0.0
      */
@@ -339,19 +351,19 @@ class FieldsetProduct
         $allowed_names = $this->fields_names();
 
         //if (isset($_POST['wck']) && is_array($_POST['wck'])) {
-            $filtered_post = array();
-            foreach ($allowed_names as $name) {
-                if (isset($_POST['wck'][$name])) {
-                    $filtered_post[$name] = $_POST['wck'][$name];
-                } else {
-                    /* Set Default values if the field is not in POST data */
-                    if($this->field($name)['type'] === 'checkboxgroup') {
-                        $filtered_post[$name] = array();
-                    }
+        $filtered_post = array();
+        foreach ($allowed_names as $name) {
+            if (isset($_POST['wck'][$name])) {
+                $filtered_post[$name] = $_POST['wck'][$name];
+            } else {
+                /* Set Default values if the field is not in POST data */
+                if ($this->field($name)['type'] === 'checkboxgroup') {
+                    $filtered_post[$name] = array();
                 }
             }
+        }
 
-            $user_input = Sanitizer::sanitize($filtered_post, 'array');
+        $user_input = Sanitizer::sanitize($filtered_post, 'array');
         //}
 
         foreach ($allowed_names as $name) {
@@ -359,7 +371,7 @@ class FieldsetProduct
                 $filtered_post[$name] = $_POST['wck'][$name];
             } else {
                 /* Set Default values if the field is not in POST data */
-                if($this->field($name)['type'] === 'checkboxgroup') {
+                if ($this->field($name)['type'] === 'checkboxgroup') {
                     $filtered_post[$name] = array();
                 }
             }
@@ -403,7 +415,7 @@ class FieldsetProduct
 
         $this->user_input = $user_input;
 
-        return $user_input;
+        return $this->user_input;
     }
 
     /**
@@ -427,14 +439,13 @@ class FieldsetProduct
     /**
      * Validate user input
      *
-     * @param array $input
      * @param bool $is_ajax_cart
      * @return bool
      * @since 1.0.0
      */
-    public function validate($input, $is_ajax_cart = false)
+    public function validate($is_ajax_cart = false)
     {
-        $this->user_input = $input;
+        //$this->user_input = $input;
 
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
@@ -447,11 +458,7 @@ class FieldsetProduct
             return false;
         }
 
-        $this->add_static_prices($input);
-
-        foreach (GlobalParameter::get_all() as $name => $value) {
-            $this->user_input['global:' . $name] = $value;
-        }
+        $this->set_additional_input_variables();
 
         return $this->is_valid;
     }
@@ -589,7 +596,7 @@ class FieldsetProduct
      * @return void
      * @since 1.2.0
      */
-    public function add_static_prices($input)
+    public function set_additional_input_variables()
     {
         if (!is_array($this->user_input)) {
             return;
@@ -613,10 +620,55 @@ class FieldsetProduct
                 $this->user_input[$name] = $static_price;
             }
 
-            if ($field->group() !== 'static' && isset($input[$name])) {
-                $this->register_extra_input_parameters($field, $input[$name]);
+            if ($field->group() !== 'static' && isset($this->user_input[$name])) {
+                $this->set_additional_field_parameters($field, $this->user_input[$name]);
             }
         }
+
+        /*
+         * Get extra values (products, dates, user, qty)
+         */
+
+        if ($this->product_id > 0) {
+            $product_helper = new ProductHelper($this->product_id, $this->variation_id);
+            if ($product_helper->is_valid()) {
+                $this->user_input["product_price"] = $product_helper->price();
+                $this->user_input["product_weight"] = $product_helper->get_weight();
+                $this->user_input["product_width"] = $product_helper->get_width();
+                $this->user_input["product_height"] = $product_helper->get_height();
+                $this->user_input["product_length"] = $product_helper->get_length();
+                $this->user_input["product_regular_price"] = $product_helper->regular_price();
+            }
+        }
+
+        $this->user_input["is_user_logged"] = (int)is_user_logged_in();
+        $this->user_input["current_month"] = absint(current_time("n"));
+        $this->user_input["day_of_month"] = absint(current_time("j"));
+        $this->user_input["day_of_week"] = absint(current_time("w"));
+        $this->user_input["current_hour"] = absint(current_time("G"));
+        if (isset($_POST["quantity"])) {
+            $this->user_input["quantity"] = absint($_POST["quantity"]);
+        }
+
+        /*
+         * Get values of global parameters
+         */
+        foreach (GlobalParameter::get_all() as $name => $value) {
+            $this->user_input['global:' . $name] = $value;
+        }/*
+         * @since 1.5.0 - get custom numerical value (wck_value) of product attribute term
+         */;
+        $this->user_input = array_merge($this->user_input, Attribute::from_request());
+
+        /*
+         * @since 1.5.0 - support for ACF integration
+         */
+        Cache::store("ACF_Post_IDs", array(
+            "product_id" => $this->product_id, //highest priority
+            "fieldset_id" => $this->get_id(),
+            "variation_id" => $this->variation_id //lowest priority
+        ));
+
     }
 
     /**
@@ -626,7 +678,7 @@ class FieldsetProduct
      * @param $input
      * @since 1.2.0
      */
-    public function register_extra_input_parameters($field, $input)
+    public function set_additional_field_parameters($field, $input)
     {
         $name = $field->data("name");
         switch ($field->type()) {
@@ -689,26 +741,16 @@ class FieldsetProduct
         if ($this->is_valid) {
             if ($this->product_id > 0) {
                 $product_helper = new ProductHelper($this->product_id, $this->variation_id);
-
-                if ($product_helper->is_valid() && isset($_POST["quantity"])) {
-                    $this->user_input["product_price"] = $product_helper->price();
-                    $this->user_input["product_weight"] = $product_helper->get_weight();
-                    $this->user_input["product_width"] = $product_helper->get_width();
-                    $this->user_input["product_height"] = $product_helper->get_height();
-                    $this->user_input["product_length"] = $product_helper->get_length();
-                    $this->user_input["product_regular_price"] = $product_helper->regular_price();
-                    $this->user_input["is_user_logged"] = (int)is_user_logged_in();
-                    $this->user_input["current_month"] = absint(current_time("n"));
-                    $this->user_input["day_of_month"] = absint(current_time("j"));
-                    $this->user_input["day_of_week"] = absint(current_time("w"));
-                    $this->user_input["current_hour"] = absint(current_time("G"));
-                    $this->user_input["quantity"] = absint($_POST["quantity"]);
-                } else {
+                if (!$product_helper->is_valid()) {
                     return Ajax::response('error', __("Select variation options first!", "wc-kalkulator"));
                 }
             }
             $parser = new ExpressionParser($this->expression(), $this->user_input);
             if ($parser->is_ready()) {
+                $result = $parser->execute();
+                if (isset($result['value']) && $result['is_error'] === false) {
+                    $this->user_input['total_price'] = $result['value'] * $this->user_input["quantity"];
+                }
                 return $parser->execute();
             } else {
                 return Ajax::response('error', $parser->error);
@@ -719,6 +761,41 @@ class FieldsetProduct
     }
 
     /**
+     * Calculates the value of formula fields
+     *
+     * @return array
+     * @since 1.5.0
+     */
+    public function calculate_formula_fields()
+    {
+        $result = array();
+        try {
+            foreach ($this->fields() as $field) {
+                if ($field->is_type("formula")) {
+                    $expression = array(
+                        'mode' => 'oneline',
+                        'expr' => $field->data("content")
+                    );
+                    $parser = new ExpressionParser($expression, $this->user_input);
+                    if ($parser->is_ready()) {
+                        $calc = $parser->execute();
+                        $result[$field->data("name")] = array(
+                            'title' => $field->data("title"),
+                            'name' => $field->data("name"),
+                            'value' => $calc['is_error'] === false ? $calc['value'] : ' - error - '
+                        );
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            error_log($e);
+        } catch (\Throwable $e) {
+            error_log($e);
+        }
+        return $result;
+    }
+
+    /**
      * Get stock reduction multiplier.
      *
      * @return array|int
@@ -726,7 +803,7 @@ class FieldsetProduct
      */
     public function stock_reduction_multiplier()
     {
-        if ($this->is_valid && $this->product_id > 0) {
+        if ($this->product_id > 0) {
             try {
                 $parser = new ExpressionParser(array(
                     'mode' => 'oneline',
@@ -764,6 +841,16 @@ class FieldsetProduct
                 $rules[$field->data('name')] = json_decode(stripslashes($field->data('visibility')), true);
         }
         return $rules;
+    }
+
+    public function js_api()
+    {
+        global $post;
+        $this->product_id = $post->ID;
+        $js = trim(str_replace(array("\r\n", "  ", "\t"), array("", " ", ""), $this->get_meta('javascript')));
+        if (!empty($js)) {
+            wp_add_inline_script('wck-ajax-script', '(function ($) { $(document).ready(function ($) { ' . $js . ' }) })(jQuery);');
+        }
     }
 
     /**

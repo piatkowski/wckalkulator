@@ -16,6 +16,12 @@ use WCKalkulator\FieldsetProduct, WCKalkulator\Sanitizer;
         $col = 1;
         $row_opened = false;
         foreach ($view->fields as $field) {
+
+            if($field['type'] === 'hidden' || $field['type'] === 'formula') {
+                echo wp_kses($field['html'], Sanitizer::allowed_html());
+                continue;
+            }
+
             if ($field['colspan'] === 2) {
                 echo $row_opened ? '</tr>' : '';
                 $col = 1;

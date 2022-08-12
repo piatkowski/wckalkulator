@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
             <?php if (absint($view->select_limit) > 0): ?>
                 <small class="multicheckbox-limit-info"><?php echo esc_html(sprintf(__('(max. %s)', 'wc-kalkulator'), $view->select_limit)); ?></small>
             <?php endif; ?>
-            <?php if (isset($view->is_required) && $view->is_required) : ?>
+            <?php if (isset($view->show_required_asterisk) && $view->show_required_asterisk) : ?>
                 <span class="required-asterisk">*</span>
             <?php endif; ?>
         </label>

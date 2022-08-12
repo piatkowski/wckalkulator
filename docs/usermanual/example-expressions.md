@@ -112,3 +112,24 @@ or
 ```
 
 ---
+
+### 5. How to use multicheckbox and conditional number fields ?
+
+In this example we define multicheckbox field named `{multi_cb}` and three number fields `{num_a}, {num_b}, {num_c}`.
+
+Multicheckbox `{multi_cb}` has three options:
+- value: 1, option title: Option A
+- value: 2, option title: Option B
+- value: 3, option title: Option C
+
+Each of number fields `{num_a}, {num_b}, {num_c}` are visible for one of three `{multi_cb}` options. So, we need to define visibility rules. For example field `{num_a}` has rule `{multi_cb} == 1`, which means that this field will be visible if user checked "Option A".
+
+Next, we need to go to "Price Add-ons" to set formulas. To check if user has selected certain option we use `is_selected()` function. This is example how to calculate price based on selected option and number field value:
+
+`if is_selected( {multi_cb}; 1 )` `add {num_a} * 100`
+
+`if is_selected( {multi_cb}; 2 )` `add {num_b} * 250`
+
+`if is_selected( {multi_cb}; 3 )` `add {num_c} * 500`
+
+<img src="../../images/example-multi-checkbox-and-visibility.png" style="display:block; margin: 0 auto; max-width:500px" alt="" />

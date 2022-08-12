@@ -75,29 +75,6 @@ use WCKalkulator\Cache;
     </p>
 </div>
 
-<div class="inventory">
-    <p>
-        <label>
-            <strong><?php _e('Inventory - Stock quantity reduction multiplier', 'wc-kalkulator'); ?></strong> <sup
-                    style="color:red">Beta</sup>
-        </label>
-    </p>
-    <p><?php _e('In this section you can define inventory reduction multiplier (formula or number). Reduction will be rouded up to the integer number. For example: stock quantity = 1000. Customer buys 3 pieces and the reduction is set to 10, the stock quantity will be reduced by 30 (3*10)', 'wc-kalkulator'); ?></p>
-    <?php
-    global $post;
-    $reduction_m = get_post_meta($post->ID, '_wck_stock_reduction_multiplier', true);
-    ?>
-    <div class="input-icon input-stock">
-        <input type="text" name="_wck_stock_reduction_multiplier"
-               placeholder="<?php _e('Number or formula (value will be multiplied by quantity)...', 'wc-kalkulator'); ?>"
-               value="<?php echo esc_html($reduction_m); ?>"
-               autocomplete="off"
-               role="presentation"><i></i>
-    </div>
-    <p class="description"><?php _e('You can use fields, operators and functions as above. You can modify stock quantity (i.e. add
-        unit) using filter `woocommerce_format_stock_quantity`.', 'wc-kalkulator'); ?></p>
-</div>
-
 <div id="wck-toolbar">
     <ul>
         <li>
@@ -146,6 +123,7 @@ use WCKalkulator\Cache;
     <select id="wck-parameters">
         <option value="" disabled selected
                 class="first-selected"><?php _e('Choose parameter...', 'wc-kalkulator'); ?></option>
+        <option value="{total_price}" class="total-price">Total Price (calculated by this plugin)</option>
         <optgroup label="Defined Fields" class="defined-fields"></optgroup>
         <optgroup label="Product">
             <option value="{product_price}">Price</option>
@@ -167,6 +145,17 @@ use WCKalkulator\Cache;
             <option value="{current_hour}">Current hour (actual value: <?php echo (int)current_time("G"); ?>)</option>
         </optgroup>
         <optgroup label="Global Parameters" class="global-parameters"></optgroup>
+        <optgroup label="Product Attributes" class="product-attributes">
+            <?php
+            $attributes = wc_get_attribute_taxonomies();
+            if (!empty($attributes)) {
+                foreach ($attributes as $attribute) {
+                    echo '<option value="{pa:' . $attribute->attribute_name . '}">' . $attribute->attribute_label . ' (WCK value)</option>';
+                    echo '<option value="{pa:' . $attribute->attribute_name . '_id}">' . $attribute->attribute_label . ' ID</option>';
+                }
+            }
+            ?>
+        </optgroup>
     </select>
     <button type="button" class="button add-field-to-formula"><?php _e('Insert', 'wc-kalkulator'); ?></button>
     <?php
@@ -200,7 +189,8 @@ use WCKalkulator\Cache;
         'sqrt' => __('sqrt(x) - square root of x', 'wc-kalkulator'),
         'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator'),
         'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator'),
-        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator')
+        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator'),
+        'ACF' => __("acf('field_name'; post_id) - get value of ACF field. Post_id is optional and may be omitted.")
     );
 
     $ending = array(
@@ -213,11 +203,13 @@ use WCKalkulator\Cache;
         'sqrt' => ' )',
         'strlen' => ' )',
         'in_array' => ' ; array )',
-        'is_selected' => ' ; value )'
+        'is_selected' => ' ; value )',
+        'acf' => "' )"
     );
 
     foreach ($operators as $op => $title) {
-        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " data-ending="' . esc_attr($ending[$op]) . '" title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
+        $op = strtolower($op);
+        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( ' . ($op === 'acf' ? "'" : '') . '" data-ending="' . esc_attr($ending[$op]) . '" title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
     ?>
 </div>

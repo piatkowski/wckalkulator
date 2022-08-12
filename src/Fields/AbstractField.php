@@ -28,6 +28,7 @@ abstract class AbstractField
             'picker' => __('Picker Fields', 'wc-kalkulator'),
             'upload' => __('Upload Fields', 'wc-kalkulator'),
             'static' => __('Static Fields', 'wc-kalkulator'),
+            'special' => __('Special Fields', 'wc-kalkulator'),
             'other' => __('Other Fields', 'wc-kalkulator')
         );
         
@@ -68,8 +69,9 @@ abstract class AbstractField
             'name' => "wck[" . $this->data("name") . "]",
             'id' => 'wck_' . $this->data("name"),
             'css_class' => $this->data("css_class"),
-            'required' => $this->is_required() ? ' required' : '',
-            'is_required' => $this->is_required() ? '1' : '0'
+            'required' => ($this->is_required() || $this->is_required_when_visible() ? ' required' : ''), // add "required" attribute
+            'is_required' => $this->is_required() ? '1' : '0', // is always required
+            'show_required_asterisk' => $this->is_required() || $this->is_required_when_visible()
         );
     }
     
@@ -107,13 +109,26 @@ abstract class AbstractField
             return '<span class="dashicons dashicons-editor-help wck-field-tip" title="' . esc_html($this->data("hint")) . '"></span>';
         return '';
     }
-    
+
     /**
+     * Returns true if the field is always required
+     *
      * @return mixed
      */
     public function is_required()
     {
-        return $this->group() === 'static' ? false : $this->data["required"];
+        return !($this->group() === 'static' || $this->type() === 'formula') && $this->data["required"] === '1';
+    }
+
+    /**
+     * Returns true if the field is required when visible
+     *
+     * @return mixed
+     * @since 1.5.0
+     */
+    public function is_required_when_visible()
+    {
+        return $this->data["required"] === '2';
     }
     
     /**
@@ -130,7 +145,7 @@ abstract class AbstractField
      */
     public function toJSON()
     {
-        return json_encode($this->data);
+        return wp_json_encode($this->data);
     }
     
     /**

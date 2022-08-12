@@ -221,7 +221,7 @@ final class Sanitizer
      *
      * @param array $array
      * @return array
-     * @since
+     * @since 1.1.0
      */
     private static function sanitize_single_array_text($array)
     {

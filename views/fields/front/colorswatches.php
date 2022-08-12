@@ -17,7 +17,7 @@ if (isset($view->size) && absint($view->size) > 0) {
         <?php echo wp_kses($view->hint, \WCKalkulator\Sanitizer::allowed_html()); ?>
         <label for="<?php echo esc_html($view->id); ?>">
             <?php echo esc_html($view->title); ?>
-            <?php if (isset($view->is_required) && $view->is_required) : ?>
+            <?php if (isset($view->show_required_asterisk) && $view->show_required_asterisk) : ?>
                 <span class="required-asterisk">*</span>
             <?php endif; ?>
         </label>

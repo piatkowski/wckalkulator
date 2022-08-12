@@ -66,19 +66,22 @@ class Ajax
                 Plugin::VERSION
             );
 
-            wp_localize_script(
+            wp_add_inline_script(
                 'wck-ajax-script',
-                'wck_ajax_object',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE),
-                    '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
-                    '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
-                    '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
-                    'form' => Settings::get('form_css_selector'),
-                    '_wck_visibility_rules' => $fieldset->visibility_rules()
-                )
+                'var wck_ajax_object = ' . wp_json_encode(
+                    array(
+                        'ajax_url' => admin_url('admin-ajax.php'),
+                        '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE),
+                        '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
+                        '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
+                        '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
+                        'form' => Settings::get('form_css_selector'),
+                        '_wck_visibility_rules' => $fieldset->visibility_rules()
+                    )
+                ) . ';'
             );
+
+            $fieldset->js_api();
         }
     }
 
@@ -112,9 +115,9 @@ class Ajax
 
         $fieldset = FieldsetProduct::getInstance();
         $fieldset->init($product_id, $variation_id);
-        $user_input = $fieldset->get_user_input();
+        $fieldset->get_user_input();
 
-        if (!$fieldset->validate($user_input, true) || !is_array($user_input)) {
+        if (!$fieldset->validate(true)) {
             Helper::message_for_manager("Data is invalid");
             wp_die("");
         }

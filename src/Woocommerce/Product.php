@@ -35,6 +35,8 @@ class Product
         add_action('woocommerce_after_add_to_cart_button', array(__CLASS__, 'price_block'));
         add_filter('woocommerce_order_item_quantity', array(__CLASS__, 'reduce_inventory'), 10, 3);
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
+        add_action('woocommerce_before_order_itemmeta', array(__CLASS__, 'display_itemmeta_for_admin'), 10, 3);
+        add_filter('woocommerce_hidden_order_itemmeta', array(__CLASS__, 'hide_itemmeta'));
 
         PriceFilter::getInstance();
         Cart::getInstance();
@@ -49,7 +51,17 @@ class Product
     {
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')) {
-            if ($fieldset->has_expression('current')) {
+
+            $fieldset->init();
+
+            /*
+             * "Price.min.css" forces price block to be hidden.
+             * Price blocks should be visible if the product is type of "variable" and user has selected 'variation_prices_visible' option.
+             * If price calculation is disabled, the option is not used and price.min.css will not load.
+             */
+            $product = wc_get_product(Product::get_id());
+            $is_variable_product = $product && $product->is_type('variable');
+            if ($fieldset->has_expression('current') && !($is_variable_product && $fieldset->is_variation_prices_visible())) {
                 wp_register_style('wckalkulator_price_css', Plugin::url() . '/assets/css/price.min.css');
                 wp_enqueue_style('wckalkulator_price_css');
             }
@@ -67,7 +79,6 @@ class Product
              */
             $enqueued = array();
             $localize = array();
-            $fieldset->init();
 
             foreach ($fieldset->fields() as $field) {
                 if (!in_array($field->type(), $enqueued)) {
@@ -86,10 +97,9 @@ class Product
             unset($localize);
 
             foreach ($unique_scripts as $script => $options) {
-                wp_localize_script(
+                wp_add_inline_script(
                     $script,
-                    str_replace('-', '_', $script) . '_options',
-                    $options
+                    'var ' . str_replace('-', '_', $script) . '_options = ' . wp_json_encode($options) . ';'
                 );
             }
         } else if (is_page('cart') || is_cart() || is_checkout() || is_page('checkout')) {
@@ -141,6 +151,9 @@ class Product
                     'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
                     //colspan since 1.4.0
                     'colspan' => max((int)$field->data('colspan'), 1),
+                    //type, group since 1.5.0
+                    'type' => $field->type(),
+                    'group' => $field->group()
                 );
                 //$html['visibility'][$field->data('name')] = $field->data('visibility');
             }
@@ -169,9 +182,8 @@ class Product
             $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
 
             $fieldset->init($product_id, $variation_id);
-            $user_input = $fieldset->get_user_input();
-
-            $validation = $fieldset->validate($user_input);
+            $fieldset->get_user_input();
+            $validation = $fieldset->validate();
             if (!$validation) {
                 foreach ($fieldset->validation_notices() as $notice) {
                     wc_add_notice($notice, 'error');
@@ -186,8 +198,10 @@ class Product
                         $validation = false;
                     }
                 } catch (\Exception $e) {
+                    error_log($e);
                     return false;
                 } catch (\Throwable $e) {
+                    error_log($e);
                     return false;
                 }
             }
@@ -233,9 +247,8 @@ class Product
 
             $fieldset = FieldsetProduct::getInstance();
             $fieldset->init($product_id, $variation_id);
-
             $user_input = $fieldset->get_user_input();
-            if (!$fieldset->validate($user_input)) {
+            if (!$fieldset->validate()) {
                 wp_die('Bad request (2)!');
             }
 
@@ -246,7 +259,6 @@ class Product
                     $calc = $fieldset->calculate();
                     if (!$calc['is_error']) {
                         $cart_item_data['wckalkulator_price'] = $calc['value'];
-                        $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
                         $success = true;
                     } else {
                         wp_die('Bad request (3)!');
@@ -281,9 +293,12 @@ class Product
                 $cart_item_data['wckalkulator_fields'] = $user_input;
                 $cart_item_data['wckalkulator_fieldset_version_hash'] = $fieldset->version_hash();
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
+                $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
+                $cart_item_data['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
             }
 
         }
+
         return $cart_item_data;
     }
 
@@ -337,6 +352,11 @@ class Product
                     $value = isset($cart_item['wckalkulator_fields']['_files'][$name]) ? $cart_item['wckalkulator_fields']['_files'][$name] : $cart_item['wckalkulator_fields'][$name];
                     $html .= $field->render_for_cart($value);
                 }
+                if (isset($cart_item['wckalkulator_formula_fields'][$name])) {
+                    $value = $cart_item['wckalkulator_formula_fields'][$name]['value'];
+                    $html .= $field->render_for_cart($value);
+                }
+
             }
 
             $item_name .= View::render('woocommerce/cart', array(
@@ -381,9 +401,9 @@ class Product
 
                 $fieldset->init($product_id, $variation_id);
 
-                // Add hidden field with all parameters. This is for cart editing.
                 $item->add_meta_data('_wck_fields', $order_fields);
                 $item->add_meta_data('_wck_stock_reduction_multiplier', $values['wckalkulator_stock_reduction_multiplier']);
+                $item->add_meta_data('_wck_formula_fields', $values['wckalkulator_formula_fields']);
 
                 foreach ($fieldset->fields() as $name => $field) {
 
@@ -453,7 +473,45 @@ class Product
     }
 
     /**
-     * Reduce inventory
+     * Display certain item meta only for admin (for example: special fields)
+     *
+     * @return void
+     * @since 1.5.0
+     */
+    public static function display_itemmeta_for_admin($item_id, $item, $product)
+    {
+        if (!(is_admin() && $item->is_type('line_item')))
+            return;
+
+        $formula_fields = $item->get_meta('_wck_formula_fields');
+
+        if (!empty($formula_fields)) {
+            echo '<table class="display_meta"><tbody>';
+            foreach ($formula_fields as $field) {
+                echo '<tr><th>' . esc_html($field['title']) . ':</th>';
+                echo '<td>' . esc_html($field['value']) . '</td></tr>';
+            }
+            echo '</tbody></table>';
+        }
+    }
+
+    /**
+     * Set hidden item meta
+     *
+     * @return array
+     * @since 1.5.0
+     */
+    public static function hide_itemmeta($order_items)
+    {
+        $order_items[] = '_wck_stock_reduction_multiplier';
+        $order_items[] = '_wck_formula_fields';
+        $order_items[] = '_wck_fields';
+        return $order_items;
+    }
+
+    /**
+     * Reduce inventory quantity
+     *
      * @param $quantity
      * @param $order
      * @param $item
@@ -463,7 +521,7 @@ class Product
     public static function reduce_inventory($quantity, $order, $item)
     {
         if ($item->meta_exists('_wck_stock_reduction_multiplier')) {
-            $multiplier = floatval( $item->get_meta('_wck_stock_reduction_multiplier', true) );
+            $multiplier = floatval($item->get_meta('_wck_stock_reduction_multiplier', true));
             return ceil($multiplier * $quantity);
         }
         return $quantity;
