@@ -847,9 +847,18 @@ class FieldsetProduct
     {
         global $post;
         $this->product_id = $post->ID;
-        $js = trim(str_replace(array("\r\n", "  ", "\t"), array("", " ", ""), $this->get_meta('javascript')));
+        $js = $this->get_meta('javascript');
+
+        /*
+            Remove comments in JS code
+            author Alexander Yancharuk @ https://stackoverflow.com/a/19510664
+        */
+        $pattern = '/(?:(?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/)|(?:(?<!\:|\\\|\')\/\/.*))/';
+        $js = preg_replace($pattern, '', $js);
+
+        $js = trim(str_replace(array("\r\n", "  ", "\t"), array("", " ", ""), $js));
         if (!empty($js)) {
-            wp_add_inline_script('wck-ajax-script', '(function ($) { $(document).ready(function ($) { ' . $js . ' }) })(jQuery);');
+            wp_add_inline_script('wck-ajax-script', '(function ($) { $(document).ready(function ($) { ' . html_entity_decode($js, ENT_QUOTES) . ' }) })(jQuery);');
         }
     }
 
