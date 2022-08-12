@@ -145,6 +145,17 @@ use WCKalkulator\Cache;
             <option value="{current_hour}">Current hour (actual value: <?php echo (int)current_time("G"); ?>)</option>
         </optgroup>
         <optgroup label="Global Parameters" class="global-parameters"></optgroup>
+        <optgroup label="Product Attributes" class="product-attributes">
+            <?php
+            $attributes = wc_get_attribute_taxonomies();
+            if (!empty($attributes)) {
+                foreach ($attributes as $attribute) {
+                    echo '<option value="{pa:' . $attribute->attribute_name . '}">' . $attribute->attribute_label . ' (WCK value)</option>';
+                    echo '<option value="{pa:' . $attribute->attribute_name . '_id}">' . $attribute->attribute_label . ' ID</option>';
+                }
+            }
+            ?>
+        </optgroup>
     </select>
     <button type="button" class="button add-field-to-formula"><?php _e('Insert', 'wc-kalkulator'); ?></button>
     <?php
@@ -178,7 +189,8 @@ use WCKalkulator\Cache;
         'sqrt' => __('sqrt(x) - square root of x', 'wc-kalkulator'),
         'strlen' => __('strlen(x) - Text length of x', 'wc-kalkulator'),
         'in_array' => __('in_array(value; array) - checks if value is in array', 'wc-kalkulator'),
-        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator')
+        'is_selected' => __('is_selected(field; value) - checks if value is selected (multi checkbox)', 'wc-kalkulator'),
+        'ACF' => __("acf('field_name'; post_id) - get value of ACF field. Post_id is optional and may be omitted.")
     );
 
     $ending = array(
@@ -191,11 +203,13 @@ use WCKalkulator\Cache;
         'sqrt' => ' )',
         'strlen' => ' )',
         'in_array' => ' ; array )',
-        'is_selected' => ' ; value )'
+        'is_selected' => ' ; value )',
+        'acf' => "' )"
     );
 
     foreach ($operators as $op => $title) {
-        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( " data-ending="' . esc_attr($ending[$op]) . '" title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
+        $op = strtolower($op);
+        echo '<button type="button" class="add-operator button" value=" ' . esc_attr($op) . '( ' . ($op === 'acf' ? "'" : '') . '" data-ending="' . esc_attr($ending[$op]) . '" title="' . esc_attr($title) . '">' . esc_html($op) . '</button>';
     }
     ?>
 </div>

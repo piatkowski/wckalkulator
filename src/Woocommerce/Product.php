@@ -97,10 +97,9 @@ class Product
             unset($localize);
 
             foreach ($unique_scripts as $script => $options) {
-                wp_localize_script(
+                wp_add_inline_script(
                     $script,
-                    str_replace('-', '_', $script) . '_options',
-                    $options
+                    'var ' . str_replace('-', '_', $script) . '_options = ' . wp_json_encode($options) . ';'
                 );
             }
         } else if (is_page('cart') || is_cart() || is_checkout() || is_page('checkout')) {
@@ -152,7 +151,7 @@ class Product
                     'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
                     //colspan since 1.4.0
                     'colspan' => max((int)$field->data('colspan'), 1),
-                    //type, group since 1.4.7
+                    //type, group since 1.5.0
                     'type' => $field->type(),
                     'group' => $field->group()
                 );
@@ -353,7 +352,7 @@ class Product
                     $value = isset($cart_item['wckalkulator_fields']['_files'][$name]) ? $cart_item['wckalkulator_fields']['_files'][$name] : $cart_item['wckalkulator_fields'][$name];
                     $html .= $field->render_for_cart($value);
                 }
-                if(isset($cart_item['wckalkulator_formula_fields'][$name])) {
+                if (isset($cart_item['wckalkulator_formula_fields'][$name])) {
                     $value = $cart_item['wckalkulator_formula_fields'][$name]['value'];
                     $html .= $field->render_for_cart($value);
                 }
@@ -477,7 +476,7 @@ class Product
      * Display certain item meta only for admin (for example: special fields)
      *
      * @return void
-     * @since 1.4.7
+     * @since 1.5.0
      */
     public static function display_itemmeta_for_admin($item_id, $item, $product)
     {
@@ -500,7 +499,7 @@ class Product
      * Set hidden item meta
      *
      * @return array
-     * @since 1.4.7
+     * @since 1.5.0
      */
     public static function hide_itemmeta($order_items)
     {

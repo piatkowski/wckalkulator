@@ -69,8 +69,8 @@ abstract class AbstractField
             'name' => "wck[" . $this->data("name") . "]",
             'id' => 'wck_' . $this->data("name"),
             'css_class' => $this->data("css_class"),
-            'required' => ($this->is_required() || $this->is_required_when_visible() ? ' required' : ''),
-            'is_required' => $this->is_required() ? '1' : '0',
+            'required' => ($this->is_required() || $this->is_required_when_visible() ? ' required' : ''), // add "required" attribute
+            'is_required' => $this->is_required() ? '1' : '0', // is always required
             'show_required_asterisk' => $this->is_required() || $this->is_required_when_visible()
         );
     }
@@ -111,6 +111,8 @@ abstract class AbstractField
     }
 
     /**
+     * Returns true if the field is always required
+     *
      * @return mixed
      */
     public function is_required()
@@ -119,7 +121,10 @@ abstract class AbstractField
     }
 
     /**
+     * Returns true if the field is required when visible
+     *
      * @return mixed
+     * @since 1.5.0
      */
     public function is_required_when_visible()
     {
@@ -140,7 +145,7 @@ abstract class AbstractField
      */
     public function toJSON()
     {
-        return json_encode($this->data);
+        return wp_json_encode($this->data);
     }
     
     /**

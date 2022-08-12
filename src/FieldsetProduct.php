@@ -2,6 +2,7 @@
 
 namespace WCKalkulator;
 
+use WCKalkulator\Woocommerce\Attribute;
 use WCKalkulator\Woocommerce\Product;
 
 /**
@@ -268,7 +269,7 @@ class FieldsetProduct
      * Get state of variation prices visibility
      *
      * @return bool
-     * @since 1.4.7
+     * @since 1.5.0
      */
     public function is_variation_prices_visible()
     {
@@ -624,6 +625,10 @@ class FieldsetProduct
             }
         }
 
+        /*
+         * Get extra values (products, dates, user, qty)
+         */
+
         if ($this->product_id > 0) {
             $product_helper = new ProductHelper($this->product_id, $this->variation_id);
             if ($product_helper->is_valid()) {
@@ -644,10 +649,26 @@ class FieldsetProduct
         if (isset($_POST["quantity"])) {
             $this->user_input["quantity"] = absint($_POST["quantity"]);
         }
-        
+
+        /*
+         * Get values of global parameters
+         */
         foreach (GlobalParameter::get_all() as $name => $value) {
             $this->user_input['global:' . $name] = $value;
-        }
+        }/*
+         * @since 1.5.0 - get custom numerical value (wck_value) of product attribute term
+         */;
+        $this->user_input = array_merge($this->user_input, Attribute::from_request());
+
+        /*
+         * @since 1.5.0 - support for ACF integration
+         */
+        Cache::store("ACF_Post_IDs", array(
+            "product_id" => $this->product_id, //highest priority
+            "fieldset_id" => $this->get_id(),
+            "variation_id" => $this->variation_id //lowest priority
+        ));
+
     }
 
     /**
@@ -743,7 +764,7 @@ class FieldsetProduct
      * Calculates the value of formula fields
      *
      * @return array
-     * @since 1.4.7
+     * @since 1.5.0
      */
     public function calculate_formula_fields()
     {
@@ -820,6 +841,16 @@ class FieldsetProduct
                 $rules[$field->data('name')] = json_decode(stripslashes($field->data('visibility')), true);
         }
         return $rules;
+    }
+
+    public function js_api()
+    {
+        global $post;
+        $this->product_id = $post->ID;
+        $js = trim(str_replace(array("\r\n", "  ", "\t"), array("", " ", ""), $this->get_meta('javascript')));
+        if (!empty($js)) {
+            wp_add_inline_script('wck-ajax-script', '(function ($) { $(document).ready(function ($) { ' . $js . ' }) })(jQuery);');
+        }
     }
 
     /**

@@ -1,13 +1,13 @@
-=== Product Fields and Price Calculator for WooCommerce ===
+=== Product Fields, Addons and Price Calculator for WooCommerce ===
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.4.7
+Stable tag: 1.5.0
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
 
-WooCommerce extra product fields, addons and price calculator (formula). Absolutely FREE - 23 different field types on your product and order page.
+WooCommerce product fields, product addons and formula price calculator. Absolutely FREE - 23 different field types on your product and order page.
 
 == Description ==
 
@@ -106,6 +106,10 @@ You can define numeric variable across all fieldsets. You can modify all prices 
 
 The customer can edit product options after adding to cart.
 
+### Integration with ACF
+
+You can use `acf('field_name')` function to get ACF field value in custom price formula.
+
 ## Compatibility
 
 * multisite mode is supported
@@ -114,6 +118,8 @@ The customer can edit product options after adding to cart.
 * virtual and variable products are supported
 * product regular and sale prices are supported
 * product tags and attributes
+* use product attributes in formulas
+* ACF supported
 
 ## More Features
 
@@ -143,9 +149,14 @@ The customer can edit product options after adding to cart.
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
-2022-08-05 v.1.4.7
+2022-08-11 v.1.5.0
 - fieldset's options (toggle default price blocks)
 - new field: formula value
+- make fields required: always/only if visible/not required
+- if the field is hidden, default value will be 0
+- you can assign numeric value to the WC Product Attributes and use it in a formula
+- added ACF integration. You can use ACF field value in a formula
+- you can use custom JavaScript code
 - bug fixes
 
 2022-07-23 v.1.4.6

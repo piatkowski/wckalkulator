@@ -72,8 +72,8 @@ class ExpressionParser
     /**
      * ExpressionParser constructor.
      *
-     * @param array $expr
-     * @param array $vars
+     * @param array $expr - the expression
+     * @param array $vars - variables used in the expression
      * @since 1.0.0
      */
     function __construct($expr, $vars)
@@ -225,8 +225,8 @@ class ExpressionParser
     {
         return
             str_replace(
-                array('{', '}', ',', 'constant(', ';', ':'),
-                array('', '', '.', '(', ',', '__p__'),
+                array('{', '}', ',', 'constant(', ';', ':', 'acf('),
+                array('', '', '.', '(', ',', '__p__', 'wck_integration_acf_get_field('),
                 html_entity_decode($str)
             );
     }
@@ -326,6 +326,11 @@ class ExpressionParser
         }, function ($arguments, $array, $value) {
             return \WCKalkulator\ExpressionParser::func_is_selected($array, $value);
         });
+
+        if(class_exists('ACF') and function_exists('get_field')) {
+            include __DIR__ . '/Integrations/ACF.php';
+            $this->expression->addFunction(ExpressionFunction::fromPhp('wck_integration_acf_get_field'));
+        }
     }
 
     /**

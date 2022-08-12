@@ -63,13 +63,14 @@ class AdminNotice
             Plugin::VERSION
         );
 
-        wp_localize_script(
+        wp_add_inline_script(
             'wck-admin-notice-script',
-            'wck_ajax_object',
-            array(
-                'ajax_url' => admin_url('admin-ajax.php'),
-                '_wck_ajax_nonce' => wp_create_nonce(AdminNotice::NONCE),
-            )
+            'var wck_ajax_object = ' . wp_json_encode(
+                array(
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    '_wck_ajax_nonce' => wp_create_nonce(AdminNotice::NONCE),
+                )
+            ) . ';'
         );
     }
 

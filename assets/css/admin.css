@@ -19,6 +19,9 @@
 .wc-kalkulator-wrapper a.button.action-add-attachment {
   margin-bottom: 10px;
 }
+.wc-kalkulator-wrapper .lh-5 {
+  line-height: 5;
+}
 .wc-kalkulator-wrapper ul#f-field-list {
   width: 100%;
 }
