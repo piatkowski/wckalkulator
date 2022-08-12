@@ -14,7 +14,7 @@ if (!function_exists('wck_integration_acf_get_field')) {
     function wck_integration_acf_get_field($name, $post_id = false)
     {
         if (class_exists('ACF') && function_exists('get_field')) {
-            if (absint($post_id) > 0) {
+            if ($post_id !== false) {
                 return floatval(get_field($name, $post_id));
             } else {
                 $cache = Cache::get("ACF_Post_IDs");
