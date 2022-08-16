@@ -27,7 +27,7 @@ class AdminNotice
         add_action('init', array(__CLASS__, 'schedule'));
         add_filter('cron_schedules', array(__CLASS__, 'cron_interval'));
         if ((int)get_option(AdminNotice::STATE_OPTION, 1) === 1) {
-            add_action('admin_notices', array(__CLASS__, 'notice_donate'));
+            //add_action('admin_notices', array(__CLASS__, 'notice_donate'));
             add_action('admin_notices', array(__CLASS__, 'notice_rate'));
         }
         add_action('wp_ajax_wck_notice_dismiss', array(__CLASS__, 'dismiss'));
@@ -145,8 +145,13 @@ class AdminNotice
             <p>
                 <?php
                 printf(
-                    __('Thank you for using <strong>WC Kalkulator</strong>! Please %1$s rate us &#9733;&#9733;&#9733;&#9733;&#9733;%2$s and remember that WCK will always be for free!.', 'wc-kalkulator'),
+                    __('Thank you for using <strong>WC Kalkulator</strong>! Please %1$s rate us &#9733;&#9733;&#9733;&#9733;&#9733;%2$s and remember that WCK will always be for free! ', 'wc-kalkulator'),
                     '<a href="https://wordpress.org/support/plugin/wc-kalkulator/reviews/#new-post" target="_blank">',
+                    '</a>'
+                );
+                printf(
+                    __('It would be nice if you could <strong>donate</strong> via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
+                    '<a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY">',
                     '</a>'
                 );
                 ?>
@@ -168,7 +173,7 @@ class AdminNotice
             <p>
                 <?php
                 printf(
-                    __('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
+                    __('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
                     '<a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY">',
                     '</a>'
                 );

@@ -746,7 +746,7 @@
                 } else if (field.type === "imageupload") {
                     suggest.push(field.name + ":size");
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + '</option>');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + ' [bytes]</option>');
                 }
             }
         };
