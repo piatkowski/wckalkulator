@@ -3,7 +3,7 @@
 /**
  * Plugin Name: WC Kalkulator
  * Description: Description: Store Manager can add fieldsets to Products and Orders. WC Kalkulator allows to order and calculate the price of the product based on the values of the fields selected by the Customer.
- * Version: 1.5.1
+ * Version: 1.5.2
  * Author: Krzysztof Piątkowski
  * Author URI: https://wckalkulator.com
  * Text Domain: wc-kalkulator
@@ -32,7 +32,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
      */
     class Plugin
     {
-        const VERSION = "1.5.1";
+        const VERSION = "1.5.2";
 
         const NAME = "wc-kalkulator";
 
@@ -105,7 +105,6 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Attribute::init();
 
             add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
-            add_action('admin_footer', array(__CLASS__, 'admin_footer'));
             add_action('current_screen', array(__CLASS__, 'current_screen'));
         }
 
@@ -120,26 +119,6 @@ if (!class_exists('WCKalkulator\Plugin')) {
                 false,
                 dirname(plugin_basename(__FILE__)) . '/languages'
             );
-        }
-
-        /**
-         * Enqueue scripts
-         *
-         * @return void
-         * @since 1.5.0
-         */
-        public static function admin_footer()
-        {
-            $screen = get_current_screen();
-
-            if ($screen->base === 'plugins') {
-                wp_enqueue_script(
-                    'wck-deactivation-script',
-                    Plugin::url() . '/assets/js/deactivation.min.js',
-                    array(),
-                    Plugin::VERSION
-                );
-            }
         }
 
         /**

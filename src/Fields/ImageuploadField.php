@@ -15,7 +15,7 @@ class ImageuploadField extends AbstractField
     protected $data;
     protected $type = "imageupload";
     protected $admin_title;
-    protected $use_expression = false;
+    protected $use_expression = true;
     protected $group = "upload";
     protected $mimes = array("jpg" => "image/jpeg", "jpeg" => "image/jpeg", "png" => "image/png", "gif" => "image/gif");
     protected $ext = array("jpg", "jpeg", "png", "gif");
