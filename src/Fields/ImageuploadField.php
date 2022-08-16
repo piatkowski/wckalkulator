@@ -57,10 +57,12 @@ class ImageuploadField extends AbstractField
      */
     public function render_for_cart($file = '')
     {
-        return View::render('fields/cart', array(
-            'title' => $this->data['title'],
-            'value' => esc_html($file['original_name']) . ' (' . round($file['size'] / 1000000, 2) . ' MB)'
-        ));
+        if (is_array($file)) {
+            return View::render('fields/cart', array(
+                'title' => $this->data['title'],
+                'value' => esc_html($file['original_name']) . ' (' . round($file['size'] / 1000000, 2) . ' MB)'
+            ));
+        }
     }
 
     /**
