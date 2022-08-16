@@ -19,6 +19,6 @@ if (!defined('ABSPATH')) {
                class="wck_imageupload <?php echo esc_html($view->id); ?>"
                name="<?php echo esc_html($view->name); ?>"
                accept="<?php echo esc_attr($view->accept); ?>"
-               data-maxfilesize="<?php echo floatval($view->max_file_size); ?>">
+               data-maxfilesize="<?php echo floatval($view->max_file_size); ?>"<?php echo esc_html($view->required); ?>>
     </td>
 </tr>
