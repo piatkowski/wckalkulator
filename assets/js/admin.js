@@ -490,6 +490,8 @@
                     "use_expression": $row.data("use-expression") === true,
                     "name": input_fname.val(),
                     "title": input_ftitle.val(),
+                    "before_title": $row.find('input.f-before-title').val(),
+                    "after_title": $row.find('input.f-after-title').val(),
                     "hint": input_fhint.val(),
                     "default_value": input_default_value.val(),
                     "css_class": input_css_class.val(),
@@ -779,6 +781,12 @@
                         }
                     }
                     $("#" + field_id + " .f-title").val(this.title);
+                    if (this.hasOwnProperty("before_title")) {
+                        $("#" + field_id + " .f-before-title").val(this.before_title);
+                    }
+                    if (this.hasOwnProperty("after_title")) {
+                        $("#" + field_id + " .f-after-title").val(this.after_title);
+                    }
                     $("#" + field_id + " .f-hint").val(this.hint);
                     $("#" + field_id + " .f-css-class").val(this.css_class);
                     if ($("#" + field_id + " .f-required").length > 0) {

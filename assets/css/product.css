@@ -26,6 +26,7 @@
 }
 .single-product div.product table.variations td.value, table.variations td.value {
   padding-bottom: 1em;
+  text-align: left;
 }
 .single-product div.product table.variations td.value label, .single-product div.product table.variations td.value select, .single-product div.product table.variations td.value input[type=text], .single-product div.product table.variations td.value input[type=email], .single-product div.product table.variations td.value input[type=number], .single-product div.product table.variations td.value textarea, table.variations td.value label, table.variations td.value select, table.variations td.value input[type=text], table.variations td.value input[type=email], table.variations td.value input[type=number], table.variations td.value textarea {
   display: block;

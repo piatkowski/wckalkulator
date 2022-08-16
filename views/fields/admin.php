@@ -40,6 +40,21 @@ use WCKalkulator\Helper;
                        required>
             </div>
             <div class="clear"></div>
+            <?php if ($view->show_title && $view->group !== 'static' && $view->group !== 'special') : ?>
+                <div class="half first">
+                    <label><?php _e('Text before Title (on Product Page)', 'wc-kalkulator'); ?>
+                        <?php echo Helper::html_help_tip(__('Text displated before field`s Title (displayed only on product page)', 'wc-kalkulator')); ?>
+                    </label>
+                    <input type="text" class="param f-before-title" placeholder="">
+                </div>
+                <div class="half second">
+                    <label><?php _e('Text after Title (on Product Page)', 'wc-kalkulator'); ?>
+                        <?php echo Helper::html_help_tip(__('Text displayed after field`s Title (displayed only on product page)', 'wc-kalkulator')); ?>
+                    </label>
+                    <input type="text" class="param f-after-title" placeholder="">
+                </div>
+                <div class="clear"></div>
+            <?php endif; ?>
         <?php endif; ?>
         <?php if ($view->group !== 'static' && $view->group !== 'special') : ?>
             <div class="half first">
@@ -62,16 +77,19 @@ use WCKalkulator\Helper;
         <?php echo wp_kses($view->admin_fields, \WCKalkulator\Sanitizer::allowed_html()); ?>
 
         <?php if ($view->type !== 'hidden' && $view->group !== 'special') : ?>
-        <label>
-            <?php _e('Conditional Visibility', 'wc-kalkulator'); ?>
-            <?php echo Helper::html_help_tip(__('Set the rules for which this field will be visible.', 'wc-kalkulator')); ?>
-        </label>
-        <div class="cv-container">
-            <button type="button" class="button action-field-visibility"><?php _e('Edit Rules', 'wc-kalkulator'); ?></button>
-            <input type="text" class="param visibility-readable" value="" placeholder="<?php _e('Set the rules for which this field will be visible. Click on the button --->', 'wc-kalkulator'); ?>" readonly>
-            <input type="hidden" class="param f-visibility">
-            <input type="hidden" class="param f-visibility-readable">
-        </div>
+            <label>
+                <?php _e('Conditional Visibility', 'wc-kalkulator'); ?>
+                <?php echo Helper::html_help_tip(__('Set the rules for which this field will be visible.', 'wc-kalkulator')); ?>
+            </label>
+            <div class="cv-container">
+                <button type="button"
+                        class="button action-field-visibility"><?php _e('Edit Rules', 'wc-kalkulator'); ?></button>
+                <input type="text" class="param visibility-readable" value=""
+                       placeholder="<?php _e('Set the rules for which this field will be visible. Click on the button --->', 'wc-kalkulator'); ?>"
+                       readonly>
+                <input type="hidden" class="param f-visibility">
+                <input type="hidden" class="param f-visibility-readable">
+            </div>
         <?php endif; ?>
     </div>
 </div>

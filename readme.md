@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -149,6 +149,10 @@ You can use `acf('field_name')` function to get ACF field value in custom price 
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-08-16 v.1.5.2, v.1.5.3
+- image upload bug fix
+- option to display text before or after field's title
+
 2022-08-11 v.1.5.0
 - fieldset's options (toggle default price blocks)
 - new field: formula value
