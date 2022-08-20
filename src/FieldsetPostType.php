@@ -41,6 +41,7 @@ class FieldsetPostType
         '_wck_priority' => 'int',
         '_wck_stock_reduction_multiplier' => 'text',
         '_wck_variation_prices_visible' => 'bool',
+        '_wck_price_block_action' => 'absint',
         '_wck_javascript' => 'textarea'
     );
 

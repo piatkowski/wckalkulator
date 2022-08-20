@@ -884,6 +884,22 @@ class FieldsetProduct
     }
 
     /**
+     * Add action to render Price Block (before or after add to cart button)
+     *
+     * @return void
+     * @since 1.5.4
+     */
+    public function add_action_price_block()
+    {
+        if ((int)$this->data->price_block_action === 1) {
+            add_action('woocommerce_before_add_to_cart_button', array(Product::class, 'price_block'));
+        } else {
+            add_action('woocommerce_after_add_to_cart_button', array(Product::class, 'price_block'));
+        }
+
+    }
+
+    /**
      * Cannot clone singleton
      *
      * @since 1.1.0

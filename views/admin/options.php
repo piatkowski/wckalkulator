@@ -2,6 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 use WCKalkulator\Helper;
 
 global $post;
@@ -18,5 +19,17 @@ global $post;
         <?php _e("Show price blocks for variable products", 'wc-kalkulator'); ?>
         <?php echo Helper::html_help_tip(__('Check this option to show variation price blocks on product page. Default: hidden.', 'wc-kalkulator')); ?>
     </label>
+</p>
+<p>
+    <?php
+    $price_block_action = (int)get_post_meta($post->ID, '_wck_price_block_action', true);
+    ?>
+    <label for="wck_price_block_action" class="post-attributes-label">
+        <?php _e("Position of the price block"); ?>
+    </label>
+    <select id="wck_price_block_action" name="_wck_price_block_action">
+        <option value="0"<?php selected($price_block_action, 0); ?>><?php _e('After Add to Cart button', 'wc-kalkulator'); ?></option>
+        <option value="1"<?php selected($price_block_action, 1); ?>><?php _e('Before Add to Cart button', 'wc-kalkulator'); ?></option>
+    </select>
 </p>
 
