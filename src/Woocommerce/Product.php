@@ -32,7 +32,7 @@ class Product
         add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'before_calculate_totals'), 10, 1);
         add_filter('woocommerce_cart_item_name', array(__CLASS__, 'cart_item_name'), 10, 3);
         add_action('woocommerce_checkout_create_order_line_item', array(__CLASS__, 'checkout_create_order_line_item'), 10, 4);
-        add_action('woocommerce_after_add_to_cart_button', array(__CLASS__, 'price_block'));
+        add_action('woocommerce_before_add_to_cart_button', array(__CLASS__, 'price_block'));
         add_filter('woocommerce_order_item_quantity', array(__CLASS__, 'reduce_inventory'), 10, 3);
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
         add_action('woocommerce_before_order_itemmeta', array(__CLASS__, 'display_itemmeta_for_admin'), 10, 3);

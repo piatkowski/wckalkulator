@@ -53,7 +53,7 @@ class PriceFilter
     public function filter_price_html($price, $product)
     {
         $product_id = $product->get_id();
-        $fieldset = FieldsetProduct::getInstance();
+        $fieldset = FieldsetProduct::getTempInstance(); //fix 1.5.4
 
         if ($fieldset->has_fieldset($product_id)) {
             

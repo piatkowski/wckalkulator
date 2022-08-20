@@ -24,6 +24,12 @@ class FieldsetProduct
     private static $instance = null;
 
     /**
+     * Temporary instance for Price Filter feature
+     * @var array
+     */
+    private static $instance_temp = null;
+
+    /**
      * @var array
      */
     private $validation_notices = array();
@@ -80,6 +86,21 @@ class FieldsetProduct
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Get second instance (for temporary use)
+     *
+     * @return FieldsetProduct
+     * @since 1.5.4
+     */
+    public static function getTempInstance(): FieldsetProduct
+    {
+        if (self::$instance_temp === null) {
+            self::$instance_temp = new static();
+        }
+
+        return self::$instance_temp;
     }
 
     /**
