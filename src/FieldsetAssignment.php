@@ -84,6 +84,7 @@ class FieldsetAssignment
      */
     public static function match($product_id)
     {
+
         if ((int)$product_id === 0)
             return 0;
         /*
@@ -92,6 +93,7 @@ class FieldsetAssignment
         $cached = Cache::get('FieldsetAssignment_match_' . $product_id);
         if ($cached)
             return $cached;
+
         /*
          * Get categories IDs
          */
@@ -120,7 +122,11 @@ class FieldsetAssignment
          * Get product attributes IDs
          */
         $attribute_id = array();
-        $taxonomies = get_taxonomies(null, 'objects');
+        $taxonomies = Cache::get('FieldsetAssignment_taxonomies');
+        if (empty($taxonomies)) {
+            $taxonomies = get_taxonomies(null, 'objects');
+            Cache::store('FieldsetAssignment_taxonomies', $taxonomies);
+        }
         foreach ($taxonomies as $taxonomy) {
             $attributes = get_the_terms($product_id, $taxonomy->name);
             if (is_array($attributes)) {
@@ -132,26 +138,33 @@ class FieldsetAssignment
         /*
          * Get all fieldsets
          */
-        $posts = get_posts(array(
-            'post_type' => FieldsetPostType::POST_TYPE,
-            'per_page' => -1,
-            'numberposts' => -1,
-            'post_status' => 'publish'
-        ));
+        $posts = Cache::get('FieldsetAssignment_all_fieldsets');
+        if (empty($posts)) {
+            $posts = get_posts(array(
+                'post_type' => FieldsetPostType::POST_TYPE,
+                'per_page' => -1,
+                'numberposts' => -1,
+                'post_status' => 'publish'
+            ));
+            Cache::store('FieldsetAssignment_all_fieldsets', $posts);
+        }
 
         $matching = null;
         $max_priority = -INF;
 
         foreach ($posts as $post) {
-
-            $assign = array(
-                'type' => get_post_meta($post->ID, '_wck_assign_type', true),
-                'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
-                'categories' => (array)get_post_meta($post->ID, '_wck_assign_categories', true),
-                'tags' => (array)get_post_meta($post->ID, '_wck_assign_tags', true),
-                'attributes' => (array)get_post_meta($post->ID, '_wck_assign_attributes', true),
-                'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
-            );
+            $assign = Cache::get('FieldsetAssignment_fieldset_assign' . $post->ID);
+            if(empty($assign)) {
+                $assign = array(
+                    'type' => get_post_meta($post->ID, '_wck_assign_type', true),
+                    'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
+                    'categories' => (array)get_post_meta($post->ID, '_wck_assign_categories', true),
+                    'tags' => (array)get_post_meta($post->ID, '_wck_assign_tags', true),
+                    'attributes' => (array)get_post_meta($post->ID, '_wck_assign_attributes', true),
+                    'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
+                );
+                Cache::store('FieldsetAssignment_fieldset_assign' . $post->ID, $assign);
+            }
 
             $has_match = false;
             switch ($assign['type']) {

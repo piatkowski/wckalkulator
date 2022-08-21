@@ -229,7 +229,6 @@ if (!class_exists('WCKalkulator\Plugin')) {
         }
 
     }
-
     Plugin::run();
 }
 
