@@ -6,7 +6,7 @@ use WCKalkulator\Woocommerce\Attribute;
 use WCKalkulator\Woocommerce\Product;
 
 /**
- * Class FieldsetProduct [Singleton]
+ * Class FieldsetProduct
  *
  * This class handles all core operations between the Fieldset (Field group) and the Product.
  *
@@ -18,7 +18,7 @@ use WCKalkulator\Woocommerce\Product;
 class FieldsetProduct
 {
     /**
-     * Singleton instances
+     * Main instance
      * @var array
      */
     private static $instance = null;
