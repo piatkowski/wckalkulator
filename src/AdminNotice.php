@@ -43,7 +43,7 @@ class AdminNotice
      */
     public static function schedule()
     {
-        if (Settings::get('dismiss_notices') === 'no' && !wp_next_scheduled(AdminNotice::TASK)) {
+        if (current_user_can('manage_woocommerce') && Settings::get('dismiss_notices') === 'no' && !wp_next_scheduled(AdminNotice::TASK)) {
             wp_schedule_event(time(), 'twice_a_week', AdminNotice::TASK);
         }
     }

@@ -230,7 +230,7 @@ You can get image file from the customer. Files are saved in customer directory 
 Go to Settings Page to set cron jobs invervals. Files are uploaded to the temp directory and will be deleted after time. Files will be kept longer if the customer places an order.
 Customer files will be deleted after 360 days (default option), but you can set your own interval.
 !!!
-You can use ``{field_name:size}`` variable in formulas to get uploaded image file size in [bytes]
+You can use ``{field_name:size}`` variable in formulas to get uploaded image file size in [MiB]
 !!!
 
 ## Special: Formula Value

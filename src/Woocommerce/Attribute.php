@@ -36,15 +36,17 @@ class Attribute
      */
     public static function woocommerce_loaded()
     {
-        $attributes = wc_get_attribute_taxonomies();
-        if (!empty($attributes)) {
-            foreach ($attributes as $attribute) {
-                add_action('pa_' . $attribute->attribute_name . '_add_form_fields', array(__CLASS__, 'add_form'));
-                add_action('pa_' . $attribute->attribute_name . '_edit_form_fields', array(__CLASS__, 'edit_form'), 10, 2);
-                add_action('manage_edit-pa_' . $attribute->attribute_name . '_columns', array(__CLASS__, 'add_columns'));
-                add_filter('manage_pa_' . $attribute->attribute_name . '_custom_column', array(__CLASS__, 'column_content'), 10, 3);
-                add_action('created_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
-                add_action('edited_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
+        if(current_user_can('manage_woocommerce')) {
+            $attributes = wc_get_attribute_taxonomies();
+            if (!empty($attributes)) {
+                foreach ($attributes as $attribute) {
+                    add_action('pa_' . $attribute->attribute_name . '_add_form_fields', array(__CLASS__, 'add_form'));
+                    add_action('pa_' . $attribute->attribute_name . '_edit_form_fields', array(__CLASS__, 'edit_form'), 10, 2);
+                    add_action('manage_edit-pa_' . $attribute->attribute_name . '_columns', array(__CLASS__, 'add_columns'));
+                    add_filter('manage_pa_' . $attribute->attribute_name . '_custom_column', array(__CLASS__, 'column_content'), 10, 3);
+                    add_action('created_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
+                    add_action('edited_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
+                }
             }
         }
     }

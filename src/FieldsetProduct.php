@@ -6,7 +6,7 @@ use WCKalkulator\Woocommerce\Attribute;
 use WCKalkulator\Woocommerce\Product;
 
 /**
- * Class FieldsetProduct [Singleton]
+ * Class FieldsetProduct
  *
  * This class handles all core operations between the Fieldset (Field group) and the Product.
  *
@@ -18,10 +18,16 @@ use WCKalkulator\Woocommerce\Product;
 class FieldsetProduct
 {
     /**
-     * Singleton instances
+     * Main instance
      * @var array
      */
     private static $instance = null;
+
+    /**
+     * Temporary instance for Price Filter feature
+     * @var array
+     */
+    private static $instance_temp = null;
 
     /**
      * @var array
@@ -80,6 +86,21 @@ class FieldsetProduct
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Get second instance (for temporary use)
+     *
+     * @return FieldsetProduct
+     * @since 1.5.4
+     */
+    public static function getTempInstance(): FieldsetProduct
+    {
+        if (self::$instance_temp === null) {
+            self::$instance_temp = new static();
+        }
+
+        return self::$instance_temp;
     }
 
     /**
@@ -860,6 +881,22 @@ class FieldsetProduct
         if (!empty($js)) {
             wp_add_inline_script('wck-ajax-script', '(function ($) { $(document).ready(function ($) { ' . html_entity_decode($js, ENT_QUOTES) . ' }) })(jQuery);');
         }
+    }
+
+    /**
+     * Add action to render Price Block (before or after add to cart button)
+     *
+     * @return void
+     * @since 1.5.4
+     */
+    public function add_action_price_block()
+    {
+        if ((int)$this->data->price_block_action === 1) {
+            add_action('woocommerce_before_add_to_cart_button', array(Product::class, 'price_block'));
+        } else {
+            add_action('woocommerce_after_add_to_cart_button', array(Product::class, 'price_block'));
+        }
+
     }
 
     /**

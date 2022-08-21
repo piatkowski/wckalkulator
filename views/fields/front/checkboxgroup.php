@@ -8,13 +8,7 @@ if (!defined('ABSPATH')) {
     <?php echo wp_kses_post(apply_filters('wck_field_td_label', '<td class="label">', $view->field_type)); ?>
         <?php echo wp_kses($view->hint, \WCKalkulator\Sanitizer::allowed_html()); ?>
         <label for="<?php echo esc_html($view->id); ?>">
-            <?php echo esc_html($view->title); ?>
-            <?php if (absint($view->select_limit) > 0): ?>
-                <small class="multicheckbox-limit-info"><?php echo esc_html(sprintf(__('(max. %s)', 'wc-kalkulator'), $view->select_limit)); ?></small>
-            <?php endif; ?>
-            <?php if (isset($view->show_required_asterisk) && $view->show_required_asterisk) : ?>
-                <span class="required-asterisk">*</span>
-            <?php endif; ?>
+            <?php include '_label.php'; ?>
         </label>
     </td>
     <?php echo wp_kses_post(apply_filters('wck_field_td', '<td class="value">', $view->field_type)); ?>

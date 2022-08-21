@@ -23,7 +23,7 @@ class Settings
      */
     public static function init()
     {
-        add_action('admin_init', array(__CLASS__, 'settings_init'));
+        add_action('init', array(__CLASS__, 'settings_init'));
         add_action('admin_menu', array(__CLASS__, 'add_menu_page'));
         self::$fields = array(
             'form_css_selector' => array(
@@ -91,6 +91,8 @@ class Settings
      */
     public static function settings_init()
     {
+        if(!current_user_can('manage_woocommerce')) return;
+
         register_setting(self::PAGE, self::OPTIONS, array(__CLASS__, 'validate'));
 
         /*
