@@ -5,6 +5,10 @@
 
     $(document).ready(function ($) {
 
+        if (!$("body").hasClass("folded")) {
+            $("body").addClass("folded");
+        }
+
         var suggest = [];
         var input_key_pressed = {};
 
@@ -130,7 +134,7 @@
 
             }
             $("#wck-parameters .total-price").toggle($(this).hasClass("show-total-price"));
-            if(!$(this).hasClass("show-total-price") && $("#wck-parameters").val() === '{total_price}') {
+            if (!$(this).hasClass("show-total-price") && $("#wck-parameters").val() === '{total_price}') {
                 $("#wck-parameters").val("");
             }
         }).on("focusout", "#wck_expression input, #wck_inventory input, input.expression-editor-enabled", function (e) {
@@ -503,7 +507,7 @@
                 };
 
                 if ($row.find('select.f-required').length > 0) {
-                    switch($row.find('select.f-required').val()) {
+                    switch ($row.find('select.f-required').val()) {
                         case "on":
                             field.required = "1"; //true
                             break;
@@ -1317,7 +1321,6 @@
         $WK.init();
         $WK.loadExpression();
         $WK.autocomplete();
-
 
     });
 })(jQuery);

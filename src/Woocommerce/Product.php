@@ -60,7 +60,9 @@ class Product
             /*
              * @since 1.5.4
              */
-            $fieldset->add_action_price_block();
+            if ($fieldset->has_expression('current')) {
+                $fieldset->add_action_price_block();
+            }
 
             /*
              * "Price.min.css" forces price block to be hidden.
@@ -218,19 +220,14 @@ class Product
         return $validation;
     }
 
-    /**
+    /**s
      * Render price block to show Ajax result (Total price)
      *
      * @since 1.1.0
      */
     public static function price_block()
     {
-        $fieldset = FieldsetProduct::getInstance();
-        if ($fieldset->has_fieldset('current')) {
-            if ($fieldset->has_expression('current')) {
-                echo View::render('woocommerce/price_block');
-            }
-        }
+        echo View::render('woocommerce/price_block');
     }
 
     /**
@@ -465,10 +462,9 @@ class Product
 
         global $post;
         $product_id = 0;
-
         if (is_product()) {
             $product_id = $post->ID;
-        } else if (!empty($post->post_content) && strstr($post->post_content, '[product_page')) {
+        } else if (!empty($post->post_content) && strpos($post->post_content, '[product_page') !== false) {
             $product_id = absint(Helper::get_id_from_shortcode_tag($post->post_content, 'product_page'));
         }
 
@@ -476,7 +472,6 @@ class Product
          * Store value to class cache
          */
         Cache::store('Product_get_id', $product_id);
-
         return $product_id;
     }
 

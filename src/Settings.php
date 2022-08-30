@@ -23,7 +23,7 @@ class Settings
      */
     public static function init()
     {
-        add_action('init', array(__CLASS__, 'settings_init'));
+        add_action('admin_init', array(__CLASS__, 'settings_init'));
         add_action('admin_menu', array(__CLASS__, 'add_menu_page'));
         self::$fields = array(
             'form_css_selector' => array(

@@ -75,6 +75,11 @@
         }
 
         function compare(valueA, comp, valueB) {
+            var numA, numB;
+            if(["5", "6", "7", "8"].includes(comp)) {
+                numA = Math.round(parseFloat(valueA) * 1000) / 1000;
+                numB = Math.round(parseFloat(valueB) * 1000) / 1000;
+            }
             try {
                 switch (comp) {
                     case "1":
@@ -85,12 +90,6 @@
                         return valueA === valueB;
                     case "4":
                         return valueA !== valueB;
-                    case "5":
-                    case "6":
-                    case "7":
-                    case "8":
-                        var numA = Math.round(parseFloat(valueA) * 1000) / 1000;
-                        var numB = Math.round(parseFloat(valueB) * 1000) / 1000;
                     case "5":
                         return numA < numB;
                     case "6":

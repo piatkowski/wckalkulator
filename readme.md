@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.5.4
+Stable tag: 1.5.7
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
