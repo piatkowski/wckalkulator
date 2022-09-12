@@ -9,18 +9,46 @@
 
         if (wck_ajax_object.hasOwnProperty("_wck_visibility_rules") && wck_ajax_object._wck_visibility_rules !== null) {
             $.each(wck_ajax_object._wck_visibility_rules, function (fieldName, options) {
-                $("[name*='wck[" + fieldName + "]']").prop("disabled", true).hide().closest('tr').hide();
+                findFieldAndToggle(fieldName, false);
                 CV[fieldName] = options;
             });
+        }
+
+        function findFieldAndToggle(fieldName, show) {
+            var inputField = $("[name*='wck[" + fieldName + "]']");
+            if(inputField.length > 0) {
+                if(show) {
+                    inputField.prop("disabled", false).show().closest('tr').show();
+                } else {
+                    inputField.prop("disabled", true).hide().closest('tr').hide();
+                }
+            } else {
+                var staticField = $("[data-wck-static-name='" + fieldName + "']");
+                if(staticField.length > 0) {
+                    staticField.toggle(show);
+                }
+            }
         }
 
         function updateUI() {
             //wck-dynamic support, conditional visibility support
             var formFields = {};
-            jQuery(_form + " [name^=wck").each(function () {
-                var fieldName = $(this).attr("name").replace("wck[", "").replace("]", "").replace("[]", "");
-                formFields["{" + fieldName + "}"] = $(this).val();
-                if (CV.hasOwnProperty(fieldName)) {
+            jQuery(_form + " [data-wck-static-name] , " + _form + " [name^=wck").each(function () {
+                var fieldName = false;
+                if($(this)[0].hasAttribute("name")) {
+                    var fieldName = $(this).attr("name").replace("wck[", "").replace("]", "").replace("[]", "");
+                    formFields["{" + fieldName + "}"] = $(this).val();
+                    var type = $(this).prop("type");
+                    switch(type) {
+                        case 'file':
+                            formFields["{" + fieldName + ":size}"] = (($(this)[0].files.length === 1) ? Math.round(($(this)[0].files[0].size / 1000000 + Number.EPSILON) * 100) / 100 : 0 );
+                            break;
+                    }
+                } else {
+                    fieldName = $(this).data("wckStaticName");
+                }
+
+                if (fieldName && CV.hasOwnProperty(fieldName)) {
                     toggleField(fieldName, CV[fieldName]);
                 }
             });
@@ -31,7 +59,11 @@
                 vars.forEach(function (v, i) {
                     expr = expr.replaceAll(v, formFields[v]);
                 });
-                $(this).text(Math.round(Mexp.eval(expr) * 100) / 100);
+                try {
+                    $(this).text(Math.round((Mexp.eval(expr) + Number.EPSILON) * 100) / 100);
+                } catch (error) {
+                    console.log("[Mexp]", error);
+                }
             });
         }
 
@@ -43,6 +75,8 @@
                     value = value.substring(0, n);
                 }
                 return value;
+            } else if(field.prop("type") === "file") {
+                return  ((field[0].files.length === 1) ? (Math.round((field[0].files[0].size / 1000000 + Number.EPSILON) * 100) / 100) : 0);
             }
             return field.val();
         }
@@ -64,12 +98,12 @@
                     return state !== false;
                 });
                 if (state === true) {
-                    $("[name*='wck[" + fieldName + "]']").prop("disabled", false).show().closest('tr').show();
+                    findFieldAndToggle(fieldName, true);
                     return false;
                 }
             });
             if (state !== true) {
-                $("[name*='wck[" + fieldName + "]']").prop("disabled", true).hide().closest('tr').hide();
+                findFieldAndToggle(fieldName, false);
                 return false;
             }
         }

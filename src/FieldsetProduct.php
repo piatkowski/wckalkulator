@@ -724,7 +724,12 @@ class FieldsetProduct
                 $this->user_input[$name . ':text'] = sanitize_text_field($input);
                 break;
             case 'imageupload':
-                $this->user_input[$name . ':size'] = round(absint($input) / 1000000, 2);
+                if(is_array($input)) {
+                    $size = $input['size'];
+                } else {
+                    $size = $input;
+                }
+                $this->user_input[$name . ':size'] = round(absint($size) / 1000000, 2);
                 break;
         }
     }
