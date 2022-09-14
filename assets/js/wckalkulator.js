@@ -178,7 +178,6 @@
         updateUI();
         calculatePrice();
 
-
         $("span.wck-field-tip").tipTip({
             attribute: 'title',
             defaultPosition: 'left'

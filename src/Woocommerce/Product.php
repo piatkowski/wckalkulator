@@ -46,8 +46,8 @@ class Product
         PriceFilter::getInstance();
         Cart::getInstance();
 
-        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
-        add_filter('woocommerce_structured_data_product_offer', array(__CLASS__, 'override_structured_data'), 10, 2);
+        //remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
+        //add_filter('woocommerce_structured_data_product_offer', array(__CLASS__, 'override_structured_data'), 10, 2);
     }
 
     /**
@@ -58,7 +58,7 @@ class Product
      * @return array
      * @since 1.5.8
      */
-    public static function override_structured_data($markup_offer, $product)
+    /*public static function override_structured_data($markup_offer, $product)
     {
         if(self::$default_price > 0) {
             $formated_price = wc_format_decimal(self::$default_price, wc_get_price_decimals());
@@ -66,7 +66,7 @@ class Product
             $markup_offer['priceSpecification']['price'] = $formated_price;
         }
         return $markup_offer;
-    }
+    }*/
 
     /**
      * Add styles and scripts to the product page
@@ -87,7 +87,7 @@ class Product
                 $fieldset->add_action_price_block();
             }
 
-            $default_price = 0;
+            /*$default_price = 0;
             $fieldset = FieldsetProduct::getInstance();
             $fieldset->init();
             $fieldset->set_default_input();
@@ -99,7 +99,7 @@ class Product
                     $default_price = 0;
                 }
             }
-            self::$default_price = $default_price;
+            self::$default_price = $default_price;*/
 
             /*
              * "Price.min.css" forces price block to be hidden.
