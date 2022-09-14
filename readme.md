@@ -154,6 +154,7 @@ Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 - image file upload bug fixes
 - conditional visibility works with static fields (html, paragraph)
 - added support for {image:size} in HTML field's content (for example: {={image:size}} MB)
+- display calculated product price in the cart widget (cart popup)
 
 v.1.5.5-1.5.7
 - bug fixes
