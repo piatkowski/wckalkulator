@@ -43,6 +43,8 @@ class Product
 
         PriceFilter::getInstance();
         Cart::getInstance();
+
+        remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
     }
 
     /**
@@ -227,7 +229,21 @@ class Product
      */
     public static function price_block()
     {
-        echo View::render('woocommerce/price_block');
+        $default_price = 0;
+        $fieldset = FieldsetProduct::getInstance();
+        $fieldset->init();
+        $fieldset->set_default_input();
+        if($fieldset->validate(true)) {
+            try {
+                $default_price = $fieldset->calculate_minimum();
+                $default_price = $default_price['value'];
+            } catch (\Exception $e) {
+                $default_price = 0;
+            }
+        }
+        echo View::render('woocommerce/price_block', array(
+            'default_price' => $default_price
+        ));
     }
 
     /**
