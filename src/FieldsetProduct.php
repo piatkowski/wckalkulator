@@ -659,6 +659,7 @@ class FieldsetProduct
                 $this->user_input["product_height"] = $product_helper->get_height();
                 $this->user_input["product_length"] = $product_helper->get_length();
                 $this->user_input["product_regular_price"] = $product_helper->regular_price();
+                $this->user_input["product_is_on_sale"] = (bool) $product_helper->is_on_sale();
             }
         }
 
@@ -724,6 +725,7 @@ class FieldsetProduct
                 $this->user_input[$name . ':text'] = sanitize_text_field($input);
                 break;
             case 'imageupload':
+            case 'fileupload':
                 if(is_array($input)) {
                     $size = $input['size'];
                 } else {

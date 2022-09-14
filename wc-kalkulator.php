@@ -68,7 +68,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\EmailField::class,
             Fields\RadioField::class,
             Fields\ImageselectField::class,
-            //Fields\FileuploadField::class, - turn off
+            Fields\FileuploadField::class,
             Fields\ImageuploadField::class,
             Fields\HtmlField::class,
             Fields\HeadingField::class,
