@@ -50,6 +50,14 @@ class Product
         add_filter('woocommerce_structured_data_product_offer', array(__CLASS__, 'override_structured_data'), 10, 2);
     }
 
+    /**
+     * Change product price in structured data
+     *
+     * @param $markup_offer
+     * @param $product
+     * @return array
+     * @since 1.5.8
+     */
     public static function override_structured_data($markup_offer, $product)
     {
         if(self::$default_price > 0) {
