@@ -156,6 +156,7 @@ Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 - added support for {image:size} in HTML field's content (for example: {={image:size}} MB)
 - display calculated product price in the cart widget (cart popup)
 - new parameter: product_is_on_sale to use in formula
+- added parameters to js dynamic formula in HTML field
 - bug fixed: incorrect value of the image swatch in the cart
 
 v.1.5.5-1.5.7
