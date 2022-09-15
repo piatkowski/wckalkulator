@@ -796,7 +796,7 @@ class FieldsetProduct
      * Calculate minimum price amount to display in price block
      *
      * @return void
-     * @since 1.5.8
+     * @since 1.6.0
      */
     public function calculate_minimum()
     {

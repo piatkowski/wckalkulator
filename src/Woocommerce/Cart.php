@@ -74,7 +74,7 @@ class Cart
      * @param $cart_item
      * @param $cart_item_key
      * @return mixed|string
-     * @since 1.5.8
+     * @since 1.6.0
      */
     public function widget_cart_item_quantity($html, $cart_item, $cart_item_key)
     {

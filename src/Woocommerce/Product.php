@@ -56,7 +56,7 @@ class Product
      * @param $markup_offer
      * @param $product
      * @return array
-     * @since 1.5.8
+     * @since 1.6.0
      */
     /*public static function override_structured_data($markup_offer, $product)
     {
