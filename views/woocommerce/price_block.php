@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 <p class="wckalkulator-price">
     <?php _e('Total', 'wc-kalkulator'); ?>
-    <span id="wckalkulator-price-off"></span>
+    <span id="wckalkulator-price"></span>
 </p>
 <?php
 /*if(isset($view->default_price) && floatval($view->default_price) > 0) {
