@@ -53,6 +53,10 @@
                 }
             });
 
+            $.each(wck_ajax_object._wck_additional_parameters, function (name, value) {
+                formFields["{" + name + "}"] = value;
+            });
+
             $("span.wck-dynamic").each(function () {
                 var expr = $(this).data('expr');
                 var vars = expr.match(/{[^}]+}/gm);

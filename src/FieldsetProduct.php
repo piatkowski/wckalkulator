@@ -617,36 +617,37 @@ class FieldsetProduct
     /**
      * Add field's static price to $user_input
      *
-     * @param $input
-     * @return void
+     * @param $return
+     * @return void|array
      * @since 1.2.0
      */
-    public function set_additional_input_variables()
+    public function set_additional_input_variables($return = false)
     {
-        if (!is_array($this->user_input)) {
+        if (!$return && !is_array($this->user_input)) {
             return;
         }
-        $field_names = array_keys($this->user_input);
+        if(!$return) {
+            $field_names = array_keys($this->user_input);
+            foreach ($this->fields() as $field) {
+                $name = $field->data("name");
 
-        foreach ($this->fields() as $field) {
-            $name = $field->data("name");
+                // Check if field has price paramter and its name is in user input
+                if ($field->data("price") !== null && in_array($name, $field_names)) {
+                    $static_price = Sanitizer::sanitize($field->data("price"), "price");
 
-            // Check if field has price paramter and its name is in user input
-            if ($field->data("price") !== null && in_array($name, $field_names)) {
-                $static_price = Sanitizer::sanitize($field->data("price"), "price");
+                    if ($field->type() === "checkbox") {
+                        $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                    }
 
-                if ($field->type() === "checkbox") {
-                    $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                    if (empty($this->user_input[$field->data("name")])) {
+                        $static_price = 0;
+                    }
+                    $this->user_input[$name] = $static_price;
                 }
 
-                if (empty($this->user_input[$field->data("name")])) {
-                    $static_price = 0;
+                if ($field->group() !== 'static' && isset($this->user_input[$name])) {
+                    $this->set_additional_field_parameters($field, $this->user_input[$name]);
                 }
-                $this->user_input[$name] = $static_price;
-            }
-
-            if ($field->group() !== 'static' && isset($this->user_input[$name])) {
-                $this->set_additional_field_parameters($field, $this->user_input[$name]);
             }
         }
 
@@ -694,6 +695,10 @@ class FieldsetProduct
             "fieldset_id" => $this->get_id(),
             "variation_id" => $this->variation_id //lowest priority
         ));
+
+        if($return) {
+            return $this->user_input;
+        }
 
     }
 
