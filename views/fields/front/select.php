@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
     <?php echo wp_kses_post(apply_filters('wck_field_td', '<td class="value">', $view->field_type)); ?>
         <select id="<?php echo esc_html($view->id); ?>"
                 name="<?php echo esc_html($view->name); ?>" <?php echo esc_html($view->required); ?>>
+            <option value=""><?php _e( 'Choose an option', 'woocommerce' ); ?></option>
         <?php foreach ($view->options_name as $i => $opt_name) : ?>
             <option class="attached enabled"
                     value="<?php echo esc_html($opt_name); ?>" <?php selected($view->value, $opt_name); ?>>

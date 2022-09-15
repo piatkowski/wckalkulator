@@ -157,6 +157,7 @@ Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 - display calculated product price in the cart widget (cart popup)
 - new parameter: product_is_on_sale to use in formula
 - added parameters to js dynamic formula in HTML field
+- added placeholder for select and dropdown fields
 - bug fixed: incorrect value of the image swatch in the cart
 
 v.1.5.5-1.5.7
