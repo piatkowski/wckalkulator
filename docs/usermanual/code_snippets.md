@@ -55,3 +55,40 @@ WCK Plugin can't work in a lightbox, so in this code snippet we will show how to
     add_action('woocommerce_before_add_to_cart_button', 'wck_before_atc');
     add_action('woocommerce_after_add_to_cart_button', 'wck_after_atc');
 ```
+
+## 2. Move Price block to the different position - for example above the fields
+
+```
+if( !function_exists('wck_add_custom_price_block') ) {
+    function wck_add_custom_price_block() {
+        /* 
+         * Here you can customize price block.
+         * Tag with id="wckalkulator-price" is required!
+         */
+?>
+        <p class="wckalkulator-price">
+            <span id="wckalkulator-price"></span>
+        </p>
+<?php
+    }
+}
+
+if( !function_exists('wck_remove_default_price_block') ) {
+    function wck_custom_price_block() {
+        remove_action(
+            'woocommerce_before_add_to_cart_button',  
+            array('WCKalkulator\Woocommerce\Product', 'price_block')
+        );
+        remove_action(
+            'woocommerce_after_add_to_cart_button',   
+            array('WCKalkulator\Woocommerce\Product', 'price_block')
+        );
+    }
+}
+
+// priority must be > 10 and the hook must be wp_enqueue_scripts
+add_action( 'wp_enqueue_scripts', 'wck_remove_default_price_block', 20);
+
+// woocommerce_before_add_to_cart_form - is an example
+add_action('woocommerce_before_add_to_cart_form', 'wck_add_custom_price_block');
+```
