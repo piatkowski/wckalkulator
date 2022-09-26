@@ -629,6 +629,7 @@
                         field.disallow_past_date = input_fdpdisallow_past_date.is(':checked');
                         break;
                     case 'imageupload':
+                    case 'fileupload':
                         //field.max_file_count = $row.find('input.fu-max-file-count').val();
                         field.max_file_size = $row.find('input.fu-max-file-size').val();
                         field.allowed_extensions = $row.find('input.fu-allowed-extensions').val();
@@ -749,10 +750,10 @@
                     suggest.push(field.name + ":date");
                     // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
                     $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date}">Timestamp of "' + field.title + '" {' + field.name + ':date}' + '</option>');
-                } else if (field.type === "imageupload") {
+                } else if (field.type === "imageupload" || field.type === "fileupload") {
                     suggest.push(field.name + ":size");
                     //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + ' [bytes]</option>');
+                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + ' [MB]</option>');
                 }
             }
         };
@@ -919,7 +920,7 @@
                         //$("#" + field_id + " .ft-pattern").val(this.pattern);
                     } else if (this.type === "colorpicker" || this.type === "datepicker" || this.type === "rangedatepicker") {
                         $("#" + field_id + " .fdp-disallow-past-date").prop("checked", this.disallow_past_date);
-                    } else if (this.type === "imageupload") {
+                    } else if (this.type === "imageupload" || this.type === "fileupload") {
                         $("#" + field_id + " .fu-max-file-size").val(this.max_file_size);
                         $("#" + field_id + " .fu-allowed-extensions").val(this.allowed_extensions);
                         var ext = this.allowed_extensions.split("|");

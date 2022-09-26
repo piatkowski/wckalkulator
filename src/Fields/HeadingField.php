@@ -37,6 +37,7 @@ class HeadingField extends HtmlField
     public function render_for_product($value = "")
     {
         return View::render('fields/front/' . $this->type, array(
+            'name' => $this->data('name'),
             'content' => $this->data('content'),
             'level' => $this->data('level')
         ));

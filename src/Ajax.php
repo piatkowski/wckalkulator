@@ -58,6 +58,8 @@ class Ajax
     {
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset('current')/* && $fieldset->has_expression('current')*/) {
+            $fieldset->init();
+            $formula_parameters = $fieldset->set_additional_input_variables(true);
 
             wp_enqueue_script(
                 'wck-ajax-script',
@@ -76,7 +78,8 @@ class Ajax
                         '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
                         '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
                         'form' => Settings::get('form_css_selector'),
-                        '_wck_visibility_rules' => $fieldset->visibility_rules()
+                        '_wck_visibility_rules' => $fieldset->visibility_rules(),
+                        '_wck_additional_parameters' => ($formula_parameters)
                     )
                 ) . ';'
             );

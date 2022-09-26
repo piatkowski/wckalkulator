@@ -19,6 +19,8 @@ use WCKalkulator\View;
  */
 class Product
 {
+    private static $default_price = 0;
+
     /**
      * Add hooks and filters
      *
@@ -43,7 +45,28 @@ class Product
 
         PriceFilter::getInstance();
         Cart::getInstance();
+
+        //remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
+        //add_filter('woocommerce_structured_data_product_offer', array(__CLASS__, 'override_structured_data'), 10, 2);
     }
+
+    /**
+     * Change product price in structured data
+     *
+     * @param $markup_offer
+     * @param $product
+     * @return array
+     * @since 1.6.0
+     */
+    /*public static function override_structured_data($markup_offer, $product)
+    {
+        if(self::$default_price > 0) {
+            $formated_price = wc_format_decimal(self::$default_price, wc_get_price_decimals());
+            $markup_offer['price'] = $formated_price;
+            $markup_offer['priceSpecification']['price'] = $formated_price;
+        }
+        return $markup_offer;
+    }*/
 
     /**
      * Add styles and scripts to the product page
@@ -63,6 +86,20 @@ class Product
             if ($fieldset->has_expression('current')) {
                 $fieldset->add_action_price_block();
             }
+
+            /*$default_price = 0;
+            $fieldset = FieldsetProduct::getInstance();
+            $fieldset->init();
+            $fieldset->set_default_input();
+            if ($fieldset->validate(true)) {
+                try {
+                    $default_price = $fieldset->calculate_minimum();
+                    $default_price = $default_price['value'];
+                } catch (\Exception $e) {
+                    $default_price = 0;
+                }
+            }
+            self::$default_price = $default_price;*/
 
             /*
              * "Price.min.css" forces price block to be hidden.
@@ -227,7 +264,9 @@ class Product
      */
     public static function price_block()
     {
-        echo View::render('woocommerce/price_block');
+        echo View::render('woocommerce/price_block', array(
+            'default_price' => self::$default_price
+        ));
     }
 
     /**

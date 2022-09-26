@@ -44,6 +44,7 @@ class HtmlField extends AbstractField
             $content = str_replace($matches[0], '<span class="wck-dynamic" data-expr="'.$matches[1].'"></span>', $content);
         }
         return View::render('fields/front/' . $this->type, array(
+            'name' => $this->data('name'),
             'content' => $content
         ));
     }

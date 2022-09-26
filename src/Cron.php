@@ -115,6 +115,10 @@ class Cron
         //$upload_path = wp_upload_dir()['basedir'] . $customer_dir;
         $upload_path = Settings::get('upload_customer_data_dir');
 
+        if(!file_exists($upload_path)) {
+            return;
+        }
+
         $ext = array('jpg', 'jpeg', 'png', 'gif');
         $dir = new \RecursiveDirectoryIterator($upload_path);
         $files = new \RecursiveIteratorIterator($dir);

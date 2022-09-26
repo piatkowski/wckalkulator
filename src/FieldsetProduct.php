@@ -360,6 +360,22 @@ class FieldsetProduct
         return false;
     }
 
+    public function set_default_input()
+    {
+        $data = array();
+        foreach ($this->fields() as $name => $field) {
+            $field = (object) $field->data();
+            if ((int)$field->use_expression === 1) {
+                if($field->type === 'checkboxgroup') {
+                    $data[$name] = array($field->default_value);
+                } else {
+                    $data[$name] = $field->default_value;
+                }
+            }
+        }
+        $this->user_input = $data;
+    }
+
     /**
      * Gets user input from $_POST. Sanitize input
      *
@@ -368,7 +384,6 @@ class FieldsetProduct
      */
     public function get_user_input()
     {
-        $user_input = array();
         $allowed_names = $this->fields_names();
 
         //if (isset($_POST['wck']) && is_array($_POST['wck'])) {
@@ -386,17 +401,6 @@ class FieldsetProduct
 
         $user_input = Sanitizer::sanitize($filtered_post, 'array');
         //}
-
-        foreach ($allowed_names as $name) {
-            if (isset($_POST['wck'][$name])) {
-                $filtered_post[$name] = $_POST['wck'][$name];
-            } else {
-                /* Set Default values if the field is not in POST data */
-                if ($this->field($name)['type'] === 'checkboxgroup') {
-                    $filtered_post[$name] = array();
-                }
-            }
-        }
 
         $user_input['_files'] = array();
 
@@ -613,36 +617,37 @@ class FieldsetProduct
     /**
      * Add field's static price to $user_input
      *
-     * @param $input
-     * @return void
+     * @param $return
+     * @return void|array
      * @since 1.2.0
      */
-    public function set_additional_input_variables()
+    public function set_additional_input_variables($return = false)
     {
-        if (!is_array($this->user_input)) {
+        if (!$return && !is_array($this->user_input)) {
             return;
         }
-        $field_names = array_keys($this->user_input);
+        if(!$return) {
+            $field_names = array_keys($this->user_input);
+            foreach ($this->fields() as $field) {
+                $name = $field->data("name");
 
-        foreach ($this->fields() as $field) {
-            $name = $field->data("name");
+                // Check if field has price paramter and its name is in user input
+                if ($field->data("price") !== null && in_array($name, $field_names)) {
+                    $static_price = Sanitizer::sanitize($field->data("price"), "price");
 
-            // Check if field has price paramter and its name is in user input
-            if ($field->data("price") !== null && in_array($name, $field_names)) {
-                $static_price = Sanitizer::sanitize($field->data("price"), "price");
+                    if ($field->type() === "checkbox") {
+                        $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                    }
 
-                if ($field->type() === "checkbox") {
-                    $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                    if (empty($this->user_input[$field->data("name")])) {
+                        $static_price = 0;
+                    }
+                    $this->user_input[$name] = $static_price;
                 }
 
-                if (empty($this->user_input[$field->data("name")])) {
-                    $static_price = 0;
+                if ($field->group() !== 'static' && isset($this->user_input[$name])) {
+                    $this->set_additional_field_parameters($field, $this->user_input[$name]);
                 }
-                $this->user_input[$name] = $static_price;
-            }
-
-            if ($field->group() !== 'static' && isset($this->user_input[$name])) {
-                $this->set_additional_field_parameters($field, $this->user_input[$name]);
             }
         }
 
@@ -659,6 +664,7 @@ class FieldsetProduct
                 $this->user_input["product_height"] = $product_helper->get_height();
                 $this->user_input["product_length"] = $product_helper->get_length();
                 $this->user_input["product_regular_price"] = $product_helper->regular_price();
+                $this->user_input["product_is_on_sale"] = (bool)$product_helper->is_on_sale();
             }
         }
 
@@ -689,6 +695,10 @@ class FieldsetProduct
             "fieldset_id" => $this->get_id(),
             "variation_id" => $this->variation_id //lowest priority
         ));
+
+        if($return) {
+            return $this->user_input;
+        }
 
     }
 
@@ -724,7 +734,13 @@ class FieldsetProduct
                 $this->user_input[$name . ':text'] = sanitize_text_field($input);
                 break;
             case 'imageupload':
-                $this->user_input[$name . ':size'] = round(absint($input) / 1000000, 2);
+            case 'fileupload':
+                if (is_array($input)) {
+                    $size = $input['size'];
+                } else {
+                    $size = $input;
+                }
+                $this->user_input[$name . ':size'] = round(absint($size) / 1000000, 2);
                 break;
         }
     }
@@ -772,13 +788,28 @@ class FieldsetProduct
                 if (isset($result['value']) && $result['is_error'] === false) {
                     $this->user_input['total_price'] = $result['value'] * $this->user_input["quantity"];
                 }
-                return $parser->execute();
+                return $result;
             } else {
                 return Ajax::response('error', $parser->error);
             }
         } else {
             return Ajax::response('error', __("Fields are not valid!", "wc-kalkulator"));
         }
+    }
+
+    /**
+     * Calculate minimum price amount to display in price block
+     *
+     * @return void
+     * @since 1.6.0
+     */
+    public function calculate_minimum()
+    {
+        $parser = new ExpressionParser($this->expression(), $this->user_input);
+        if ($parser->is_ready()) {
+            return $parser->execute();
+        }
+        return -1;
     }
 
     /**

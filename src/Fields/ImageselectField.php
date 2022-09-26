@@ -32,13 +32,10 @@ class ImageselectField extends SelectField
      */
     public function render_for_cart($value = '')
     {
-        $value = $this->get_option_image($value);
-        
         return View::render('fields/cart', array(
             'title' => $this->data['title'],
             'value' => $this->get_option_title($value),
-            'image' => $value,
-            
+            'image' => $this->get_option_image($value),
         ));
     }
     

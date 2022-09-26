@@ -128,6 +128,7 @@ use WCKalkulator\Cache;
         <optgroup label="Product">
             <option value="{product_price}">Price</option>
             <option value="{product_regular_price}">Regular price</option>
+            <option value="{product_is_on_sale}">Is on sale?</option>
             <option value="{product_weight}">Weight</option>
             <option value="{product_width}">Width</option>
             <option value="{product_height}">Height</option>
