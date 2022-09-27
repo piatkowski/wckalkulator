@@ -5,6 +5,8 @@ icon: git-branch
 ---
 
 # CHANGELOG
+2022-09-27 v.1.6.1
+- fixed issue with color picker
 
 2022-09-26 v.1.6.0
 - image file upload bug fixes
