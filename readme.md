@@ -150,7 +150,7 @@ Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
 
-2022-09-?? v.1.6.0
+2022-09-26 v.1.6.0
 - image file upload bug fixes
 - conditional visibility works with static fields (html, paragraph)
 - added support for {image:size} in HTML field's content (for example: {={image:size}} MB)
