@@ -2,7 +2,7 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 Requires PHP: 5.6
 License: GNU GPLv2
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
@@ -149,8 +149,10 @@ You can use `acf('field_name')` function to get ACF field value in custom price 
 Full documentation at: [www.wckalkulator.com](https://wckalkulator.com)
 
 == Changelog ==
+2022-09-27 v.1.6.1
+- fixed issue with color picker
 
-2022-09-?? v.1.6.0
+2022-09-26 v.1.6.0
 - image file upload bug fixes
 - conditional visibility works with static fields (html, paragraph)
 - added support for {image:size} in HTML field's content (for example: {={image:size}} MB)
