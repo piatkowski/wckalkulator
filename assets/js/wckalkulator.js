@@ -190,7 +190,7 @@
             defaultPosition: 'left'
         });
 
-        $("input[type=checkbox][data-type='checkboxgroup']").change(function (e) {
+        $("input[type=checkbox][data-type='checkboxgroup'], input[type=checkbox][data-type='productbundlecheckbox']").change(function (e) {
             var group = $(this).data("group");
             var required = $(this).data("required") === 1;
             var limit = $(this).data("limit");
@@ -214,7 +214,7 @@
         $(_form).submit(function (e) {
             var lastGroup = "";
             var _form = $(this).get(0);
-            $("input[type=checkbox][data-type='checkboxgroup']").each(function () {
+            $("input[type=checkbox][data-type='checkboxgroup'], input[type=checkbox][data-type='productbundlecheckbox']").each(function () {
                 var group = $(this).data("group");
                 if (group !== lastGroup) {
                     if ($(this).data("required") === 1 && $("input[type=checkbox][data-group=" + group + "]:checked").length === 0) {

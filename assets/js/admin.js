@@ -545,12 +545,13 @@
                     case 'colorswatches':
                     case 'radiogroup':
                     case 'checkboxgroup':
+                    case 'productbundlecheckbox':
                         field.options_name = [];
                         field.options_title = [];
                         if (field.type === "imageselect" || field.type === "imageswatches") {
                             field.options_image = [];
                         }
-                        if (field.type === "checkboxgroup") {
+                        if (field.type === "checkboxgroup" || field.type === "productbundlecheckbox") {
                             field.select_limit = $row.find("input.fcbg-limit").val();
                         }
                         $fs_options = $row.find(".fs-option");
@@ -845,7 +846,7 @@
                             }
                         });
 
-                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup', 'imageswatches', 'colorswatches'].indexOf(this.type) >= 0) {
+                    } else if (['select', 'radio', 'imageselect', 'radiogroup', 'checkboxgroup', 'imageswatches', 'colorswatches', 'productbundlecheckbox'].indexOf(this.type) >= 0) {
                         options_name = this.options_name;
                         options_title = this.options_title;
                         default_value = this.default_value;
@@ -853,7 +854,7 @@
                             options_image = this.options_image;
                             wp.media.attachment(options_image).fetch();
                         }
-                        if (this.type === "checkboxgroup") {
+                        if (this.type === "checkboxgroup" || this.type === 'productbundlecheckbox') {
                             $("#" + field_id + " .fcbg-limit").val(this.select_limit);
                         }
                         //console.log("Dropdown: ", default_value);

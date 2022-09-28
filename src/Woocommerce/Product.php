@@ -3,6 +3,7 @@
 namespace WCKalkulator\Woocommerce;
 
 use WCKalkulator\Cache;
+use WCKalkulator\Fields\ProductBundleCheckboxField;
 use WCKalkulator\FieldsetProduct;
 use WCKalkulator\Helper;
 use WCKalkulator\Plugin;
@@ -42,7 +43,7 @@ class Product
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
         add_action('woocommerce_before_order_itemmeta', array(__CLASS__, 'display_itemmeta_for_admin'), 10, 3);
         add_filter('woocommerce_hidden_order_itemmeta', array(__CLASS__, 'hide_itemmeta'));
-
+        add_action('template_redirect', array(__CLASS__, 'maybe_add_bundle_to_cart'));
         PriceFilter::getInstance();
         Cart::getInstance();
 
@@ -339,6 +340,25 @@ class Product
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
                 $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
                 $cart_item_data['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
+
+                $product_bundle = array();
+
+                /* Add Bundles to cart item data */
+                foreach($fieldset->fields() as $field) {
+                    if($field instanceof ProductBundleCheckboxField) {
+                        $bundle_field_name = $field->data('name');
+                        if(isset($user_input[$bundle_field_name])) {
+                            $product_ids = $user_input[$bundle_field_name];
+                            if(is_array($product_ids)) {
+                                foreach($product_ids as $product_id) {
+                                    $product_bundle[] = (int) $product_id;
+                                }
+                            }
+                        }
+                    }
+                }
+                Cache::store('product_budle', $product_bundle);
+                Cache::store('product_budle_qty', $quantity);
             }
 
         }
@@ -364,6 +384,7 @@ class Product
                 $value['data']->set_price(($value['wckalkulator_price']));
             }
         }
+
     }
 
     /**
@@ -567,6 +588,16 @@ class Product
             return ceil($multiplier * $quantity);
         }
         return $quantity;
+    }
+
+    public static function maybe_add_bundle_to_cart() {
+        $product_ids = Cache::get_once('product_budle');
+        $qty = (int) Cache::get_once('product_budle_qty');
+        if(is_array($product_ids) && $qty > 0) {
+            foreach($product_ids as $product_id) {
+                WC()->cart->add_to_cart($product_id, $qty);
+            }
+        }
     }
 
 }

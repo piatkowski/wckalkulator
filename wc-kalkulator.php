@@ -79,7 +79,8 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\ImageswatchesField::class,
             Fields\ColorswatchesField::class,
             Fields\EmptyField::class,
-            Fields\HiddenField::class
+            Fields\HiddenField::class,
+            Fields\ProductBundleCheckboxField::class
         );
 
         /**
@@ -231,5 +232,3 @@ if (!class_exists('WCKalkulator\Plugin')) {
     }
     Plugin::run();
 }
-
-
