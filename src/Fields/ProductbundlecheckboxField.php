@@ -8,7 +8,7 @@ use WCKalkulator\View;
  * Class ProductBundleCheckboxField
  * @package WCKalkulator
  */
-class ProductBundleCheckboxField extends CheckboxgroupField
+class ProductbundlecheckboxField extends CheckboxgroupField
 {
     protected $type = "productbundlecheckbox";
     protected $default_data = array("css_class" => "", "required" => false, "default_value" => "", "hint" => "", "select_limit" => 0);

@@ -3,7 +3,7 @@
 namespace WCKalkulator\Woocommerce;
 
 use WCKalkulator\Cache;
-use WCKalkulator\Fields\ProductBundleCheckboxField;
+use WCKalkulator\Fields\ProductbundlecheckboxField;
 use WCKalkulator\FieldsetProduct;
 use WCKalkulator\Helper;
 use WCKalkulator\Plugin;
@@ -345,7 +345,7 @@ class Product
 
                 /* Add Bundles to cart item data */
                 foreach($fieldset->fields() as $field) {
-                    if($field instanceof ProductBundleCheckboxField) {
+                    if($field instanceof ProductbundlecheckboxField) {
                         $bundle_field_name = $field->data('name');
                         if(isset($user_input[$bundle_field_name])) {
                             $product_ids = $user_input[$bundle_field_name];

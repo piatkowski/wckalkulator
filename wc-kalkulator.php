@@ -80,7 +80,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
             Fields\ColorswatchesField::class,
             Fields\EmptyField::class,
             Fields\HiddenField::class,
-            Fields\ProductBundleCheckboxField::class
+            Fields\ProductbundlecheckboxField::class
         );
 
         /**
