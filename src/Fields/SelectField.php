@@ -54,6 +54,10 @@ class SelectField extends AbstractField
      */
     public function render_for_cart($value = '')
     {
+        if ($value == '') {
+            return;
+        }
+        
         $value = $this->get_option_title($value);
         
         return View::render('fields/cart', array(
