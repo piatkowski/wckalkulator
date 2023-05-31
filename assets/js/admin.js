@@ -171,6 +171,11 @@
         }).on("click", ".field .pairs .action-add", function () {
             var $clone = $(this).prev(".pair").clone().insertBefore($(this));
             $clone.find("input").val("");
+            if ($(this).hasClass('productbundlecheckbox')) {
+                $clone.find('.select2').remove();
+                $clone.find("select.fs-name").removeClass('select2-hidden-accessible enhanced').html("").val("");
+                $(document.body).trigger('wc-enhanced-select-init');
+            }
         }).on("click", ".field .pairs .action-showimport", function () {
             $(this).parent().find("div.importer").toggle();
         }).on("click", ".field .pairs .action-import", function () {
@@ -548,16 +553,22 @@
                     case 'productbundlecheckbox':
                         field.options_name = [];
                         field.options_title = [];
+
+                        
                         if (field.type === "imageselect" || field.type === "imageswatches") {
                             field.options_image = [];
                         }
                         if (field.type === "checkboxgroup" || field.type === "productbundlecheckbox") {
                             field.select_limit = $row.find("input.fcbg-limit").val();
                         }
+                        var isProductBundleCheckbox = field.type === "productbundlecheckbox";
+                        if (isProductBundleCheckbox) {
+                            field.options_product_name = [];
+                        }
                         $fs_options = $row.find(".fs-option");
                         $fs_options.each(function () {
                             var fs_title = $(this).find("input.fs-title");
-                            var fs_name = $(this).find("input.fs-name");
+                            var fs_name = $(this).find(".fs-name");
 
                             var f_default_value = $(this).find('input.f-default-value').is(":checked");
                             //alert("State: " + f_default_value);
@@ -566,6 +577,9 @@
                             }
                             field.options_name.push(fs_name.val() + ":" + fs_title.val());
                             field.options_title.push(fs_title.val());
+                            if(isProductBundleCheckbox) {
+                                field.options_product_name.push(fs_name.text());
+                            }
 
                             if (field.type === "imageselect" || field.type === "imageswatches") {
                                 var fs_image = $(this).find("input.fs-image");
@@ -860,17 +874,31 @@
                         //console.log("Dropdown: ", default_value);
                         first = true;
                         $checked = null;
+
+                        var isProductBundleCheckbox = this.type === 'productbundlecheckbox';
+                        var options_product_name = this.hasOwnProperty('options_product_name') ? this.options_product_name : [];
+
                         $.each(options_name, function (i, option_name) {
                             //Clean option_name after ":"
                             if (option_name.indexOf(':') >= 0) {
                                 option_name = option_name.slice(0, option_name.indexOf(':'));
                             }
 
+                            var fs_image;
+
                             if (first) {
                                 var $first = $field.find(".fs-option");
-                                $first.find("input.fs-name").val(option_name);
+                                if (isProductBundleCheckbox) {
+                                    $first.find("select.fs-name").html($('<option>', {
+                                        value: option_name,
+                                        text: (typeof options_product_name[i] !== 'undefined') ? options_product_name[i] : '#' + option_name
+                                    }));
+                                    console.log('add first');
+                                } else {
+                                    $first.find("input.fs-name").val(option_name);
+                                }
                                 $first.find("input.fs-title").val(options_title[i]);
-                                var fs_image = $first.find("input.fs-image");
+                                fs_image = $first.find("input.fs-image");
                                 if (fs_image.length > 0) {
                                     fs_image.val(options_image[i]);
                                     $first.find("a.action-add-image").hide();
@@ -885,7 +913,15 @@
                                 first = false;
                             } else {
                                 var $clone = $field.find(".fs-option").last().clone().insertBefore($("#" + field_id + " .fs-options .action-add"));
-                                $clone.find("input.fs-name").val(option_name);
+                                if (isProductBundleCheckbox) {
+                                    $clone.find("select.fs-name").html($('<option>', {
+                                        value: option_name,
+                                        text: (typeof options_product_name[i] !== 'undefined') ? options_product_name[i] : '#' + option_name
+                                    }));
+                                    console.log('add next');
+                                } else {
+                                    $clone.find("input.fs-name").val(option_name);
+                                }
                                 $clone.find("input.fs-title").val(options_title[i]);
                                 fs_image = $clone.find("input.fs-image");
                                 if (fs_image.length > 0) {
@@ -904,6 +940,10 @@
                                 $checked.prop("checked", true);
                             }
                         });
+
+                        if (isProductBundleCheckbox) {
+                            $(document.body).trigger('wc-enhanced-select-init');
+                        }
                     } else if (this.type === "number") {
                         $("#" + field_id + " .fn-min-value").val(this.min);
                         $("#" + field_id + " .fn-max-value").val(this.max);

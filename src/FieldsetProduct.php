@@ -786,6 +786,10 @@ class FieldsetProduct
             if ($parser->is_ready()) {
                 $result = $parser->execute();
                 if (isset($result['value']) && $result['is_error'] === false) {
+	                if (class_exists('WOOCS')) {
+		                global $WOOCS;
+		                $result['value'] = $WOOCS->woocs_exchange_value(floatval($result['value']));
+	                }
                     $this->user_input['total_price'] = $result['value'] * $this->user_input["quantity"];
                 }
                 return $result;

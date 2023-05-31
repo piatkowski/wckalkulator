@@ -20,8 +20,8 @@ use WCKalkulator\Helper;
 <div class="pairs fs-options">
     <div class="pair fs-option">
         <div class="column column-1">
-            <label><?php _e("Product ID", "wc-kalkulator"); ?></label>
-            <input type="number" step="any" class="key fs-name" placeholder="0" required>
+            <label><?php _e("Product", "wc-kalkulator"); ?></label>
+            <select class="key fs-name wc-product-search" placeholder="0" required></select>
         </div>
         <div class="column column-2">
             <label><?php _e("Option Label", "wc-kalkulator"); ?></label>
@@ -32,12 +32,13 @@ use WCKalkulator\Helper;
         </div>
         <div class="clearfix"></div>
     </div>
-    <button type="button" class="button action-add">
+    <button type="button" class="button action-add productbundlecheckbox">
         <?php _e("Add new option", "wc-kalkulator"); ?>
     </button>
     <button type="button" class="button action-removeall">
         <?php _e("Remove all", "wc-kalkulator"); ?>
     </button>
+    <?php /*
     <button type="button" class="button action-showimport">
         <?php _e("Import options", "wc-kalkulator"); ?>
     </button>
@@ -47,5 +48,5 @@ use WCKalkulator\Helper;
         <button type="button" class="button action-import">
             <?php _e("Add", "wc-kalkulator"); ?>
         </button>
-    </div>
+    </div> */ ?>
 </div>

@@ -39,6 +39,7 @@ class View
             ob_start();
 
             $override = self::override_file($template);
+
             if (file_exists($override)) {
                 include $override;
             } else {
