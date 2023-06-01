@@ -15,7 +15,7 @@ class SelectField extends AbstractField
     protected $data;
     protected $type = "select";
     protected $admin_title;
-    protected $use_expression = true;
+	protected $use_expression = true;
     protected $group = "select";
     
     /**
