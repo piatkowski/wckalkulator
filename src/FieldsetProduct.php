@@ -191,6 +191,9 @@ class FieldsetProduct
         if (!isset($this->data->fieldset)) {
             return;
         }
+        
+        $this->fields = array();
+        
         if (is_array($this->data->fieldset)) {
             foreach ($this->data->fieldset as $name => $data) {
                 $FieldClass = "\\WCKalkulator\\Fields\\" . ucfirst($data["type"]) . "Field";

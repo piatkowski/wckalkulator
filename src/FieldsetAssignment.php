@@ -215,7 +215,8 @@ class FieldsetAssignment
         $result = array();
         if (is_array($products)) {
             $products = wc_get_products(array(
-                'include' => $products
+                'include' => $products,
+                'limits' => -1
             ));
 
             foreach ($products as $product) {
