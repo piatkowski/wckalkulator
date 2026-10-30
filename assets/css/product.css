@@ -66,6 +66,7 @@
 }
 .single-product div.product table.variations td.value .wck-range-date-picker, table.variations td.value .wck-range-date-picker {
   width: 49% !important;
+  float: left;
 }
 .single-product div.product table.variations td.value .wck-range-date-picker.date_from, table.variations td.value .wck-range-date-picker.date_from {
   margin-right: 2%;
