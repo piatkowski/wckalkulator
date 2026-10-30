@@ -1193,3 +1193,203 @@ msgstr ""
 #: views/woocommerce/product.php:41
 msgid "Unsupported layout!"
 msgstr ""
+
+#: src/Ajax.php:67
+msgid "Step %1$s of %2$s"
+msgstr ""
+
+#: src/Ajax.php:68
+msgid "Items: %s"
+msgstr ""
+
+#: src/Ajax.php:69
+msgid "Quantity must fit the allowed number of items. Edit the configuration before changing quantity."
+msgstr ""
+
+#: src/Ajax.php:70
+msgid "Enter a measurement within the range and step shown below."
+msgstr ""
+
+#: src/Ajax.php:71
+msgid "Select at least one option."
+msgstr ""
+
+#: src/Ajax.php:90
+msgid "Price could not be updated. Please try again."
+msgstr ""
+
+#: src/Ajax.php:155
+msgid "The product price could not be displayed."
+msgstr ""
+
+#: src/Fields/MeasurementField.php:83
+msgid "Measurement with unit"
+msgstr ""
+
+#: src/Fields/RepeaterField.php:26
+msgid "Repeatable field group"
+msgstr ""
+
+#: src/Fields/RepeaterField.php:113
+msgid "Remove item"
+msgstr ""
+
+#: src/Fields/SectionField.php:17
+msgid "Section / configurator step"
+msgstr ""
+
+#: views/fields/admin.php:16
+msgid "Delete field"
+msgstr ""
+
+#: views/fields/admin.php:17
+msgid "Toggle field settings"
+msgstr ""
+
+#: views/fields/admin.php:18
+msgid "Duplicate field"
+msgstr ""
+
+#: views/fields/admin.php:19
+msgid "Toggle full row"
+msgstr ""
+
+#: views/fields/admin.php:45
+msgid "Text before Title (on Product Page)"
+msgstr ""
+
+#: views/fields/admin.php:46
+msgid "Text displated before field`s Title (displayed only on product page)"
+msgstr ""
+
+#: views/fields/admin.php:51
+msgid "Text after Title (on Product Page)"
+msgstr ""
+
+#: views/fields/admin.php:52
+msgid "Text displayed after field`s Title (displayed only on product page)"
+msgstr ""
+
+#: views/fields/admin.php:78
+msgid "Repeatable group (optional)"
+msgstr ""
+
+#: views/fields/admin.php:79
+msgid "Outside a repeatable group"
+msgstr ""
+
+#: views/fields/admin.php:80
+msgid "Select a repeatable group after adding it. Its fields are priced using the group row formula."
+msgstr ""
+
+#: views/fields/admin/measurement.php:4
+msgid "Base unit used in formulas"
+msgstr ""
+
+#: views/fields/admin/measurement.php:10
+msgid "Allowed units (comma separated, same measurement type)"
+msgstr ""
+
+#: views/fields/admin/measurement.php:13
+msgid "Minimum in base unit"
+msgstr ""
+
+#: views/fields/admin/measurement.php:13
+msgid "Maximum in base unit"
+msgstr ""
+
+#: views/fields/admin/measurement.php:13
+msgid "Step in base unit (from minimum)"
+msgstr ""
+
+#: views/fields/admin/measurement.php:13
+msgid "Decimal places in base unit"
+msgstr ""
+
+#: views/fields/admin/measurement.php:16
+msgid "Default value in base unit"
+msgstr ""
+
+#: views/fields/admin/measurement.php:18
+msgid "No"
+msgstr ""
+
+#: views/fields/admin/measurement.php:18
+msgid "Always require"
+msgstr ""
+
+#: views/fields/admin/measurement.php:18
+msgid "Only if visible"
+msgstr ""
+
+#: views/fields/admin/repeater.php:4
+msgid "Repeat mode"
+msgstr ""
+
+#: views/fields/admin/repeater.php:5
+msgid "Add items with a button"
+msgstr ""
+
+#: views/fields/admin/repeater.php:5
+msgid "One row per product quantity"
+msgstr ""
+
+#: views/fields/admin/repeater.php:6
+msgid "Minimum rows"
+msgstr ""
+
+#: views/fields/admin/repeater.php:7
+msgid "Maximum rows"
+msgstr ""
+
+#: views/fields/admin/repeater.php:8
+msgid "Price formula for one row"
+msgstr ""
+
+#: views/fields/admin/repeater.php:9
+msgid "Assign ordinary fields to this group using their Repeatable group setting. Use their names in the row formula. The group value is the sum, or the average per product in quantity mode; :sum is always the total and :count the row count. Maximum 20 fields per group."
+msgstr ""
+
+#: views/fields/admin/section.php:4
+msgid "Section display"
+msgstr ""
+
+#: views/fields/admin/section.php:5
+msgid "Section"
+msgstr ""
+
+#: views/fields/admin/section.php:5
+msgid "Configurator step"
+msgstr ""
+
+#: views/fields/admin/section.php:6
+msgid "Includes subsequent fields until the next section. Steps have Back/Next navigation. Ordinary sections stay visible."
+msgstr ""
+
+#: views/fields/front/measurement.php:9
+msgid "Unit"
+msgstr ""
+
+#: views/fields/front/measurement.php:15
+msgid "Range: %1$s–%2$s %3$s; step: %4$s %3$s."
+msgstr ""
+
+#: views/fields/front/repeater.php:14
+msgid "Add item"
+msgstr ""
+
+#: views/woocommerce/configurator.php:18
+msgid "Configuration progress"
+msgstr ""
+
+#: views/woocommerce/configurator.php:29
+msgid "Configuration steps"
+msgstr ""
+
+#: views/woocommerce/configurator.php:30
+msgid "Back"
+msgstr ""
+
+#: views/woocommerce/configurator.php:32
+msgid "Next"
+msgstr ""

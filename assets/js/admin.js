@@ -137,6 +137,16 @@
             if (!$WK.stateExprToolbar) {
                 $WK.stateExprToolbar = true;
                 $WK.saveFields();
+                if ($(this).is('[data-wck-param="row_formula"]')) {
+                    var groupName = $(this).closest('.field').find('.f-name').val();
+                    var variables = $('#wck-parameters .defined-fields').empty();
+                    $.each($WK.fields, function (name, field) {
+                        if (field.repeat_group !== groupName) { return; }
+                        appendOption(variables, '{' + name + '}', field.title + ' {' + name + '}');
+                        var suffixes = field.type === 'checkboxgroup' ? ['sum', 'min', 'max'] : ['text', 'textarea', 'email'].indexOf(field.type) >= 0 ? ['text'] : [];
+                        suffixes.forEach(function (suffix) { appendOption(variables, '{' + name + ':' + suffix + '}', name + ':' + suffix); });
+                    });
+                }
                 $("#wck-parameters .first-selected").prop("selected", true);
 
                 $("#wck-expression-toolbar").stop(true, false).fadeIn('fast');
@@ -477,7 +487,24 @@
             }
         });
 
+        function refreshRepeatGroups() {
+            var groups = [];
+            $('#f-field-list .field[data-type="repeater"]').each(function () {
+                var name = $(this).find('.f-name').val();
+                if (name) { groups.push({name: name, title: $(this).find('.f-title').val() || name}); }
+            });
+            $('#f-field-list .f-repeat-group').each(function () {
+                var select = $(this), value = select.val() || select.data('loaded-group') || '';
+                select.children('option').slice(1).remove();
+                groups.forEach(function (group) { appendOption(select, group.name, group.title + ' {' + group.name + '}'); });
+                if (value && !groups.some(function (group) { return group.name === value; })) { appendOption(select, value, value); }
+                select.val(value);
+            });
+        }
+        $('#f-field-list').on('change', '.f-name, .f-title', refreshRepeatGroups).on('change', '.f-repeat-group', function () { $(this).data('loaded-group', ''); });
+
         $WK.saveFields = function () {
+            refreshRepeatGroups();
             $WK.fields = {};
             suggest = [];
             var error = $("li .field", $WK.fieldList).length === 0;
@@ -517,6 +544,8 @@
                     "visibility_readable": $row.find('input.f-visibility-readable').val()
                 };
 
+                if ($row.find('.f-repeat-group').length) { field.repeat_group = $row.find('.f-repeat-group').val() || ''; }
+                $row.find('[data-wck-param]').each(function () { field[$(this).attr('data-wck-param')] = $(this).val(); });
                 if ($row.find('select.f-required').length > 0) {
                     switch ($row.find('select.f-required').val()) {
                         case "on":
@@ -721,7 +750,7 @@
 
         $WK.appendFormulaVars = function (field) {
             $WK.fields[field.name] = field;
-            if (!field.use_expression) {
+            if (!field.use_expression || field.repeat_group) {
                 return;
             }
 
@@ -731,7 +760,10 @@
                 appendOption($definedFields, "{" + reference + "}", label + " {" + reference + "}");
             };
 
-            if (field.type !== "checkboxgroup") {
+            if (field.type === 'repeater') {
+                addFormulaOption(field.name, field.title);
+                ['sum', 'count', 'min', 'max'].forEach(function (suffix) { addFormulaOption(field.name + ':' + suffix, field.title + ' ' + suffix); });
+            } else if (field.type !== "checkboxgroup") {
                 addFormulaOption(field.name, '"' + field.title + '" value/price');
             } else {
                 addFormulaOption(field.name, "Array of selected values");
@@ -781,6 +813,13 @@
                             $("#" + field_id + " .wck-toggle-colspan").trigger("click");
                         }
                     }
+                    var loaded = this;
+                    $field.find('[data-wck-param]').each(function () {
+                        var key = $(this).attr('data-wck-param');
+                        if (Object.prototype.hasOwnProperty.call(loaded, key)) { $(this).val(loaded[key]); }
+                    });
+                    $field.find('.f-repeat-group').data('loaded-group', this.repeat_group || '');
+                    if (this.type === 'measurement') { $field.find('.f-default-value').val(this.default_value); }
                     $("#" + field_id + " .f-title").val(this.title);
                     if (this.hasOwnProperty("before_title")) {
                         $("#" + field_id + " .f-before-title").val(this.before_title);
@@ -1156,7 +1195,8 @@
             appendOption(fieldSelect, "", "Choose field...");
             fieldSelect.find("option").first().prop("disabled", true).prop("selected", true);
             $.each($WK.fieldList.find(".field"), function () {
-                if ($(this).data("group") !== "static" && !$(this).is(context)) {
+                var sameGroup = ($(this).find('.f-repeat-group').val() || '') === (context.find('.f-repeat-group').val() || '');
+                if ($(this).data("group") !== "static" && $(this).data('group') !== 'special' && sameGroup && !$(this).is(context)) {
                     var name = $(this).find(".f-name").val();
                     appendOption(fieldSelect, name, name);
                 }

@@ -440,7 +440,7 @@ class FieldsetPostType
             }
 
             if ($configuration) {
-                update_post_meta($post_id, '_wck_schema_version', 1);
+                update_post_meta($post_id, '_wck_schema_version', FieldStructure::version(is_array($effective_fieldset) ? $effective_fieldset : array()));
             }
 
             // Treat code publication as a separate privilege. WordPress removes
@@ -550,7 +550,7 @@ class FieldsetPostType
                 }
             }
         }
-        return true;
+        return FieldStructure::validate($fieldset);
     }
 
     /** Validate the persisted expression document's shape. */
@@ -613,7 +613,8 @@ class FieldsetPostType
                         $type = $reference_schema[$name];
                         $supported = array(
                             'text' => array('text', 'textarea', 'email'),
-                            'sum' => array('checkboxgroup'), 'min' => array('checkboxgroup'), 'max' => array('checkboxgroup'),
+                            'sum' => array('checkboxgroup', 'repeater'), 'min' => array('checkboxgroup', 'repeater'), 'max' => array('checkboxgroup', 'repeater'),
+                            'count' => array('repeater'),
                             'date' => array('datepicker'), 'date_from' => array('rangedatepicker'), 'date_to' => array('rangedatepicker'), 'days' => array('rangedatepicker'),
                             'size' => array('fileupload', 'imageupload')
                         );
@@ -634,6 +635,9 @@ class FieldsetPostType
             return $schema;
         }
         foreach ($fieldset as $key => $field) {
+            if (is_array($field) && !empty($field['repeat_group'])) {
+                continue;
+            }
             if (is_array($field) && isset($field['name'], $field['type']) && is_string($field['name']) && is_string($field['type'])) {
                 $schema[$field['name']] = $field['type'];
             } elseif (is_string($field) && is_string($key)) {

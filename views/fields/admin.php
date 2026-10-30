@@ -74,6 +74,11 @@ use WCKalkulator\Helper;
             </div>
             <div class="clear"></div>
         <?php endif; ?>
+        <?php if (in_array($view->type, array('number', 'measurement', 'text', 'textarea', 'email', 'select', 'dropdown', 'radio', 'checkbox', 'checkboxgroup'), true)) : ?>
+            <label><?php esc_html_e('Repeatable group (optional)', 'wc-kalkulator'); ?></label>
+            <select class="param f-repeat-group"><option value=""><?php esc_html_e('Outside a repeatable group', 'wc-kalkulator'); ?></option></select>
+            <p><?php esc_html_e('Select a repeatable group after adding it. Its fields are priced using the group row formula.', 'wc-kalkulator'); ?></p>
+        <?php endif; ?>
         <?php echo wp_kses($view->admin_fields, \WCKalkulator\Sanitizer::allowed_html()); ?>
 
         <?php if ($view->type !== 'hidden' && $view->group !== 'special') : ?>

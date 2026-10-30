@@ -387,9 +387,12 @@ class Product
                 $html['fields'][] = array(
                     'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
                     //colspan since 1.4.0
-                    'colspan' => max((int)$field->data('colspan'), 1),
+                    'colspan' => $field->type() === 'repeater' ? 2 : max((int)$field->data('colspan'), 1),
                     //type, group since 1.5.0
                     'type' => $field->type(),
+                    'name' => $field_name,
+                    'title' => $field->data('title'),
+                    'section_mode' => $field->data('section_mode'),
                     'group' => $field->group()
                 );
                 //$html['visibility'][$field->data('name')] = $field->data('visibility');
@@ -470,7 +473,7 @@ class Product
                 $validation = false;
             }
             if ($validation) {
-                self::$validated_field_inputs[(int) $product_id . ':' . (int) $variation_id] = $user_input;
+                self::$validated_field_inputs[(int) $product_id . ':' . (int) $variation_id] = $fieldset->validated_input();
             }
         }
 
@@ -557,7 +560,7 @@ class Product
                     wc_add_notice(__('The uploaded file could not be stored. Please try again.', 'wc-kalkulator'), 'error');
                     throw new \RuntimeException(__('The uploaded file could not be stored. Please try again.', 'wc-kalkulator'));
                 }
-                $cart_item_data['wckalkulator_fields'] = $user_input;
+                $cart_item_data['wckalkulator_fields'] = $has_validated_input ? $user_input : $fieldset->validated_input();
                 $cart_item_data['wckalkulator_fieldset_version_hash'] = $fieldset->version_hash();
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
                 $configuration_snapshot = $fieldset->configuration_snapshot();

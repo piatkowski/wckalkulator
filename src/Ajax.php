@@ -62,10 +62,19 @@ class Ajax
             $fieldset->init();
             $formula_parameters = $fieldset->set_additional_input_variables(true);
 
+            wp_enqueue_script('wck-configurator', Plugin::url() . '/assets/js/configurator.min.js', array('jquery'), Plugin::VERSION, true);
+            wp_add_inline_script('wck-configurator', 'var wck_configurator_i18n = ' . wp_json_encode(array(
+                'step' => __('Step %1$s of %2$s', 'wc-kalkulator'),
+                'rows' => __('Items: %s', 'wc-kalkulator'),
+                'limit' => __('Quantity must fit the allowed number of items. Edit the configuration before changing quantity.', 'wc-kalkulator'),
+                'measurement' => __('Enter a measurement within the range and step shown below.', 'wc-kalkulator'),
+                'required' => __('Select at least one option.', 'wc-kalkulator')
+            )) . ';', 'before');
+
             wp_enqueue_script(
                 'wck-ajax-script',
                 Plugin::url() . '/assets/js/wckalkulator.min.js',
-                ['jquery'],
+                array('jquery', 'wck-configurator'),
                 Plugin::VERSION
             );
 

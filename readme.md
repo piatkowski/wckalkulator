@@ -110,6 +110,14 @@ The customer can edit product options after adding to cart.
 
 You can use `acf('field_name')` function to get ACF field value in custom price formula.
 
+### Structured configurators
+
+Measurement fields with unit conversion, sections and multi-step forms, and repeatable
+field groups with server-side row pricing are available in this source tree.
+Choose Measurement with unit, Section / configurator step, or Repeatable field group
+in the field editor. Assign child fields using their Repeatable group setting and
+configure the group row formula; the main price formula can use the group value.
+
 ## Compatibility
 
 * multisite mode is supported

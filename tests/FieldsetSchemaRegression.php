@@ -15,6 +15,7 @@ namespace {
     function sanitize_text_field($value) { return trim(strip_tags((string) $value)); }
     function wp_kses_post($value) { return $value; }
     require __DIR__ . '/../src/Sanitizer.php';
+    require __DIR__ . '/../src/FieldStructure.php';
     require __DIR__ . '/../src/FieldsetPostType.php';
     $reflection = new \ReflectionClass('WCKalkulator\\FieldsetPostType');
     $fieldset_method = $reflection->getMethod('validate_fieldset_schema');

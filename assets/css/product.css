@@ -66,7 +66,6 @@
 }
 .single-product div.product table.variations td.value .wck-range-date-picker, table.variations td.value .wck-range-date-picker {
   width: 49% !important;
-  float: left;
 }
 .single-product div.product table.variations td.value .wck-range-date-picker.date_from, table.variations td.value .wck-range-date-picker.date_from {
   margin-right: 2%;
@@ -194,5 +193,83 @@
 p.wckalkulator-price {
   font-size: 20px;
   padding-top: 20px;
+}
+
+/* Structured measurements and product configurations inherit the theme controls. */
+.wck-measurement {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.wck-measurement input {
+  flex: 1;
+  min-width: 0;
+}
+.wck-measurement select {
+  flex: 0 0 6em;
+}
+
+.wck-configurator [hidden], .wck-repeater [hidden] {
+  display: none !important;
+}
+.wck-configurator button:focus-visible, .wck-repeater button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.wck-configurator .wck-step-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 2em;
+  padding-left: 1.5em;
+  margin-bottom: 1.5em;
+}
+.wck-configurator .wck-step-progress [aria-current=step] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.wck-configurator .wck-step-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-block: 1em;
+}
+.wck-configurator .wck-step-navigation p {
+  margin: 0;
+}
+.wck-configurator .wck-section h3 {
+  margin-block: 1.5em 0.75em;
+}
+
+.wck-repeater {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+.wck-repeater legend {
+  font-weight: 600;
+  margin-bottom: 1em;
+}
+.wck-repeater .wck-repeat-row {
+  padding-block: 1em;
+  border-bottom: 1px solid currentColor;
+  margin-bottom: 1em;
+}
+.wck-repeater table.wck-repeat-fields {
+  width: 100%;
+  margin: 0;
+}
+.wck-repeater .wck-repeat-status {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .wck-repeater table.wck-repeat-fields td {
+    display: block;
+    width: 100%;
+  }
 }
 /*# sourceMappingURL=product.css.map */

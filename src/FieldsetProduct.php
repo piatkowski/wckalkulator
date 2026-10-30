@@ -58,6 +58,8 @@ class FieldsetProduct
      */
     private $user_input;
 
+    private $validated_input = array();
+
     /**
      * @var bool
      */
@@ -80,6 +82,12 @@ class FieldsetProduct
      */
     protected function __construct()
     {
+    }
+
+    /** Independent context for each repeated row, never a shared singleton. */
+    public static function create_context()
+    {
+        return new static();
     }
 
     /**
@@ -126,6 +134,7 @@ class FieldsetProduct
         $this->data = null;
         $this->fields = array();
         $this->user_input = array();
+        $this->validated_input = array();
         $this->is_valid = false;
         $this->validation_notices = array();
         $this->field_visibility = array();
@@ -148,6 +157,7 @@ class FieldsetProduct
         $this->data = null;
         $this->fields = array();
         $this->user_input = array();
+        $this->validated_input = array();
         $this->is_valid = false;
         $this->validation_notices = array();
         $this->field_visibility = array();
@@ -285,6 +295,12 @@ class FieldsetProduct
             $class_by_type[strtolower(substr($class_name, 0, -5))] = $field_class;
         }
         foreach ($this->data->fieldset as $name => $field_data) {
+            if (is_array($field_data) && !empty($field_data['repeat_group'])) {
+                continue;
+            }
+            if (is_array($field_data) && isset($field_data['type']) && $field_data['type'] === 'repeater') {
+                $field_data['children'] = FieldStructure::children($this->data->fieldset, $name);
+            }
             if (!is_array($field_data) || !isset($field_data['type'], $field_data['name'])
                 || !is_string($field_data['type']) || !isset($class_by_type[$field_data['type']])
                 || !is_string($field_data['name']) || (string) $name !== $field_data['name']) {
@@ -520,7 +536,11 @@ class FieldsetProduct
             }
             if (array_key_exists($name, $raw_post)) {
                 $value = $raw_post[$name];
-                if ($field->type() === 'textarea') {
+                if (in_array($field->type(), array('measurement', 'repeater'), true)) {
+                    $valid = true;
+                    $filtered_post[$name] = $this->sanitize_structured_input($value, 0, $valid);
+                    $this->request_input_valid = $this->request_input_valid && $valid;
+                } elseif ($field->type() === 'textarea') {
                     $filtered_post[$name] = is_scalar($value) ? sanitize_textarea_field((string) $value) : $value;
                 } elseif (is_array($value)) {
                     $filtered_post[$name] = array();
@@ -534,7 +554,7 @@ class FieldsetProduct
                 } else {
                     $filtered_post[$name] = is_scalar($value) ? sanitize_text_field((string) $value) : $value;
                 }
-            } elseif ($field->type() === 'checkboxgroup') {
+            } elseif (in_array($field->type(), array('checkboxgroup', 'repeater'), true)) {
                 $filtered_post[$name] = array();
             }
         }
@@ -667,6 +687,7 @@ class FieldsetProduct
             return false;
         }
 
+        $raw_input = $this->user_input;
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
         } else {
@@ -678,6 +699,11 @@ class FieldsetProduct
             return false;
         }
 
+        $this->validated_input = $raw_input;
+        if (!$this->prepare_structured_input($context)) {
+            $this->is_valid = false;
+            return false;
+        }
         $this->set_additional_input_variables(false, $context);
 
         return $this->is_valid;
@@ -756,6 +782,12 @@ class FieldsetProduct
             return false;
         }
 
+        foreach ($this->fields() as $name => $field) {
+            if ($field->type() === 'measurement' && isset($input[$name])) {
+                $normalized = $field->normalize($input[$name]);
+                $input[$name] = $normalized === false || (is_array($input[$name]) && isset($input[$name]['value']) && $input[$name]['value'] === '') ? '' : $normalized;
+            }
+        }
         $states = array();
         $visiting = array();
         foreach ($this->fields() as $field) {
@@ -960,7 +992,7 @@ class FieldsetProduct
 
     private function neutral_field_value($field)
     {
-        return $field->type() === 'checkboxgroup' ? array() : '';
+        return in_array($field->type(), array('checkboxgroup', 'repeater'), true) ? array() : '';
     }
 
     /**
@@ -1196,6 +1228,11 @@ class FieldsetProduct
             $this->is_valid = false;
             return false;
         }
+        $this->validated_input = $this->user_input;
+        if (!$this->prepare_structured_input($context)) {
+            $this->is_valid = false;
+            return false;
+        }
         $this->is_valid = true;
         $this->set_additional_input_variables(false, $context);
         if (isset($context['parameter_snapshot']) && is_array($context['parameter_snapshot'])) {
@@ -1206,6 +1243,81 @@ class FieldsetProduct
             }
         }
 
+        return true;
+    }
+
+    public function validated_input()
+    {
+        return $this->is_valid ? $this->validated_input : array();
+    }
+
+    /** Read bounded structured values without flattening unit or row boundaries. */
+    private function sanitize_structured_input($value, $depth, &$valid)
+    {
+        if (is_array($value)) {
+            if ($depth > 3 || count($value) > 50) { $valid = false; return array(); }
+            $result = array();
+            foreach ($value as $key => $item) {
+                $result[$key] = $this->sanitize_structured_input($item, $depth + 1, $valid);
+            }
+            return $result;
+        }
+        if (!is_scalar($value) || is_bool($value) || strlen((string) $value) > 20000) { $valid = false; return null; }
+        return sanitize_textarea_field((string) $value);
+    }
+
+    /** Entry point used by independent repeater rows; calculations never read requests. */
+    public function set_input_context($input, $context)
+    {
+        $this->is_valid = false;
+        $this->validated_input = array();
+        if (!is_array($input) || array_diff(array_keys($input), $this->fields_names())) { return false; }
+        $this->user_input = $input;
+        foreach ($this->fields() as $name => $field) {
+            if ($field->type() === 'checkboxgroup' && !array_key_exists($name, $this->user_input)) { $this->user_input[$name] = array(); }
+        }
+        $this->user_input['_files'] = array();
+        if (!$this->validate(false, $context)) { return false; }
+        if (isset($context['parameter_snapshot']) && is_array($context['parameter_snapshot'])) {
+            foreach ($context['parameter_snapshot'] as $name => $value) {
+                if (strpos($name, 'global:') === 0 || strpos($name, 'pa:') === 0) { $this->user_input[$name] = $value; }
+            }
+        }
+        return true;
+    }
+
+    /** Replace structured raw values only in the private calculation input. */
+    private function prepare_structured_input($context)
+    {
+        $context['product_id'] = $this->product_id;
+        $context['variation_id'] = $this->variation_id;
+        foreach ($this->fields() as $name => $field) {
+            if (!in_array($field->type(), array('measurement', 'repeater'), true)) { continue; }
+            if (isset($this->field_visibility[$name]) && !$this->field_visibility[$name]) {
+                $this->user_input[$name] = 0;
+                if ($field->type() === 'repeater') {
+                    foreach (array('sum', 'count', 'min', 'max') as $suffix) { $this->user_input[$name . ':' . $suffix] = 0; }
+                }
+                continue;
+            }
+            $raw = array_key_exists($name, $this->user_input) ? $this->user_input[$name] : ($field->type() === 'repeater' ? array() : '');
+            if ($field->type() === 'measurement') {
+                $number = $raw === '' && !$field->is_required() ? 0 : $field->normalize($raw);
+                if ($number !== false) { $this->user_input[$name] = $number; continue; }
+            } else {
+                $result = $field->evaluate_rows($raw, $context);
+                if ($result !== false) {
+                    $this->validated_input[$name] = $result['rows'];
+                    foreach (array('sum', 'count', 'min', 'max') as $suffix) { $this->user_input[$name . ':' . $suffix] = $result[$suffix]; }
+                    // WooCommerce multiplies the resulting unit price by quantity once.
+                    $this->user_input[$name] = $field->data('repeat_mode') === 'quantity' && $result['count'] > 0
+                        ? $result['sum'] / $result['count'] : $result['sum'];
+                    continue;
+                }
+            }
+            $this->validation_notices[] = sprintf(__('Field %s has incorrect value.', 'wc-kalkulator'), $field->data('title'));
+            return false;
+        }
         return true;
     }
 

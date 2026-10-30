@@ -78,6 +78,9 @@ if (!class_exists('WCKalkulator\Plugin')) {
          */
         public static $defined_fields = array(
             Fields\NumberField::class,
+            Fields\MeasurementField::class,
+            Fields\SectionField::class,
+            Fields\RepeaterField::class,
             Fields\SelectField::class,
             Fields\DropdownField::class,
             Fields\CheckboxField::class,

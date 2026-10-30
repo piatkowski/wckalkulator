@@ -171,3 +171,68 @@
 p.wckalkulator-price
   font-size: 20px
   padding-top: 20px
+
+
+/* Structured measurements and product configurations inherit the theme controls.
+.wck-measurement
+  display: flex
+  align-items: center
+  gap: .5em
+  input
+    flex: 1
+    min-width: 0
+  select
+    flex: 0 0 6em
+
+.wck-configurator, .wck-repeater
+  [hidden]
+    display: none !important
+  button:focus-visible
+    outline: 2px solid currentColor
+    outline-offset: 3px
+
+.wck-configurator
+  .wck-step-progress
+    display: flex
+    flex-wrap: wrap
+    gap: .5em 2em
+    padding-left: 1.5em
+    margin-bottom: 1.5em
+    [aria-current=step]
+      font-weight: 700
+      text-decoration: underline
+      text-underline-offset: .25em
+  .wck-step-navigation
+    display: flex
+    flex-wrap: wrap
+    align-items: center
+    justify-content: space-between
+    gap: 1em
+    margin-block: 1em
+    p
+      margin: 0
+  .wck-section h3
+    margin-block: 1.5em .75em
+
+.wck-repeater
+  min-width: 0
+  padding: 0
+  border: 0
+  legend
+    font-weight: 600
+    margin-bottom: 1em
+  .wck-repeat-row
+    padding-block: 1em
+    border-bottom: 1px solid currentColor
+    margin-bottom: 1em
+  table.wck-repeat-fields
+    width: 100%
+    margin: 0
+  .wck-repeat-status
+    font-variant-numeric: tabular-nums
+
+@media (max-width: 600px)
+  .wck-repeater table.wck-repeat-fields
+    td
+      display: block
+      width: 100%

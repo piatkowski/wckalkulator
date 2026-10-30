@@ -93,6 +93,16 @@ final class Sanitizer
                 'data-expr' => true
             )
         );
+        $allowed['button'] = array('type' => true, 'class' => true, 'disabled' => true, 'aria-label' => true);
+        $allowed['fieldset'] = array('class' => true, 'disabled' => true);
+        $allowed['legend'] = array('class' => true);
+        $allowed['template'] = array('class' => true);
+        foreach (array('div', 'tr', 'fieldset', 'input', 'select', 'option', 'section', 'nav', 'p', 'ol', 'li', 'h3') as $tag) {
+            if (!isset($allowed[$tag])) { $allowed[$tag] = array(); }
+            foreach (array('hidden', 'tabindex', 'aria-live', 'aria-current', 'aria-label', 'data-wck-param', 'data-wck-config', 'data-wck-factor', 'data-wck-field', 'data-wck-name', 'data-wck-min', 'data-wck-max', 'data-wck-mode', 'data-wck-children') as $attribute) {
+                $allowed[$tag][$attribute] = true;
+            }
+        }
         $post_allowed = wp_kses_allowed_html('post');
         foreach ($allowed as $tag => $attributes) {
             if (!isset($post_allowed[$tag]) || !is_array($post_allowed[$tag])) {
