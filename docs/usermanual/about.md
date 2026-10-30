@@ -13,7 +13,7 @@ Some of fields can be used to get informations from Customer (for example: text,
 
 The plugin is designed to work with multisite mode. We encourage you to contact us and request new features.
 
-If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski)
 
 
 ## Definitions
@@ -76,10 +76,10 @@ We recommend using PHP7.4 and above. PHP7.4 is supported in Wordpress v5.3 and a
 - image upload field (use file size in formula/expression)
 - dynamic formula in a static field's contents
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.buymeacoffee.com/piatkowski)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!
 

@@ -104,6 +104,6 @@ class ImageselectField extends SelectField {
 		$img   = $this->get_option_image( $value );
 		$title = $this->get_option_title( $value );
 
-		return $title . ' <a href="' . $img . '" target="_blank"><img src="' . $img . '" style="max-width:60px" /></a>';
+		return esc_html($title) . ' <a href="' . esc_url($img) . '" target="_blank" rel="noopener noreferrer"><img src="' . esc_url($img) . '" alt="' . esc_attr($title) . '" style="max-width:60px" /></a>';
 	}
 }

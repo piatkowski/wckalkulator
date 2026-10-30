@@ -72,34 +72,33 @@ class CheckboxgroupField extends SelectField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( ! $this->is_required() && ( $value === '' || $value === null || $value === array() ) ) {
 			return true;
 		}
 
-		if ( is_array( $value ) ) {
-
-			if ( ( (int) $this->data( 'select_limit' ) > 0 && count( $value ) > $this->data( 'select_limit' ) ) || ( $this->is_required() && count( $value ) === 0 ) ) {
-				return false;
-			}
-
-			foreach ( $value as $val ) {
-				if ( ! in_array( $val, $this->data["options_name"] ) ) {
-					return false;
-				}
-
-				return true;
-			}
-		}
-
-		/**
-		 * if $value is not an array
-		 */
-
-		if ( $this->is_required() && empty( $value ) ) {
+		if ( ! is_array( $value ) ) {
 			return false;
 		}
 
-		return in_array( $value, $this->data["options_name"] );
+		$select_limit = (int) $this->data( 'select_limit' );
+		if ( ( $this->is_required() && count( $value ) === 0 ) || ( $select_limit > 0 && count( $value ) > $select_limit ) ) {
+			return false;
+		}
+
+		$options = isset( $this->data['options_name'] ) && is_array( $this->data['options_name'] )
+			? $this->data['options_name']
+			: array();
+		$validated_values = array();
+
+		foreach ( $value as $val ) {
+			if ( ! is_scalar( $val ) || ! in_array( $val, $options, true ) || in_array( $val, $validated_values, true ) ) {
+				return false;
+			}
+
+			$validated_values[] = $val;
+		}
+
+		return true;
 	}
 
 

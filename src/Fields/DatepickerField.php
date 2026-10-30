@@ -99,17 +99,22 @@ class DatepickerField extends TextField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( ! is_string( $value ) ) {
+			return false;
+		}
+		if ( ! $this->is_required() && $value === '' ) {
 			return true;
 		}
 		//yyyy-mm-dd
 		$is_valid = false;
-		$date_arr = explode( '-', $value );
+		$date_arr = preg_split( '/-/', $value );
 		if ( count( $date_arr ) === 3 ) {
 			$year     = $date_arr[0];
 			$month    = $date_arr[1];
 			$day      = $date_arr[2];
-			$is_valid = checkdate( $month, $day, $year );
+			$is_valid = ctype_digit( $year ) && ctype_digit( $month ) && ctype_digit( $day)
+				&& strlen( $year ) === 4 && strlen( $month ) === 2 && strlen( $day ) === 2
+				&& checkdate( (int) $month, (int) $day, (int) $year );
 		}
 		if ( ! $is_valid ) {
 			error_log( $this->data( "name" ) . " - date is incorrect " . $value );
@@ -144,6 +149,6 @@ class DatepickerField extends TextField {
 	 * @since 1.2.0
 	 */
 	public function order_item_value( $value ) {
-		return $this->get_option_title( $value );
+		return $value;
 	}
 }

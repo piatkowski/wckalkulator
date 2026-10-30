@@ -26,7 +26,7 @@ if (isset($view->size) && absint($view->size) > 0) {
                        id="<?php echo esc_html($id); ?>" <?php echo esc_html($view->required); ?>
                        class="attached enabled"
                        value="<?php echo esc_html($opt_name); ?>" <?php checked($view->value, $opt_name); ?>>
-                <img src="<?php echo wp_get_attachment_image_url($view->options_image[$i]); ?>"
+                <img src="<?php echo esc_url(wp_get_attachment_image_url($view->options_image[$i])); ?>"
                      alt="<?php echo esc_html($view->options_title[$i]); ?>"
                      style="<?php echo esc_html($style); ?>"/>
                 <?php if (!(isset($view->hide_caption) && $view->hide_caption === true)): ?>

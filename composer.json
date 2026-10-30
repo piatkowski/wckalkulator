@@ -1,10 +1,24 @@
 {
+	"name": "wckalkulator/wc-kalkulator",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-only",
 	"autoload"    : {
 		"psr-4" : {
 			"WCKalkulator\\" : "src/"
 		}
 	},
 	"require": {
+		"php": ">=7.4",
 		"symfony/expression-language": "^5.4"
+	},
+	"config": {
+		"platform": {
+			"php": "7.4.0"
+		}
+	},
+	"scripts": {
+		"lint:php": "sh scripts/lint-php.sh",
+		"test": "sh scripts/test-regressions.sh",
+		"package:check": "sh scripts/package-release.sh"
 	}
 }

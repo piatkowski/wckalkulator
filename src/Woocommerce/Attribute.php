@@ -36,17 +36,15 @@ class Attribute
      */
     public static function woocommerce_loaded()
     {
-        if(current_user_can('manage_woocommerce')) {
-            $attributes = wc_get_attribute_taxonomies();
-            if (!empty($attributes)) {
-                foreach ($attributes as $attribute) {
-                    add_action('pa_' . $attribute->attribute_name . '_add_form_fields', array(__CLASS__, 'add_form'));
-                    add_action('pa_' . $attribute->attribute_name . '_edit_form_fields', array(__CLASS__, 'edit_form'), 10, 2);
-                    add_action('manage_edit-pa_' . $attribute->attribute_name . '_columns', array(__CLASS__, 'add_columns'));
-                    add_filter('manage_pa_' . $attribute->attribute_name . '_custom_column', array(__CLASS__, 'column_content'), 10, 3);
-                    add_action('created_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
-                    add_action('edited_pa_' . $attribute->attribute_name, array(__CLASS__, 'save'));
-                }
+        $attributes = wc_get_attribute_taxonomies();
+        if (!empty($attributes)) {
+            foreach ($attributes as $attribute) {
+                add_action('pa_' . $attribute->attribute_name . '_add_form_fields', array(__CLASS__, 'add_form'));
+                add_action('pa_' . $attribute->attribute_name . '_edit_form_fields', array(__CLASS__, 'edit_form'), 10, 2);
+                add_action('manage_edit-pa_' . $attribute->attribute_name . '_columns', array(__CLASS__, 'add_columns'));
+                add_filter('manage_pa_' . $attribute->attribute_name . '_custom_column', array(__CLASS__, 'column_content'), 10, 3);
+                add_action('created_pa_' . $attribute->attribute_name, array(__CLASS__, 'save_created'));
+                add_action('edited_pa_' . $attribute->attribute_name, array(__CLASS__, 'save_edited'));
             }
         }
     }
@@ -61,6 +59,7 @@ class Attribute
     {
         ?>
         <div class="form-field">
+            <?php wp_nonce_field('wck_attribute_term_value', '_wck_attribute_term_nonce'); ?>
             <label for="wck_value"><?php _e('Field Value for WCK', 'wc-kalkulator'); ?></label>
             <input type="number" name="wck_value" step="any"/>
             <p><?php _e('Numeric Value of the attribute to be used in WC Kalkulator Formula', 'wc-kalkulator'); ?></p>
@@ -81,6 +80,7 @@ class Attribute
         <tr class="form-field">
             <th><label for="wck_value"><?php _e('Field Value for WCK', 'wc-kalkulator'); ?></label></th>
             <td>
+                <?php wp_nonce_field('wck_attribute_term_value', '_wck_attribute_term_nonce'); ?>
                 <input name="wck_value" id="wck_value" type="number" step="any" value="<?php echo esc_attr($value) ?>"/>
                 <p class="description"><?php _e('Numeric Value of the attribute to be used in WC Kalkulator Formula', 'wc-kalkulator'); ?></p>
             </td>
@@ -94,13 +94,46 @@ class Attribute
      * @return void
      * @since 1.5.0
      */
+    public static function save_created($term_id)
+    {
+        self::save_term($term_id, 'manage_terms');
+    }
+
+    public static function save_edited($term_id)
+    {
+        self::save_term($term_id, 'edit_terms');
+    }
+
+    /** Backward-compatible edit callback; core taxonomy hooks use the scoped wrappers above. */
     public static function save($term_id)
     {
-        update_term_meta(
-            $term_id,
-            'wck_value',
-            floatval($_POST['wck_value'])
-        );
+        self::save_term($term_id, 'edit_terms');
+    }
+
+    private static function save_term($term_id, $required_capability)
+    {
+        $term_id = is_scalar($term_id) ? absint($term_id) : 0;
+        if (!$term_id || !isset($_POST['_wck_attribute_term_nonce'], $_POST['wck_value'])
+            || !is_scalar($_POST['_wck_attribute_term_nonce']) || !is_scalar($_POST['wck_value'])
+            || !wp_verify_nonce(wp_unslash((string) $_POST['_wck_attribute_term_nonce']), 'wck_attribute_term_value')) {
+            return;
+        }
+        $term = get_term($term_id);
+        if (!$term || is_wp_error($term) || strpos($term->taxonomy, 'pa_') !== 0) {
+            return;
+        }
+        $taxonomy = get_taxonomy($term->taxonomy);
+        $capability = $taxonomy && isset($taxonomy->cap->{$required_capability})
+            ? $taxonomy->cap->{$required_capability} : '';
+        if ($capability === '' || !current_user_can($capability)) {
+            return;
+        }
+
+        $raw_value = trim((string) wp_unslash($_POST['wck_value']));
+        if ($raw_value !== '' && (!is_numeric($raw_value) || !is_finite((float) $raw_value))) {
+            return;
+        }
+        update_term_meta($term_id, 'wck_value', $raw_value === '' ? 0 : (float) $raw_value);
     }
 
     /**
@@ -148,23 +181,30 @@ class Attribute
     }
 
     /**
-     * Return array of Product Attributes and numeric value if attribute is in $_POST request
+     * Return attribute values from explicit cart data or the current request.
      *
      * @return array
      * @since 1.5.0
      */
-    public static function from_request()
+    public static function from_request($attributes = null)
     {
         $output = array();
-        if (!empty($_POST)) {
-            $attributes = wc_get_attribute_taxonomies();
-            foreach ($attributes as $attribute) {
+        if ($attributes === null) {
+            if (empty($_POST)) {
+                return $output;
+            }
+            $attributes = $_POST;
+        }
+
+        if (is_array($attributes)) {
+            $attribute_values = $attributes;
+            foreach (wc_get_attribute_taxonomies() as $attribute) {
                 $name = 'attribute_pa_' . $attribute->attribute_name;
                 $var_name = 'pa:' . $attribute->attribute_name;
                 $value = null;
                 $terms = null;
-                if (isset($_POST[$name])) {
-                    $value = sanitize_text_field($_POST[$name]);
+                if (isset($attribute_values[$name]) && is_scalar($attribute_values[$name])) {
+                    $value = sanitize_text_field($attribute_values[$name]);
                     $terms = self::get_term($attribute->attribute_name, $value);
                     if (!empty($terms)) {
                         $value = floatval(get_term_meta($terms[0]->term_id, 'wck_value', true));

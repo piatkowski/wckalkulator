@@ -37,6 +37,43 @@ class FieldsetAssignment
             self::TYPE_ALL_EXCEPT => __('All Products, except below:', 'wc-kalkulator'),
             self::TYPE_ONLY_SELECTED => __('Only selected below:', 'wc-kalkulator')
         );
+
+        // These values are request-local, but a single request may switch sites
+        // in multisite. Invalidate them when the assignment source changes.
+        add_action('save_post_' . FieldsetPostType::POST_TYPE, array(__CLASS__, 'invalidate_cache'), 100);
+        add_action('before_delete_post', array(__CLASS__, 'invalidate_deleted_fieldset_cache'));
+        add_action('trashed_post', array(__CLASS__, 'invalidate_cache'));
+        add_action('untrashed_post', array(__CLASS__, 'invalidate_cache'));
+        add_action('set_object_terms', array(__CLASS__, 'invalidate_product_assignment_cache'));
+    }
+
+    /** Clear this site's request-local assignment results after fieldset changes. */
+    public static function invalidate_cache()
+    {
+        Cache::forget_prefix(self::cache_prefix());
+    }
+
+    /** Clear assignment cache only when a fieldset was deleted. */
+    public static function invalidate_deleted_fieldset_cache($post_id)
+    {
+        if (get_post_type($post_id) === FieldsetPostType::POST_TYPE) {
+            self::invalidate_cache();
+        }
+    }
+
+    /** Clear product matches after category, tag, or attribute assignment changes. */
+    public static function invalidate_product_assignment_cache($object_id, $terms, $tt_ids, $taxonomy)
+    {
+        if (is_string($taxonomy) && (strpos($taxonomy, 'product_') === 0 || strpos($taxonomy, 'pa_') === 0)) {
+            self::invalidate_cache();
+        }
+    }
+
+    /** Prefix all assignment cache keys with the active site ID. */
+    private static function cache_prefix()
+    {
+        $blog_id = function_exists('get_current_blog_id') ? (int) get_current_blog_id() : 0;
+        return 'FieldsetAssignment_' . $blog_id . '_';
     }
 
     /**
@@ -90,9 +127,11 @@ class FieldsetAssignment
         /*
          * Return cached fieldset
          */
-        $cached = Cache::get('FieldsetAssignment_match_' . $product_id);
-        if ($cached)
-            return $cached;
+        $prefix = self::cache_prefix();
+        $cache_key = $prefix . 'match_' . $product_id;
+        if (Cache::has($cache_key)) {
+            return Cache::get($cache_key);
+        }
 
         /*
          * Get categories IDs
@@ -122,10 +161,16 @@ class FieldsetAssignment
          * Get product attributes IDs
          */
         $attribute_id = array();
-        $taxonomies = Cache::get('FieldsetAssignment_taxonomies');
-        if (empty($taxonomies)) {
-            $taxonomies = get_taxonomies(null, 'objects');
-            Cache::store('FieldsetAssignment_taxonomies', $taxonomies);
+        $taxonomies_key = $prefix . 'taxonomies';
+        $taxonomies = Cache::get($taxonomies_key);
+        if (!Cache::has($taxonomies_key)) {
+            $taxonomies = get_taxonomies(array('object_type' => array('product')), 'objects');
+            foreach ($taxonomies as $name => $taxonomy) {
+                if (strpos($name, 'pa_') !== 0) {
+                    unset($taxonomies[$name]);
+                }
+            }
+            Cache::store($taxonomies_key, $taxonomies);
         }
         foreach ($taxonomies as $taxonomy) {
             $attributes = get_the_terms($product_id, $taxonomy->name);
@@ -138,23 +183,24 @@ class FieldsetAssignment
         /*
          * Get all fieldsets
          */
-        $posts = Cache::get('FieldsetAssignment_all_fieldsets');
-        if (empty($posts)) {
+        $posts_key = $prefix . 'all_fieldsets';
+        $posts = Cache::get($posts_key);
+        if (!Cache::has($posts_key)) {
             $posts = get_posts(array(
                 'post_type' => FieldsetPostType::POST_TYPE,
-                'per_page' => -1,
                 'numberposts' => -1,
                 'post_status' => 'publish'
             ));
-            Cache::store('FieldsetAssignment_all_fieldsets', $posts);
+            Cache::store($posts_key, $posts);
         }
 
         $matching = null;
         $max_priority = -INF;
 
         foreach ($posts as $post) {
-            $assign = Cache::get('FieldsetAssignment_fieldset_assign' . $post->ID);
-            if(empty($assign)) {
+            $assign_key = $prefix . 'fieldset_assign_' . $post->ID;
+            $assign = Cache::get($assign_key);
+            if (!Cache::has($assign_key)) {
                 $assign = array(
                     'type' => get_post_meta($post->ID, '_wck_assign_type', true),
                     'products' => (array)get_post_meta($post->ID, '_wck_assign_products', true),
@@ -163,7 +209,7 @@ class FieldsetAssignment
                     'attributes' => (array)get_post_meta($post->ID, '_wck_assign_attributes', true),
                     'priority' => get_post_meta($post->ID, '_wck_assign_priority', true)
                 );
-                Cache::store('FieldsetAssignment_fieldset_assign' . $post->ID, $assign);
+                Cache::store($assign_key, $assign);
             }
 
             $has_match = false;
@@ -199,7 +245,7 @@ class FieldsetAssignment
 
         }
 
-        Cache::store('FieldsetAssignment_match_' . $product_id, $matching);
+        Cache::store($cache_key, $matching);
         return $matching;
     }
 

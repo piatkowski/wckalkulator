@@ -65,6 +65,9 @@ class PriceFilter
                     'prefix' => $fieldset->filter_price_prefix,
                     'sufix' => $fieldset->filter_price_sufix,
                     'value' => $fieldset->filter_price_value,
+                    'display_value' => $fieldset->filter_price_value !== '' && is_numeric($fieldset->filter_price_value)
+                        ? wc_get_price_to_display($product, array('price' => (float) $fieldset->filter_price_value))
+                        : '',
                     'price' => $price
                 ));
                 

@@ -34,6 +34,15 @@ class FieldsetProduct
      */
     private $validation_notices = array();
 
+    /** @var array Server-evaluated visibility state for the current input. */
+    private $field_visibility = array();
+
+    /** @var bool Whether the current request payload had a valid shape. */
+    private $request_input_valid = true;
+
+    /** @var bool Whether the loaded fieldset passed its runtime schema checks. */
+    private $configuration_valid = true;
+
     /**
      * @var object
      */
@@ -114,6 +123,15 @@ class FieldsetProduct
      */
     public function init($product_id = null, $variation_id = null)
     {
+        $this->data = null;
+        $this->fields = array();
+        $this->user_input = array();
+        $this->is_valid = false;
+        $this->validation_notices = array();
+        $this->field_visibility = array();
+        $this->request_input_valid = true;
+        $this->configuration_valid = true;
+
         $this->product_id = ($product_id === null) ? Product::get_id() : $product_id;
         $this->variation_id = ($variation_id === null) ? null : $variation_id;
 
@@ -122,6 +140,58 @@ class FieldsetProduct
         $this->init_fields();
         //}
         return $this->data;
+    }
+
+    /** Initialize this context from a versioned cart/order configuration snapshot. */
+    public function init_from_snapshot($snapshot, $product_id, $variation_id = null)
+    {
+        $this->data = null;
+        $this->fields = array();
+        $this->user_input = array();
+        $this->is_valid = false;
+        $this->validation_notices = array();
+        $this->field_visibility = array();
+        $this->request_input_valid = true;
+        $this->configuration_valid = true;
+        $this->product_id = (int) $product_id;
+        $this->variation_id = $variation_id === null ? null : (int) $variation_id;
+
+        if (!is_array($snapshot) || !isset($snapshot['id']) || (int) $snapshot['id'] < 1
+            || !isset($snapshot['fieldset']) || !is_array($snapshot['fieldset'])) {
+            $this->configuration_valid = false;
+            return false;
+        }
+
+        $this->data = (object) $snapshot;
+        $this->init_fields();
+        return $this->configuration_valid;
+    }
+
+    /** Return a plain, serializable copy of the active fieldset configuration. */
+    public function configuration_snapshot()
+    {
+        if (!$this->configuration_valid || !is_object($this->data)) {
+            return false;
+        }
+        $snapshot = get_object_vars($this->data);
+        return is_array($snapshot) ? $snapshot : false;
+    }
+
+    public function configuration_is_valid()
+    {
+        return $this->configuration_valid;
+    }
+
+    /** Capture global and product-attribute values used by the configured formulas. */
+    public function calculation_parameter_snapshot()
+    {
+        $snapshot = array();
+        foreach (is_array($this->user_input) ? $this->user_input : array() as $name => $value) {
+            if (is_string($name) && (strpos($name, 'global:') === 0 || strpos($name, 'pa:') === 0)) {
+                $snapshot[$name] = $value;
+            }
+        }
+        return $snapshot;
     }
 
     /**
@@ -191,11 +261,43 @@ class FieldsetProduct
         if (!isset($this->data->fieldset)) {
             return;
         }
-        if (is_array($this->data->fieldset)) {
-            foreach ($this->data->fieldset as $name => $data) {
-                $FieldClass = "\\WCKalkulator\\Fields\\" . ucfirst($data["type"]) . "Field";
-                $this->fields[$name] = new $FieldClass();
-                $this->fields[$name]->fromArray($data);
+        $versioned = isset($this->data->schema_version) && (int) $this->data->schema_version > 0;
+        if (!is_array($this->data->fieldset) || ($versioned && count($this->data->fieldset) > 200)) {
+            $this->configuration_valid = false;
+            return;
+        }
+        // Existing 1.6.1 configurations have no schema marker. Keep reading
+        // them without applying rules introduced for newly saved documents.
+        if ($versioned && !FieldsetPostType::validate_fieldset_schema($this->data->fieldset)) {
+            $this->configuration_valid = false;
+            return;
+        }
+        $mode = isset($this->data->choose_expression_type) ? $this->data->choose_expression_type : 'off';
+        if ($versioned && $mode !== 'off' && isset($this->data->expression) && $this->data->expression !== ''
+            && !FieldsetPostType::validate_expression_schema($this->data->expression, $this->data->fieldset)) {
+            $this->configuration_valid = false;
+            return;
+        }
+        $class_by_type = array();
+        foreach (Plugin::$defined_fields as $field_class) {
+            $class_parts = explode('\\', $field_class);
+            $class_name = end($class_parts);
+            $class_by_type[strtolower(substr($class_name, 0, -5))] = $field_class;
+        }
+        foreach ($this->data->fieldset as $name => $field_data) {
+            if (!is_array($field_data) || !isset($field_data['type'], $field_data['name'])
+                || !is_string($field_data['type']) || !isset($class_by_type[$field_data['type']])
+                || !is_string($field_data['name']) || (string) $name !== $field_data['name']) {
+                $this->configuration_valid = false;
+                continue;
+            }
+            try {
+                $field_class = $class_by_type[$field_data['type']];
+                $field = new $field_class();
+                $field->fromArray($field_data);
+                $this->fields[$name] = $field;
+            } catch (\Throwable $e) {
+                $this->configuration_valid = false;
             }
         }
     }
@@ -210,7 +312,7 @@ class FieldsetProduct
      */
     public function has_fieldset($current = '')
     {
-        if ($current === 'current' && (is_product() || Product::get_id() > 0)) {
+        if ($current === 'current' && ((function_exists('is_product') && is_product()) || Product::get_id() > 0)) {
             return FieldsetAssignment::match(Product::get_id()) !== null;
         } elseif ((int)$current > 0) {
             return FieldsetAssignment::match((int)$current) !== null;
@@ -230,16 +332,31 @@ class FieldsetProduct
      */
     public function has_expression($current = '')
     {
-        $id = 0;
-        if ($current === 'current' && (is_product() || Product::get_id() > 0)) {
-            $id = FieldsetAssignment::match(Product::get_id());
-        } elseif ((int)$current > 0) {
-            $id = FieldsetAssignment::match((int)$current) !== null;
-        } elseif ($current === '') {
-            $id = $this->get_id();
+        if ($current === '' && is_object($this->data)) {
+            return isset($this->data->choose_expression_type) && $this->data->choose_expression_type !== "off";
         }
 
-        return $id > 0 && $this->get_data($id)->choose_expression_type !== "off";
+        if ($current === 'current') {
+            $product_id = $this->product_id > 0 ? $this->product_id : Product::get_id();
+        } elseif (is_scalar($current) && ctype_digit((string) $current) && (int) $current > 0) {
+            $product_id = (int) $current;
+        } elseif ($current === '') {
+            $product_id = $this->product_id > 0 ? $this->product_id : Product::get_id();
+        } else {
+            return false;
+        }
+
+        if ($product_id < 1) {
+            return false;
+        }
+
+        $fieldset_id = FieldsetAssignment::match($product_id);
+        if (!$fieldset_id) {
+            return false;
+        }
+
+        $fieldset = $this->get_data($fieldset_id);
+        return isset($fieldset->choose_expression_type) && $fieldset->choose_expression_type !== "off";
     }
 
     /**
@@ -385,55 +502,116 @@ class FieldsetProduct
     public function get_user_input()
     {
         $allowed_names = $this->fields_names();
-
-        //if (isset($_POST['wck']) && is_array($_POST['wck'])) {
         $filtered_post = array();
+        $raw_post = isset($_POST['wck']) ? wp_unslash($_POST['wck']) : array();
+        if (!is_array($raw_post)) {
+            $this->request_input_valid = false;
+            $raw_post = array();
+        }
+        foreach ($raw_post as $name => $unused) {
+            if (!in_array($name, $allowed_names, true)) {
+                $this->request_input_valid = false;
+            }
+        }
         foreach ($allowed_names as $name) {
-            if (isset($_POST['wck'][$name])) {
-                $filtered_post[$name] = $_POST['wck'][$name];
-            } else {
-                /* Set Default values if the field is not in POST data */
-                if ($this->field($name)['type'] === 'checkboxgroup') {
+            $field = isset($this->fields[$name]) ? $this->fields[$name] : null;
+            if (!$field) {
+                continue;
+            }
+            if (array_key_exists($name, $raw_post)) {
+                $value = $raw_post[$name];
+                if ($field->type() === 'textarea') {
+                    $filtered_post[$name] = is_scalar($value) ? sanitize_textarea_field((string) $value) : $value;
+                } elseif (is_array($value)) {
                     $filtered_post[$name] = array();
+                    foreach ($value as $sub_key => $sub_value) {
+                        if (!is_scalar($sub_value)) {
+                            $this->request_input_valid = false;
+                            continue;
+                        }
+                        $filtered_post[$name][$sub_key] = sanitize_text_field((string) $sub_value);
+                    }
+                } else {
+                    $filtered_post[$name] = is_scalar($value) ? sanitize_text_field((string) $value) : $value;
+                }
+            } elseif ($field->type() === 'checkboxgroup') {
+                $filtered_post[$name] = array();
+            }
+        }
+
+        $user_input = $filtered_post;
+
+        $user_input['_files'] = array();
+
+        if (isset($_FILES['wck'])) {
+            $upload = $_FILES['wck'];
+            if (!is_array($upload) || !isset($upload['name'], $upload['tmp_name'], $upload['error'], $upload['size'])
+                || !is_array($upload['name']) || !is_array($upload['tmp_name'])
+                || !is_array($upload['error']) || !is_array($upload['size'])
+                || (isset($upload['type']) && !is_array($upload['type']))) {
+                $this->request_input_valid = false;
+            } else {
+                foreach ($upload['name'] as $name => $file_name) {
+                    if (!in_array($name, $allowed_names, true) || !isset($this->fields[$name])
+                        || $this->fields[$name]->group() !== 'upload'
+                        || !is_string($file_name) || !isset($upload['tmp_name'][$name], $upload['error'][$name], $upload['size'][$name])
+                        || !is_string($upload['tmp_name'][$name]) || !is_numeric($upload['error'][$name])
+                        || !is_numeric($upload['size'][$name])) {
+                        $this->request_input_valid = false;
+                        continue;
+                    }
+                    $error_code = (int) $upload['error'][$name];
+                    if ($error_code === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
+                    if ($error_code !== UPLOAD_ERR_OK || !is_uploaded_file($upload['tmp_name'][$name])) {
+                        $this->request_input_valid = false;
+                        continue;
+                    }
+                    $validate = wp_check_filetype_and_ext($upload['tmp_name'][$name], $file_name);
+                    if (isset($validate['ext']) && $validate['ext'] !== false) {
+                        $file_id = PrivateUploads::new_id();
+                        if (!$file_id) {
+                            $this->request_input_valid = false;
+                            continue;
+                        }
+                        $extension = strtolower($validate['ext']);
+                        $user_input[$name] = (int) $upload['size'][$name];
+                        $user_input['_files'][$name] = array(
+                            'name' => $name,
+                            'file_id' => $file_id,
+                            'extension' => $extension,
+                            'original_name' => $file_name,
+                            'type' => isset($upload['type'][$name]) && is_string($upload['type'][$name]) ? $upload['type'][$name] : '',
+                            'tmp_name' => $upload['tmp_name'][$name],
+                            'size' => (int) $upload['size'][$name],
+                            'error' => 0,
+                        );
+                    } else {
+                        $this->request_input_valid = false;
+                    }
                 }
             }
         }
 
-        $user_input = Sanitizer::sanitize($filtered_post, 'array');
-        //}
-
-        $user_input['_files'] = array();
-
-        /* Since v.1.3.1 upload path is defined in WCK Settings
-        $customer_dir = '/wc-kalkulator/customer-data/' . date("Y/m/");
-        $upload_path = wp_upload_dir()['basedir'] . $customer_dir;
-        $upload_url = wp_upload_dir()['baseurl'] . $customer_dir;
-        */
-
-        $upload_path = Settings::get('upload_customer_data_dir') . date("Y/m/");
-        $upload_url = str_replace(ABSPATH, get_site_url() . '/', $upload_path);
-
-        if (isset($_FILES['wck'])) {
-            foreach ($_FILES['wck']['name'] as $name => $file_name) {
-                if (in_array($name, $allowed_names) && $_FILES['wck']['error'][$name] == 0) {
-                    $validate = wp_check_filetype_and_ext($_FILES['wck']['tmp_name'][$name], $file_name);
-                    if ($validate['ext'] !== false) {
-                        $file = uniqid() . '.' . $validate['ext'];
-                        $upload_file = wp_unique_filename($upload_path, $file);
-                        $temp_file = 'wckalkulator_tmp_' . wp_unique_filename(get_temp_dir(), $file);
-                        $user_input[$name] = $_FILES['wck']['size'][$name]; //fixed
-                        $user_input['_files'][$name] = array(
-                            'name' => $name,
-                            'original_name' => $file_name,
-                            'type' => $_FILES['wck']['type'][$name],
-                            'tmp_name' => $_FILES['wck']['tmp_name'][$name],
-                            'upload_path' => $upload_path . $upload_file,
-                            'upload_url' => $upload_url . $upload_file,
-                            'upload_tmp' => get_temp_dir() . $temp_file,
-                            'size' => $_FILES['wck']['size'][$name],
-                            'error' => 0,
-                        );
+        // A cart edit may retain an existing staged upload when the form has no replacement file.
+        $edit_key = isset($_POST['_wck_edit']) && is_scalar($_POST['_wck_edit'])
+            ? sanitize_text_field(wp_unslash((string) $_POST['_wck_edit'])) : '';
+        if ($edit_key !== '' && function_exists('WC') && WC() && isset(WC()->cart)) {
+            $old_item = WC()->cart->get_cart_item($edit_key);
+            if (is_array($old_item) && isset($old_item['product_id'], $old_item['wckalkulator_fields'])
+                && (int) $old_item['product_id'] === (int) $this->product_id
+                && (!isset($old_item['wckalkulator_fieldset_id']) || (int) $old_item['wckalkulator_fieldset_id'] === (int) $this->id())) {
+                $old_files = isset($old_item['wckalkulator_fields']['_files']) && is_array($old_item['wckalkulator_fields']['_files'])
+                    ? $old_item['wckalkulator_fields']['_files'] : array();
+                foreach ($old_files as $name => $file_data) {
+                    if (!isset($this->fields[$name]) || $this->fields[$name]->group() !== 'upload'
+                        || isset($user_input['_files'][$name]) || !PrivateUploads::is_staged($file_data)) {
+                        continue;
                     }
+                    $file_data['tmp_name'] = PrivateUploads::staged_path($file_data);
+                    $user_input['_files'][$name] = $file_data;
+                    $user_input[$name] = (int) $file_data['size'];
                 }
             }
         }
@@ -454,11 +632,12 @@ class FieldsetProduct
         $files = isset($this->user_input['_files']) ? $this->user_input['_files'] : null;
         if (!empty($files) && !empty($this->user_input)) {
             foreach ($files as $name => $data) {
-                if ($this->fields[$name]->validate($data)) {
-                    $this->fields[$name]->upload_temp($data);
+                if (!isset($this->fields[$name]) || !$this->fields[$name]->validate($data) || !$this->fields[$name]->upload_temp($data)) {
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     /**
@@ -468,9 +647,25 @@ class FieldsetProduct
      * @return bool
      * @since 1.0.0
      */
-    public function validate($is_ajax_cart = false)
+    public function validate($is_ajax_cart = false, $context = array())
     {
+        if (!$this->configuration_valid) {
+            $this->validation_notices[] = __('Product field configuration is invalid.', 'wc-kalkulator');
+            $this->is_valid = false;
+            return false;
+        }
+        if (!$this->request_input_valid || !is_array($this->user_input)) {
+            $this->validation_notices[] = __('Product options have an invalid format.', 'wc-kalkulator');
+            $this->is_valid = false;
+            return false;
+        }
         //$this->user_input = $input;
+
+        if (!$this->apply_visibility_to_user_input()) {
+            $this->is_valid = false;
+            $this->user_input = array();
+            return false;
+        }
 
         if ($is_ajax_cart) {
             $this->is_valid = $this->validate_for_expression();
@@ -483,7 +678,7 @@ class FieldsetProduct
             return false;
         }
 
-        $this->set_additional_input_variables();
+        $this->set_additional_input_variables(false, $context);
 
         return $this->is_valid;
     }
@@ -496,29 +691,276 @@ class FieldsetProduct
      */
     public function validate_for_expression()
     {
-        if (!is_array($this->expression())) {
-            return true;
-        }
-        //Implode array as string
-        if (is_array($this->expression('expr'))) {
-            $expr = implode("", array_map(function ($a) {
-                return implode("", $a);
-            }, $this->expression('expr')));
-        } else {
-            $expr = $this->expression('expr');
-        }
-
+        $references = array();
+        $this->collect_expression_field_references($this->expression(), $references);
         foreach ($this->fields() as $field) {
-            if ($field->use_expression()) {
-                $field_name = $field->data("name");
-                if (strpos('{' . $field_name . '}', $expr) !== false) {
-                    if (!$field->validate($this->user_input[$field_name])) {
-                        return false;
-                    }
+            $field_name = $field->data('name');
+            if (!isset($references[$field_name])) {
+                continue;
+            }
+            if (array_key_exists($field_name, $this->user_input)) {
+                $value = isset($this->user_input['_files'][$field_name])
+                    ? $this->user_input['_files'][$field_name]
+                    : $this->user_input[$field_name];
+                $valid_upload_preview = $field->group() === 'upload'
+                    && (is_int($value) || is_float($value) || is_string($value))
+                    && is_numeric($value) && is_finite((float) $value)
+                    && (float) $value >= 0
+                    && (float) $value <= (float) $field->data('max_file_size') * 1000000
+                    && ((float) $value > 0 || !$field->is_required());
+                if (!$valid_upload_preview && !$field->validate($value)) {
+                    $this->validation_notices[] = sprintf(__('Field %s has incorrect value.', 'wc-kalkulator'), $field->data('title'));
+                    return false;
                 }
             }
         }
         return true;
+    }
+
+    /** Collect field references, including derived parameters such as :sum. */
+    private function collect_expression_field_references($value, &$references)
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $this->collect_expression_field_references($item, $references);
+            }
+            return;
+        }
+        if (!is_string($value)) {
+            return;
+        }
+        if (preg_match_all('/\\{([^{}]+)\\}/u', $value, $matches)) {
+            foreach ($matches[1] as $reference) {
+                $reference = explode(':', $reference, 2);
+                $field_name = $reference[0];
+                if (isset($this->fields[$field_name])) {
+                    $references[$field_name] = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Evaluate visibility rules as OR groups containing AND conditions.
+     * Missing references, malformed rules and dependency cycles are invalid configuration.
+     *
+     * @param array $input
+     * @param string|null $error
+     * @return array|false
+     */
+    public function evaluate_visibility($input, &$error = null)
+    {
+        $error = null;
+        if (!is_array($input)) {
+            $error = 'invalid_input';
+            return false;
+        }
+
+        $states = array();
+        $visiting = array();
+        foreach ($this->fields() as $field) {
+            $name = $field->data('name');
+            if (!is_string($name) || $name === '') {
+                return false;
+            }
+            $this->resolve_field_visibility($name, $input, $states, $visiting, $error);
+            if ($error !== null) {
+                return false;
+            }
+        }
+        return $states;
+    }
+
+    /** Resolve a field's visibility, detecting cycles while walking dependencies. */
+    private function resolve_field_visibility($name, $input, &$states, &$visiting, &$error)
+    {
+        if (array_key_exists($name, $states)) {
+            return $states[$name];
+        }
+        if (isset($visiting[$name])) {
+            $error = 'visibility_cycle';
+            return false;
+        }
+        if (!isset($this->fields[$name])) {
+            $error = 'visibility_reference_missing';
+            return false;
+        }
+
+        $visiting[$name] = true;
+        $raw_rules = $this->fields[$name]->data('visibility');
+        if ($raw_rules === null || $raw_rules === false || (is_string($raw_rules) && trim($raw_rules) === '')) {
+            unset($visiting[$name]);
+            $states[$name] = true;
+            return true;
+        }
+
+        $rules = is_array($raw_rules) ? $raw_rules : json_decode(stripslashes((string) $raw_rules), true);
+        if (!is_array($rules) || !$rules) {
+            $error = 'visibility_rules_invalid';
+            unset($visiting[$name]);
+            return false;
+        }
+
+        foreach ($rules as $or_group) {
+            if (!is_array($or_group) || !$or_group) {
+                $error = 'visibility_rules_invalid';
+                unset($visiting[$name]);
+                return false;
+            }
+            $group_matches = true;
+            foreach ($or_group as $condition) {
+                if (!is_array($condition) || !isset($condition['field'], $condition['comp'])
+                    || !is_scalar($condition['field']) || !is_scalar($condition['comp'])) {
+                    $error = 'visibility_rules_invalid';
+                    unset($visiting[$name]);
+                    return false;
+                }
+                $reference = (string) $condition['field'];
+                $comparison = (string) $condition['comp'];
+                if (!isset($this->fields[$reference])
+                    || $this->fields[$reference]->group() === 'static') {
+                    $error = 'visibility_reference_missing';
+                    unset($visiting[$name]);
+                    return false;
+                }
+                if (!in_array($comparison, array('1', '2', '3', '4', '5', '6', '7', '8', '9'), true)
+                    || (!in_array($comparison, array('1', '2'), true)
+                        && (!array_key_exists('value', $condition) || !is_scalar($condition['value'])))) {
+                    $error = 'visibility_rules_invalid';
+                    unset($visiting[$name]);
+                    return false;
+                }
+                $reference_visible = $this->resolve_field_visibility($reference, $input, $states, $visiting, $error);
+                if ($reference_visible === false && $error !== null) {
+                    unset($visiting[$name]);
+                    return false;
+                }
+                $reference_values = $reference_visible
+                    ? (array_key_exists($reference, $input) ? $input[$reference] : '')
+                    : '';
+                if (!$this->compare_visibility_values($reference_values, $comparison, isset($condition['value']) ? $condition['value'] : '')) {
+                    $group_matches = false;
+                    break;
+                }
+            }
+            if ($group_matches) {
+                unset($visiting[$name]);
+                $states[$name] = true;
+                return true;
+            }
+        }
+
+        unset($visiting[$name]);
+        $states[$name] = false;
+        return false;
+    }
+
+    /** Match one condition using the same comparison codes as the field rules editor. */
+    private function compare_visibility_values($value, $comparison, $target)
+    {
+        $values = is_array($value) ? $value : array($value);
+        $values = array_values(array_filter($values, 'is_scalar'));
+        $nonempty = array_values(array_filter($values, function ($candidate) {
+            return $candidate !== '';
+        }));
+
+        if ($comparison === '1') {
+            return count($nonempty) === 0;
+        }
+        if ($comparison === '2') {
+            return count($nonempty) > 0;
+        }
+
+        $target = (string) $target;
+        if ($comparison === '3') {
+            foreach ($nonempty as $candidate) {
+                if ((string) $candidate === $target) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if ($comparison === '4') {
+            if (!$nonempty) {
+                return false;
+            }
+            foreach ($nonempty as $candidate) {
+                if ((string) $candidate === $target) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if ($comparison === '9') {
+            foreach ($nonempty as $candidate) {
+                if (strpos((string) $candidate, $target) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        $target = str_replace(',', '.', $target);
+        if (!is_numeric($target) || !is_finite((float) $target) || abs((float) $target) > 1000000000000) {
+            return false;
+        }
+        $target_number = floor((float) $target * 1000 + 0.5) / 1000;
+        foreach ($nonempty as $candidate) {
+            $candidate = str_replace(',', '.', (string) $candidate);
+            if (!is_numeric($candidate) || !is_finite((float) $candidate) || abs((float) $candidate) > 1000000000000) {
+                continue;
+            }
+            $candidate_number = floor((float) $candidate * 1000 + 0.5) / 1000;
+            if (($comparison === '5' && $candidate_number < $target_number)
+                || ($comparison === '6' && $candidate_number <= $target_number)
+                || ($comparison === '7' && $candidate_number > $target_number)
+                || ($comparison === '8' && $candidate_number >= $target_number)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Remove hidden values and replace them with a neutral value before validation/calculation. */
+    private function apply_visibility_to_user_input()
+    {
+        if (!is_array($this->user_input)) {
+            $this->validation_notices[] = __('Field visibility configuration is invalid.', 'wc-kalkulator');
+            return false;
+        }
+        $error = null;
+        $visibility = $this->evaluate_visibility($this->user_input, $error);
+        if ($visibility === false) {
+            $this->validation_notices[] = __('Field visibility configuration is invalid.', 'wc-kalkulator');
+            return false;
+        }
+
+        $this->field_visibility = $visibility;
+        foreach ($this->fields() as $field) {
+            $name = $field->data('name');
+            if (!empty($visibility[$name])) {
+                continue;
+            }
+            unset($this->user_input[$name]);
+            if (isset($this->user_input['_files']) && is_array($this->user_input['_files'])) {
+                unset($this->user_input['_files'][$name]);
+            }
+            $this->user_input[$name] = $this->neutral_field_value($field);
+        }
+        if (!isset($this->user_input['_files']) || !is_array($this->user_input['_files'])) {
+            $this->user_input['_files'] = array();
+        }
+        return true;
+    }
+
+    private function field_value_is_empty($value)
+    {
+        return $value === null || $value === '' || $value === array();
+    }
+
+    private function neutral_field_value($field)
+    {
+        return $field->type() === 'checkboxgroup' ? array() : '';
     }
 
     /**
@@ -559,11 +1001,15 @@ class FieldsetProduct
      */
     public function validate_names()
     {
-        $field_names = array_keys($this->user_input);
         $is_valid = true;
         foreach ($this->fields() as $field) {
             $field_name = $field->data("name");
-            if ((!in_array($field_name, $field_names) || $this->user_input[$field_name] === '') && $field->is_required()) {
+            if (isset($this->field_visibility[$field_name]) && !$this->field_visibility[$field_name]) {
+                continue;
+            }
+            $is_required = $field->is_required() || $field->is_required_when_visible();
+            if ($is_required && (!array_key_exists($field_name, $this->user_input)
+                || $this->field_value_is_empty($this->user_input[$field_name]))) {
                 $this->validation_notices[] = sprintf(
                     __('Field %s is required.', 'wc-kalkulator'),
                     $field->data("title") . ' ' . $field->data("name")
@@ -587,6 +1033,11 @@ class FieldsetProduct
         foreach ($this->fields() as $field) {
 
             $field_name = $field->data("name");
+
+            if (isset($this->field_visibility[$field_name]) && !$this->field_visibility[$field_name]) {
+                $filtered_input[$field_name] = $this->neutral_field_value($field);
+                continue;
+            }
 
             if (!array_key_exists($field_name, $this->user_input)) {
                 continue;
@@ -621,8 +1072,9 @@ class FieldsetProduct
      * @return void|array
      * @since 1.2.0
      */
-    public function set_additional_input_variables($return = false)
+    public function set_additional_input_variables($return = false, $context = array())
     {
+        $context = is_array($context) ? $context : array();
         if (!$return && !is_array($this->user_input)) {
             return;
         }
@@ -632,20 +1084,22 @@ class FieldsetProduct
                 $name = $field->data("name");
 
                 // Check if field has price paramter and its name is in user input
-                if ($field->data("price") !== null && in_array($name, $field_names)) {
+                if ($field->data("price") !== null && in_array($name, $field_names, true)) {
+                    $raw_value = $this->user_input[$name];
+                    if ($field->group() !== 'static' && array_key_exists($name, $this->user_input)) {
+                        $this->set_additional_field_parameters($field, $raw_value);
+                    }
                     $static_price = Sanitizer::sanitize($field->data("price"), "price");
 
                     if ($field->type() === "checkbox") {
-                        $static_price = intval((int)$this->user_input[$name] === 1) * $static_price;
+                        $static_price = intval((string) $raw_value === '1') * $static_price;
                     }
 
-                    if (empty($this->user_input[$field->data("name")])) {
+                    if ($raw_value === '' || $raw_value === null || $raw_value === false || $raw_value === array()) {
                         $static_price = 0;
                     }
                     $this->user_input[$name] = $static_price;
-                }
-
-                if ($field->group() !== 'static' && isset($this->user_input[$name])) {
+                } elseif ($field->group() !== 'static' && array_key_exists($name, $this->user_input)) {
                     $this->set_additional_field_parameters($field, $this->user_input[$name]);
                 }
             }
@@ -658,7 +1112,9 @@ class FieldsetProduct
         if ($this->product_id > 0) {
             $product_helper = new ProductHelper($this->product_id, $this->variation_id);
             if ($product_helper->is_valid()) {
-                $this->user_input["product_price"] = $product_helper->price();
+                $this->user_input["product_price"] = array_key_exists('product_price', $context)
+                    ? $context['product_price']
+                    : $product_helper->price();
                 $this->user_input["product_weight"] = $product_helper->get_weight();
                 $this->user_input["product_width"] = $product_helper->get_width();
                 $this->user_input["product_height"] = $product_helper->get_height();
@@ -673,8 +1129,10 @@ class FieldsetProduct
         $this->user_input["day_of_month"] = absint(current_time("j"));
         $this->user_input["day_of_week"] = absint(current_time("w"));
         $this->user_input["current_hour"] = absint(current_time("G"));
-        if (isset($_POST["quantity"])) {
-            $this->user_input["quantity"] = absint($_POST["quantity"]);
+        if (array_key_exists('quantity', $context)) {
+            $this->user_input["quantity"] = is_numeric($context['quantity']) && is_finite((float) $context['quantity'])
+                ? (float) $context['quantity']
+                : 0;
         }
 
         /*
@@ -685,7 +1143,8 @@ class FieldsetProduct
         }/*
          * @since 1.5.0 - get custom numerical value (wck_value) of product attribute term
          */;
-        $this->user_input = array_merge($this->user_input, Attribute::from_request());
+        $attributes = array_key_exists('attributes', $context) ? $context['attributes'] : null;
+        $this->user_input = array_merge($this->user_input, Attribute::from_request($attributes));
 
         /*
          * @since 1.5.0 - support for ACF integration
@@ -696,10 +1155,58 @@ class FieldsetProduct
             "variation_id" => $this->variation_id //lowest priority
         ));
 
-        if($return) {
-            return $this->user_input;
+        if ($return) {
+            $public_parameters = array();
+            foreach (GlobalParameter::get_all(true) as $name => $value) {
+                $public_parameters['global:' . $name] = $value;
+            }
+            return $public_parameters;
         }
 
+    }
+
+    /**
+     * Load a previously validated cart input and refresh request-dependent values.
+     *
+     * @param array $input
+     * @param array $context
+     * @return bool
+     */
+    public function set_cart_context($input, $context)
+    {
+        if (!$this->configuration_valid || !is_array($input) || !is_array($context)) {
+            return false;
+        }
+
+        $this->user_input = array();
+        foreach ($this->fields_names() as $name) {
+            if (array_key_exists($name, $input)) {
+                $this->user_input[$name] = $input[$name];
+            }
+        }
+        if (isset($input['_files']) && is_array($input['_files'])) {
+            $this->user_input['_files'] = $input['_files'];
+        } else {
+            $this->user_input['_files'] = array();
+        }
+
+        $this->validation_notices = array();
+        $this->field_visibility = array();
+        if (!$this->apply_visibility_to_user_input() || !$this->validate_names()) {
+            $this->is_valid = false;
+            return false;
+        }
+        $this->is_valid = true;
+        $this->set_additional_input_variables(false, $context);
+        if (isset($context['parameter_snapshot']) && is_array($context['parameter_snapshot'])) {
+            foreach ($context['parameter_snapshot'] as $name => $value) {
+                if (is_string($name) && (strpos($name, 'global:') === 0 || strpos($name, 'pa:') === 0)) {
+                    $this->user_input[$name] = $value;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -730,8 +1237,10 @@ class FieldsetProduct
                 $this->user_input[$name . ':sum'] = count($input) > 0 ? array_sum($input) : 0;
                 break;
             case 'text':
+                $this->user_input[$name . ':text'] = sanitize_text_field((string) $input);
+                break;
             case 'textarea':
-                $this->user_input[$name . ':text'] = sanitize_text_field($input);
+                $this->user_input[$name . ':text'] = sanitize_textarea_field((string) $input);
                 break;
             case 'imageupload':
             case 'fileupload':
@@ -828,7 +1337,7 @@ class FieldsetProduct
                         'mode' => 'oneline',
                         'expr' => $field->data("content")
                     );
-                    $parser = new ExpressionParser($expression, $this->user_input);
+                    $parser = new ExpressionParser($expression, $this->user_input, 'formula');
                     if ($parser->is_ready()) {
                         $calc = $parser->execute();
                         $result[$field->data("name")] = array(
@@ -850,17 +1359,23 @@ class FieldsetProduct
     /**
      * Get stock reduction multiplier.
      *
-     * @return array|int
+     * @return float|int|false
      * @since 1.4.0
      */
     public function stock_reduction_multiplier()
     {
         if ($this->product_id > 0) {
+            $expression = isset($this->data->stock_reduction_multiplier)
+                ? trim((string) $this->data->stock_reduction_multiplier)
+                : '';
+            if ($expression === '') {
+                return 1;
+            }
             try {
                 $parser = new ExpressionParser(array(
                     'mode' => 'oneline',
-                    'expr' => $this->data->stock_reduction_multiplier
-                ), $this->user_input);
+                    'expr' => $expression
+                ), $this->user_input, 'stock_multiplier');
                 if ($parser->is_ready()) {
                     $calc = $parser->execute();
                     if (!$calc['is_error']) {
@@ -868,12 +1383,12 @@ class FieldsetProduct
                     }
                 }
             } catch (\Exception $e) {
-                return 1;
+                return false;
             } catch (\Throwable $e) {
-                return 1;
+                return false;
             }
         }
-        return 1;
+        return false;
     }
 
     /**
@@ -897,8 +1412,12 @@ class FieldsetProduct
 
     public function js_api()
     {
-        global $post;
-        $this->product_id = $post->ID;
+        // An absent flag denotes a script saved before the publication flag
+        // existed. An explicit disabled flag is always respected.
+        $enabled = get_post_meta($this->data->id, '_wck_javascript_enabled', true);
+        if ($enabled !== '' && $enabled !== '1') {
+            return;
+        }
         $js = $this->get_meta('javascript');
 
         /*

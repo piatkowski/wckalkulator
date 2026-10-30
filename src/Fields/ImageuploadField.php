@@ -56,6 +56,11 @@ class ImageuploadField extends AbstractField {
 	public function render_for_product( $value = "" ) {
 		$args                  = $this->prepared_data();
 		$args['max_file_size'] = $this->data( 'max_file_size' );
+		$args['existing_file_name'] = is_array( $value ) && isset( $value['original_name'] ) && is_string( $value['original_name'] )
+			? $value['original_name'] : '';
+		if ( $args['existing_file_name'] !== '' ) {
+			$args['required'] = '';
+		}
 		if ( ! empty( $this->data( 'allowed_extensions' ) ) ) {
 			$args['allowed_extensions'] = $this->data( 'allowed_extensions' );
 			$args['accept']             = '.' . str_replace( '|', ', .', $this->data( 'allowed_extensions' ) );
@@ -91,7 +96,11 @@ class ImageuploadField extends AbstractField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( \WCKalkulator\PrivateUploads::is_staged( $value ) ) {
+			$path = \WCKalkulator\PrivateUploads::staged_path($value);
+			return $path && wp_get_image_mime($path) !== false;
+		}
+		if ( ! $this->is_required() && ( $value === '' || $value === null || $value === array() ) ) {
 			return true;
 		}
 
@@ -99,7 +108,8 @@ class ImageuploadField extends AbstractField {
 			return false;
 		}
 
-		if ( is_array( $value ) ) {
+		if ( is_array( $value ) && isset( $value['tmp_name'], $value['original_name'], $value['size'] )
+			&& is_string( $value['tmp_name'] ) && is_string( $value['original_name'] ) && is_numeric( $value['size'] ) ) {
 			if ( is_uploaded_file( $value['tmp_name'] ) ) {
 				$allowed_size = $this->data( 'max_file_size' ) * 1000000; //Bytes
 				$allowed_ext  = array();
@@ -153,17 +163,7 @@ class ImageuploadField extends AbstractField {
 	 * @since 1.3.0
 	 */
 	public function upload( $data ) {
-		if ( ! file_exists( $data['upload_tmp'] ) ) {
-			return false;
-		}
-
-		$dir = dirname( $data['upload_path'] );
-		if ( ! file_exists( $dir ) ) {
-			mkdir( $dir, 0755, true );
-			file_put_contents( $dir . '/index.html', '' );
-		}
-
-		return rename( $data['upload_tmp'], $data['upload_path'] );
+		return \WCKalkulator\PrivateUploads::promote( $data );
 	}
 
 	/**
@@ -175,8 +175,15 @@ class ImageuploadField extends AbstractField {
 	 * @since 1.3.0
 	 */
 	public function upload_temp( $data ) {
-		if ( move_uploaded_file( $data['tmp_name'], $data['upload_tmp'] ) ) {
-			chmod( $data['upload_tmp'], 0644 );
+		if ( \WCKalkulator\PrivateUploads::is_staged( $data ) ) {
+			return true;
+		}
+		$destination = isset($data['file_id'], $data['extension']) ? \WCKalkulator\PrivateUploads::temp_path($data['file_id'], $data['extension']) : false;
+		if (!$destination || !isset($data['tmp_name']) || !is_uploaded_file($data['tmp_name'])) {
+			return false;
+		}
+		if (move_uploaded_file($data['tmp_name'], $destination) && is_file($destination)) {
+			chmod($destination, 0600);
 
 			return true;
 		}

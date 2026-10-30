@@ -69,8 +69,8 @@ abstract class AbstractField {
 			'css_class'              => $this->data( "css_class" ),
 			'required'               => ( $this->is_required() || $this->is_required_when_visible() ? ' required' : '' ),
 			// add "required" attribute
-			'is_required'            => $this->is_required() ? '1' : '0',
-			// is always required
+			'is_required'            => ( $this->is_required() || $this->is_required_when_visible() ) ? '1' : '0',
+			// is required either always or when the field is visible
 			'show_required_asterisk' => $this->is_required() || $this->is_required_when_visible()
 		);
 	}
@@ -92,7 +92,7 @@ abstract class AbstractField {
 			return $this->data;
 		}
 
-		if ( ! empty( $this->data[ $key ] ) ) {
+		if ( is_array( $this->data ) && array_key_exists( $key, $this->data ) ) {
 			return $this->data[ $key ];
 		}
 
@@ -116,7 +116,9 @@ abstract class AbstractField {
 	 * @return mixed
 	 */
 	public function is_required() {
-		return ! ( $this->group() === 'static' || $this->type() === 'formula' ) && $this->data["required"] === '1';
+		$required = isset( $this->data['required'] ) ? $this->data['required'] : false;
+		return ! ( $this->group() === 'static' || $this->type() === 'formula' )
+			&& ( $required === true || $required === 1 || in_array( $required, array( '1', '2' ), true ) );
 	}
 
 	/**
@@ -126,7 +128,7 @@ abstract class AbstractField {
 	 * @since 1.5.0
 	 */
 	public function is_required_when_visible() {
-		return $this->data["required"] === '2';
+		return ! ( $this->group() === 'static' || $this->type() === 'formula' ) && $this->data["required"] === '2';
 	}
 
 	/**
@@ -210,6 +212,9 @@ abstract class AbstractField {
 	 * @return mixed
 	 */
 	public function use_expression() {
+		if ( isset( $this->data['use_expression'] ) ) {
+			return $this->data['use_expression'] === true || $this->data['use_expression'] === 1 || $this->data['use_expression'] === '1';
+		}
 		return $this->use_expression;
 	}
 

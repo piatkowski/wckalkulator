@@ -39,6 +39,7 @@ $attributes = get_post_meta($post->ID, '_wck_assign_attributes', true);
             <?php echo Helper::html_help_tip(__('Search a product by title. You can choose multiple products.', 'wc-kalkulator')); ?>
         </label>
     </p>
+    <input type="hidden" name="_wck_assign_products_submitted" value="1" />
     <select class="wc-product-search" multiple="multiple" id="assign_products" name="_wck_assign_products[]"
             data-action="woocommerce_json_search_products">
         <?php foreach (FieldsetAssignment::products_readable($products) as $id => $title): ?>
@@ -52,6 +53,7 @@ $attributes = get_post_meta($post->ID, '_wck_assign_attributes', true);
             <?php echo Helper::html_help_tip(__('Search a category by title. You can choose multiple categories.', 'wc-kalkulator')); ?>
         </label>
     </p>
+    <input type="hidden" name="_wck_assign_categories_submitted" value="1" />
     <select class="wc-category-search" multiple="multiple" id="assign_categories" name="_wck_assign_categories[]">
         <?php foreach (FieldsetAssignment::categories_readable($categories) as $id => $title): ?>
             <option value="<?php echo esc_html($id); ?>" selected><?php echo esc_html($title); ?></option>
@@ -64,6 +66,7 @@ $attributes = get_post_meta($post->ID, '_wck_assign_attributes', true);
             <?php echo Helper::html_help_tip(__('Search a tag by name. You can choose multiple tags.', 'wc-kalkulator')); ?>
         </label>
     </p>
+    <input type="hidden" name="_wck_assign_tags_submitted" value="1" />
 
     <select class="wc-product-search" multiple="multiple" id="assign_tags" name="_wck_assign_tags[]"
             data-action="wckalkulator_json_search_tags">
@@ -78,6 +81,7 @@ $attributes = get_post_meta($post->ID, '_wck_assign_attributes', true);
             <?php echo Helper::html_help_tip(__('Search an attribute by name. You can choose multiple attributes.', 'wc-kalkulator')); ?>
         </label>
     </p>
+    <input type="hidden" name="_wck_assign_attributes_submitted" value="1" />
 
     <select class="wc-product-search" multiple="multiple" id="assign_attributes" name="_wck_assign_attributes[]"
             data-action="wckalkulator_json_search_attributes">

@@ -52,10 +52,10 @@ In this video I show how to use layouts feature.
 
 [!embed](https://youtu.be/b2iNp1lHxK0)
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.buymeacoffee.com/piatkowski)
 &nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!

@@ -12,6 +12,10 @@
         var suggest = [];
         var input_key_pressed = {};
 
+        function appendOption($select, value, label) {
+            $select.append($('<option/>').val(String(value)).text(String(label)));
+        }
+
         $("#f-field-list").sortable({
             handle: ".header",
             placeholder: "wck-sortable-placeholder",
@@ -29,7 +33,10 @@
         $WK.colorpicker.iris();
 
         $WK.expressionLastFocusedInput = null;
-        $WK.wpMediaFrame = null;
+        $WK.wpMediaImageFrame = null;
+        $WK.wpMediaAttachmentFrame = null;
+        $WK.wpMediaImageTarget = null;
+        $WK.wpMediaAttachmentTarget = null;
         $WK.wpMediaTarget = null;
         $WK.iconPreloader = "data:image/gif;base64,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";
         $WK.fieldsLayout = 'one-col';
@@ -78,10 +85,12 @@
             var item = $(this).parent().parent().parent();
             if ($(this).hasClass("woocommerce-input-toggle--disabled")) {
                 $(this).removeClass("woocommerce-input-toggle--disabled").addClass("woocommerce-input-toggle--enabled");
+                $(this).attr("aria-pressed", "true");
                 item.addClass("wck-layout-colspan");
                 item.find('.f-colspan').val(2);
             } else {
                 $(this).removeClass("woocommerce-input-toggle--enabled").addClass("woocommerce-input-toggle--disabled");
+                $(this).attr("aria-pressed", "false");
                 item.removeClass("wck-layout-colspan");
                 item.find('.f-colspan').val(1);
             }
@@ -215,8 +224,10 @@
             $(this).toggleClass("dashicons-arrow-up-alt2");
             $(this).toggleClass("dashicons-arrow-down-alt2");
             if ($(this).hasClass("dashicons-arrow-down-alt2")) {
+                $(this).attr("aria-expanded", "false");
                 $(this).parent().find(".name").text((fieldBody.find(".f-title").length ? "- " + fieldBody.find(".f-title").val() : "") + " {" + fieldBody.find(".f-name").val() + "}");
             } else {
+                $(this).attr("aria-expanded", "true");
                 $(this).parent().find(".name").text("");
             }
 
@@ -249,55 +260,55 @@
             }
         }).on("click", ".action-add-image", function (e) {
             e.preventDefault();
-            $WK.wpMediaTarget = $(this);
+            $WK.wpMediaImageTarget = $(this);
 
-            if ($WK.wpMediaFrame) {
-                $WK.wpMediaFrame.open();
+            if ($WK.wpMediaImageFrame) {
+                $WK.wpMediaImageFrame.open();
                 return;
             }
-            $WK.wpMediaFrame = wp.media({
+            $WK.wpMediaImageFrame = wp.media({
                 multiple: false,
                 button: {
                     text: "Select this image"
                 }
             });
 
-            $WK.wpMediaFrame.on('select', function () {
-                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
-                if ($WK.wpMediaTarget.prop("tagName") === "A") {
-                    $WK.wpMediaTarget.next('img.wp-media-image-preview').attr('src', attachment.url);
-                    $WK.wpMediaTarget.next().next('input.wp-media-image-id').attr('value', attachment.id);
-                    $WK.wpMediaTarget.hide();
+            $WK.wpMediaImageFrame.on('select', function () {
+                var attachment = $WK.wpMediaImageFrame.state().get('selection').first().toJSON();
+                if ($WK.wpMediaImageTarget.prop("tagName") === "A") {
+                    $WK.wpMediaImageTarget.next('img.wp-media-image-preview').attr('src', attachment.url);
+                    $WK.wpMediaImageTarget.next().next('input.wp-media-image-id').val(attachment.id);
+                    $WK.wpMediaImageTarget.hide();
                 } else {
-                    $WK.wpMediaTarget.attr('src', attachment.url);
-                    $WK.wpMediaTarget.next('input.wp-media-image-id').attr('value', attachment.id);
+                    $WK.wpMediaImageTarget.attr('src', attachment.url);
+                    $WK.wpMediaImageTarget.next('input.wp-media-image-id').val(attachment.id);
                 }
             });
 
-            $WK.wpMediaFrame.open();
+            $WK.wpMediaImageFrame.open();
         }).on("click", ".action-add-attachment", function (e) {
             e.preventDefault();
-            $WK.wpMediaTarget = $(this);
+            $WK.wpMediaAttachmentTarget = $(this);
 
-            if ($WK.wpMediaFrame) {
-                $WK.wpMediaFrame.open();
+            if ($WK.wpMediaAttachmentFrame) {
+                $WK.wpMediaAttachmentFrame.open();
                 return;
             }
-            $WK.wpMediaFrame = wp.media({
+            $WK.wpMediaAttachmentFrame = wp.media({
                 multiple: false,
                 button: {
                     text: "Select this file"
                 }
             });
 
-            $WK.wpMediaFrame.on('select', function () {
-                var attachment = $WK.wpMediaFrame.state().get('selection').first().toJSON();
-                $WK.wpMediaTarget.next('input.wp-media-attachment-id').val(attachment.id);
-                $WK.wpMediaTarget.next().next('a.wp-media-attachment-preview').attr('href', attachment.url).text(attachment.url);
+            $WK.wpMediaAttachmentFrame.on('select', function () {
+                var attachment = $WK.wpMediaAttachmentFrame.state().get('selection').first().toJSON();
+                $WK.wpMediaAttachmentTarget.next('input.wp-media-attachment-id').val(attachment.id);
+                $WK.wpMediaAttachmentTarget.next().next('a.wp-media-attachment-preview').attr('href', attachment.url).text(attachment.url);
 
             });
 
-            $WK.wpMediaFrame.open();
+            $WK.wpMediaAttachmentFrame.open();
         }).on("focus", '[data-type="colorswatches"] input.fs-title', function (e) {
             e.preventDefault();
             var _target = $(this);
@@ -689,72 +700,57 @@
 
         $WK.appendGlobalParameters = function () {
             if (typeof wck_global_parameters !== undefined) {
-                $("#wck-parameters .global-parameters").html("");
+                var $globalParameters = $("#wck-parameters .global-parameters").empty();
                 $.each(wck_global_parameters, function (name, value) {
                     var name = "global:" + name;
-                    var appendChildren = "";
                     suggest.push(name);
                     //$("#formula_fields").append('<span class="formula-field">{' + name + '}</span> ');
                     if (typeof value === 'object') {
                         $.each(value, function (k, v) {
                             var suffix = "['" + k + "']";
-                            appendChildren = appendChildren + '<option value="{' + name + '}' + suffix + '">' + name.replace('global:', '') + '[' + k + '] = ' + v + '</option>';
+                            appendOption($globalParameters, '{' + name + '}' + suffix, name.replace('global:', '') + '[' + k + '] = ' + v);
                         });
                         value = "";
                     } else {
                         value = " = " + value;
                     }
-                    $("#wck-parameters .global-parameters").append('<option value="{' + name + '}">' + name.replace('global:', '') + value + '</option>');
-                    $("#wck-parameters .global-parameters").append(appendChildren);
+                    appendOption($globalParameters, '{' + name + '}', name.replace('global:', '') + value);
                 });
             }
         }
 
         $WK.appendFormulaVars = function (field) {
             $WK.fields[field.name] = field;
-            if (field.use_expression) {
-                if (field.type !== 'checkboxgroup') {
-                    suggest.push(field.name);
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">"' + field.title + '" value/price {' + field.name + '}' + '</option>');
-                } else {
-                    suggest.push(field.name);
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + '}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + '}">Array of selected values {' + field.name + '}' + '</option>');
-                    suggest.push(field.name + ":sum");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':sum}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':sum}">Sum of "' + field.title + '" {' + field.name + ':sum}' + '</option>');
-                    suggest.push(field.name + ":min");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':min}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':min}">Min. value of "' + field.title + '" {' + field.name + ':min}' + '</option>');
-                    suggest.push(field.name + ":max");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':max}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':max}">Max. value of "' + field.title + '" {' + field.name + ':max}' + '</option>');
-                }
-                if (field.type === "text" || field.type === "textarea") {
-                    suggest.push(field.name + ":text");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':text}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':text}">Text value of "' + field.title + '" {' + field.name + ':text}' + '</option>');
-                }
-                if (field.type === "rangedatepicker") {
-                    suggest.push(field.name + ":date_from");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_from}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date_from}">Date "from" of "' + field.title + '" {' + field.name + ':date_from}' + '</option>');
-                    suggest.push(field.name + ":date_to");
-                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date_to}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date_to}">Date "to" of "' + field.title + '" {' + field.name + ':date_to}' + '</option>');
-                    suggest.push(field.name + ":days");
-                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':days}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':days}">Days between dates of "' + field.title + '" {' + field.name + ':days}' + '</option>');
-                } else if (field.type === "datepicker") {
-                    suggest.push(field.name + ":date");
-                    // $("#formula_fields").append('<span class="formula-field">{' + field.name + ':date}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':date}">Timestamp of "' + field.title + '" {' + field.name + ':date}' + '</option>');
-                } else if (field.type === "imageupload" || field.type === "fileupload") {
-                    suggest.push(field.name + ":size");
-                    //$("#formula_fields").append('<span class="formula-field">{' + field.name + ':size}</span> ');
-                    $("#wck-parameters .defined-fields").append('<option value="{' + field.name + ':size}">File size of "' + field.title + '" {' + field.name + ':size}' + ' [MB]</option>');
-                }
+            if (!field.use_expression) {
+                return;
+            }
+
+            var $definedFields = $("#wck-parameters .defined-fields");
+            var addFormulaOption = function (reference, label) {
+                suggest.push(reference);
+                appendOption($definedFields, "{" + reference + "}", label + " {" + reference + "}");
+            };
+
+            if (field.type !== "checkboxgroup") {
+                addFormulaOption(field.name, '"' + field.title + '" value/price');
+            } else {
+                addFormulaOption(field.name, "Array of selected values");
+                addFormulaOption(field.name + ":sum", 'Sum of "' + field.title + '"');
+                addFormulaOption(field.name + ":min", 'Min. value of "' + field.title + '"');
+                addFormulaOption(field.name + ":max", 'Max. value of "' + field.title + '"');
+            }
+
+            if (field.type === "text" || field.type === "textarea") {
+                addFormulaOption(field.name + ":text", 'Text value of "' + field.title + '"');
+            }
+            if (field.type === "rangedatepicker") {
+                addFormulaOption(field.name + ":date_from", 'Date "from" of "' + field.title + '"');
+                addFormulaOption(field.name + ":date_to", 'Date "to" of "' + field.title + '"');
+                addFormulaOption(field.name + ":days", 'Days between dates of "' + field.title + '"');
+            } else if (field.type === "datepicker") {
+                addFormulaOption(field.name + ":date", 'Timestamp of "' + field.title + '"');
+            } else if (field.type === "imageupload" || field.type === "fileupload") {
+                addFormulaOption(field.name + ":size", 'File size of "' + field.title + '" [MB]');
             }
         };
 
@@ -861,9 +857,13 @@
                         $checked = null;
                         $.each(options_name, function (i, option_name) {
                             //Clean option_name after ":"
-                            if (option_name.indexOf(':') >= 0) {
-                                option_name = option_name.slice(0, option_name.indexOf(':'));
-                            }
+                            var option_id = option_name.indexOf(':') >= 0
+                                ? option_name.slice(0, option_name.indexOf(':'))
+                                : option_name;
+                            var default_id = typeof default_value === "string" && default_value.indexOf(':') >= 0
+                                ? default_value.slice(0, default_value.indexOf(':'))
+                                : default_value;
+                            option_name = option_id;
 
                             if (first) {
                                 var $first = $field.find(".fs-option");
@@ -878,7 +878,7 @@
                                         $first.find(".wp-media-image-preview").attr("src", attachment.get('url'));
                                     });
                                 }
-                                if (default_value === option_name) {
+                                if (default_id === option_id) {
                                     $checked = $first.find("input.f-default-value");//.prop("checked", true);
                                 }
                                 first = false;
@@ -895,7 +895,7 @@
                                         $clone.find(".wp-media-image-preview").attr("src", attachment.get('url'));
                                     });
                                 }
-                                if (default_value === option_name) {
+                                if (default_id === option_id) {
                                     $checked = $clone.find("input.f-default-value");//.prop("checked", true);
                                 }
                             }
@@ -978,7 +978,7 @@
                 '<input type="text" placeholder="Price formula..." value=""><i></i>' +
                 '</div>' +
                 '<div class="input-buttons">' +
-                '<span class="action-delete dashicons dashicons-trash"></span>' +
+                '<button type="button" class="action-delete dashicons dashicons-trash" aria-label="Delete formula"></button>' +
                 '</div>' +
                 '<div class="clearfix"></div></div>');
             $(".input-if input", $html).val(if_value);
@@ -1143,19 +1143,22 @@
         $CV.builder = $CV.window.find(".builder");
         $CV.template = $CV.window.find(".template").children();
         $CV.context = null;
+        $CV.returnFocus = null;
 
         // --- Methods ---
 
         $CV.open = function (context) {
+            $CV.returnFocus = document.activeElement;
             $CV.context = context;
             var fieldSelect = $CV.template.find("select.p-field");
             fieldSelect.empty();
             $WK.saveFields();
-            fieldSelect.append('<option value="" selected disabled>Choose field...</option>');
+            appendOption(fieldSelect, "", "Choose field...");
+            fieldSelect.find("option").first().prop("disabled", true).prop("selected", true);
             $.each($WK.fieldList.find(".field"), function () {
                 if ($(this).data("group") !== "static" && !$(this).is(context)) {
                     var name = $(this).find(".f-name").val();
-                    fieldSelect.append('<option value="' + name + '">' + name + '</option>');
+                    appendOption(fieldSelect, name, name);
                 }
             });
 
@@ -1182,13 +1185,44 @@
             }
 
             $CV.window.find("span.self-name").text(context.find(".f-name").val());
-            $CV.window.show().css({"display": "flex"});
+            $CV.window.show().css({"display": "flex"}).attr("aria-hidden", "false");
+            var $initialFocus = $CV.window.find(".p-field:visible").first();
+            ($initialFocus.length ? $initialFocus : $CV.window).trigger("focus");
         };
 
         $CV.close = function () {
-            $CV.window.hide();
+            $CV.window.hide().attr("aria-hidden", "true");
             $CV.builder.empty();
+            if ($CV.returnFocus && $CV.returnFocus.focus) {
+                $CV.returnFocus.focus();
+            }
         };
+
+        $CV.window.on("keydown", function (e) {
+            if (e.key === "Escape") {
+                e.preventDefault();
+                $CV.close();
+                return;
+            }
+            if (e.key !== "Tab") {
+                return;
+            }
+            var $focusable = $CV.window.find("a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex='-1'])").filter(":visible");
+            if (!$focusable.length) {
+                e.preventDefault();
+                $CV.window.trigger("focus");
+                return;
+            }
+            var first = $focusable[0];
+            var last = $focusable[$focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
 
         $CV.add = function (type, destination, values) {
             if (destination === null) {

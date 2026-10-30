@@ -35,7 +35,7 @@ msgid "Thank you for using <strong>WC Kalkulator</strong>! Please %1$s rate us &
 msgstr ""
 
 #: src/AdminNotice.php:170
-msgid "Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money via PayPal :) - %1$s<strong>Yes, I'd like to support!</strong>%2$s"
+msgid "Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> a small amount of money :) - %1$s<strong>Yes, I'd like to support!</strong>%2$s"
 msgstr ""
 
 #: src/Ajax.php:76

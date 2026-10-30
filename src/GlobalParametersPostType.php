@@ -16,9 +16,12 @@ class GlobalParametersPostType
 {
     const POST_TYPE = "wck_global_parameter";
 
+    private static $changing_invalid_status = false;
+
     public static $meta_keys = array(
         '_wck_param_name' => 'text',
-        '_wck_param_value' => 'text'
+        '_wck_param_value' => 'text',
+        '_wck_param_public' => 'bool'
     );
 
     /**
@@ -33,7 +36,8 @@ class GlobalParametersPostType
         add_action('init', array(__CLASS__, 'register_post_type'));
         add_filter('manage_' . self::POST_TYPE . '_posts_columns', array(__CLASS__, 'manage_posts_columns'));
         add_action('manage_' . self::POST_TYPE . '_posts_custom_column', array(__CLASS__, 'manage_posts_custom_column'), 10, 2);
-        add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'));
+        add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'), 10, 2);
+        add_action('admin_notices', array(__CLASS__, 'show_save_error'));
         add_filter('get_user_option_meta-box-order_' . self::POST_TYPE, array(__CLASS__, 'metabox_order'));
         add_filter('bulk_actions-edit-' . self::POST_TYPE, array(__CLASS__, 'bulk_actions'));
         add_action('load-edit.php', function () {
@@ -66,7 +70,7 @@ class GlobalParametersPostType
      */
     public static function register_post_type()
     {
-        if (!current_user_can('manage_woocommerce') || post_type_exists(self::POST_TYPE)) {
+        if (post_type_exists(self::POST_TYPE)) {
             return;
         }
 
@@ -92,8 +96,20 @@ class GlobalParametersPostType
                 'show_ui' => true,
                 'has_archive' => false,
                 'map_meta_cap' => true,
-                'capability_type' => 'post',
-                'capabilities' => array(),
+                'capability_type' => 'wck_global_parameter',
+                'capabilities' => array(
+                    'edit_posts' => 'manage_woocommerce',
+                    'edit_others_posts' => 'manage_woocommerce',
+                    'delete_posts' => 'manage_woocommerce',
+                    'publish_posts' => 'manage_woocommerce',
+                    'read_private_posts' => 'manage_woocommerce',
+                    'delete_private_posts' => 'manage_woocommerce',
+                    'delete_published_posts' => 'manage_woocommerce',
+                    'delete_others_posts' => 'manage_woocommerce',
+                    'edit_private_posts' => 'manage_woocommerce',
+                    'edit_published_posts' => 'manage_woocommerce',
+                    'read' => 'manage_woocommerce'
+                ),
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'query_var' => true,
@@ -192,24 +208,101 @@ class GlobalParametersPostType
      * @param $post
      * @since 1.1.0
      */
-    public static function save_post($post)
+    public static function save_post($post_id, $post = null)
     {
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        if (!is_scalar($post_id)) {
             return;
+        }
+        $post_id = absint($post_id);
+        if (!is_object($post) && function_exists('get_post')) {
+            $post = get_post($post_id);
+        }
+        if (self::$changing_invalid_status || !is_object($post) || $post->post_type !== self::POST_TYPE
+            || (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            || wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
+            return;
+        }
+        if (!isset($_POST['_wck_nonce']) || !is_scalar($_POST['_wck_nonce'])
+            || !wp_verify_nonce(wp_unslash((string) $_POST['_wck_nonce']), self::POST_TYPE)
+            || !current_user_can('edit_post', $post->ID)
+            || !isset($_POST['_wck_param_name'], $_POST['_wck_param_value'])
+            || !is_scalar($_POST['_wck_param_name']) || !is_scalar($_POST['_wck_param_value'])) {
+            return;
+        }
 
-        global $post;
+        $name = sanitize_text_field(wp_unslash((string) $_POST['_wck_param_name']));
+        $expression = sanitize_text_field(wp_unslash((string) $_POST['_wck_param_value']));
+        $error = null;
 
-        if (isset($_POST['_wck_nonce']) && wp_verify_nonce($_POST['_wck_nonce'], self::POST_TYPE)) {
-
-            $post_id = $post->ID;
-
-            foreach (self::$meta_keys as $key => $data_type) {
-                if (isset($_POST[$key])) {
-                    $value = Sanitizer::sanitize($_POST[$key], $data_type);
-                    update_post_meta($post_id, $key, $value);
-                }
+        if (!GlobalParameter::is_valid_name($name)) {
+            $error = 'invalid_name';
+        } elseif (self::has_duplicate_parameter_name($name, $post_id)) {
+            $error = 'duplicate_name';
+        } else {
+            $result = null;
+            if (!GlobalParameter::evaluate_expression($expression, $result, $error)) {
+                // The evaluator returns only generic error codes, never exception details.
             }
         }
+
+        if ($error !== null) {
+            set_transient('wck_global_parameter_save_error_' . get_current_user_id(), array(
+                'post_id' => $post_id,
+                'reason' => $error
+            ), 10 * MINUTE_IN_SECONDS);
+            // Preserve the last working published value until a valid edit.
+            return;
+        }
+
+        update_post_meta($post_id, '_wck_param_name', $name);
+        update_post_meta($post_id, '_wck_param_value', $expression);
+        update_post_meta($post_id, '_wck_param_public', isset($_POST['_wck_param_public'])
+            && wp_unslash($_POST['_wck_param_public']) === '1' ? '1' : '0');
+        update_post_meta($post_id, '_wck_schema_version', 1);
+        GlobalParameter::clear_cache();
+    }
+
+    private static function has_duplicate_parameter_name($name, $exclude_id)
+    {
+        $posts = get_posts(array(
+            'post_type' => self::POST_TYPE,
+            'post_status' => array('publish', 'draft', 'pending', 'private', 'future'),
+            'numberposts' => -1,
+            'fields' => 'ids'
+        ));
+        foreach ($posts as $post_id) {
+            if ((int) $post_id !== (int) $exclude_id
+                && get_post_meta($post_id, '_wck_param_name', true) === $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static function show_save_error()
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            return;
+        }
+        $key = 'wck_global_parameter_save_error_' . get_current_user_id();
+        $error = get_transient($key);
+        if (!is_array($error) || empty($error['post_id'])) {
+            return;
+        }
+        delete_transient($key);
+        $messages = array(
+            'invalid_name' => __('Nazwa parametru może zawierać tylko litery, cyfry i podkreślenia.', 'wc-kalkulator'),
+            'duplicate_name' => __('Nazwa parametru musi być unikalna.', 'wc-kalkulator'),
+            'invalid_type' => __('Wartość parametru musi być liczbą lub tablicą liczb.', 'wc-kalkulator'),
+            'invalid_expression' => __('Formuła parametru jest niepoprawna.', 'wc-kalkulator')
+        );
+        $message = isset($messages[$error['reason']]) ? $messages[$error['reason']] : __('Parametr globalny jest niepoprawny.', 'wc-kalkulator');
+        $link = get_edit_post_link((int) $error['post_id']);
+        echo '<div class="notice notice-error"><p>' . esc_html($message);
+        if ($link) {
+            echo ' <a href="' . esc_url($link) . '">' . esc_html__('Popraw parametr', 'wc-kalkulator') . '</a>';
+        }
+        echo '</p></div>';
     }
 
     /**
@@ -235,17 +328,17 @@ class GlobalParametersPostType
      */
     public static function delete_all_posts()
     {
-        $args = array(
-            'numberposts' => -1,
-            'post_type' => self::POST_TYPE,
-            'post_status' => 'any'
-        );
-        $posts = get_posts($args);
-        if ($posts) {
-            foreach ($posts as $item) {
-                wp_delete_post($item->ID, true);
+        do {
+            $post_ids = get_posts(array(
+                'numberposts' => 100,
+                'post_type' => self::POST_TYPE,
+                'post_status' => array_keys(get_post_stati()),
+                'fields' => 'ids'
+            ));
+            foreach ($post_ids as $post_id) {
+                wp_delete_post($post_id, true);
             }
-        }
+        } while (count($post_ids) === 100);
     }
 
     /**

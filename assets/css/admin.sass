@@ -190,6 +190,23 @@
   ul#f-field-list li .field .header .right, .input-group .right
     float: right
 
+  ul#f-field-list li .field .header button.right
+    width: auto
+    min-width: 44px
+    min-height: 44px
+    padding: 3px
+    border: 0
+    background: transparent
+    cursor: pointer
+
+  ul#f-field-list li .field .header button.right:focus-visible,
+  ul#f-field-list li .field:focus-within .header .right
+    opacity: 1
+
+  @media (hover: none)
+    ul#f-field-list li .field .header .right
+      opacity: 1
+
   ul#f-field-list li .field .body .param:not([type=checkbox]), ul#f-field-list li .field .body label
     display: block
     width: 100%
@@ -482,16 +499,20 @@
     width: 270px
 
 #wck-cv-builder
-  overflow: none
+  overflow: hidden
   display: none
   border-radius: 3px
   position: fixed
   z-index: 99999999
-  top: 150px
+  top: 5vh
   left: 50%
-  margin-left: -500px
-  bottom: 150px
-  width: 1000px
+  transform: translateX(-50%)
+  bottom: auto
+  width: calc(100vw - 32px)
+  max-width: 1000px
+  height: 90vh
+  max-height: 900px
+  box-sizing: border-box
   background-color: #FFFFFF
   box-shadow: 0 0 200px 100px rgba(0, 0, 0, 0.4)
   flex-direction: column
@@ -501,8 +522,9 @@
     visibility: hidden
 
   .builder
-    flex-basis: 100%
-    margin: 20px 40px 0 5px
+    flex: 1 1 auto
+    min-height: 0
+    margin: 20px 24px 0
     overflow-y: auto
 
     .or-group
@@ -543,12 +565,16 @@
       text-decoration: none
       opacity: 0
       padding: 5px
+      border: 0
+      background: transparent
+      color: inherit
+      cursor: pointer
 
       span
         font-size: 14px
         line-height: 1
 
-    .and-condition:hover
+    .and-condition:hover, .and-condition:focus-within
       .cv-remove
         opacity: 1
 
@@ -565,9 +591,31 @@
     padding: 40px 40px 0 40px
 
   p.save
-    padding: 10px 20px 0px
+    flex: 0 0 auto
+    padding: 10px 20px
+    margin: 0
     text-align: right
     border-top: 1px solid #ccc
+
+@media (max-width: 600px)
+  #wck-cv-builder
+    top: 2vh
+    width: calc(100vw - 16px)
+    height: 96vh
+
+    h1
+      padding: 20px 16px 0
+      font-size: 18px
+
+    .builder
+      margin: 12px 12px 0
+
+    .builder .and-condition
+      flex-wrap: wrap
+
+      .p-field, .p-comparison, .p-value
+        flex: 1 1 100%
+        min-width: 0
 
 .postbox.closed
   border: 1px solid #c3c4c7

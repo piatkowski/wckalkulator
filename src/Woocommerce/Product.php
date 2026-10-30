@@ -3,9 +3,11 @@
 namespace WCKalkulator\Woocommerce;
 
 use WCKalkulator\Cache;
+use WCKalkulator\FieldsetAssignment;
 use WCKalkulator\FieldsetProduct;
 use WCKalkulator\Helper;
 use WCKalkulator\Plugin;
+use WCKalkulator\PrivateUploads;
 use WCKalkulator\Sanitizer;
 use WCKalkulator\View;
 
@@ -19,7 +21,10 @@ use WCKalkulator\View;
  */
 class Product
 {
+    /** Cart key pairs to replace after WooCommerce confirms add_to_cart success. */
+    private static $pending_cart_replacements = array();
     private static $default_price = 0;
+    private static $validated_field_inputs = array();
 
     /**
      * Add hooks and filters
@@ -31,14 +36,21 @@ class Product
         add_action('woocommerce_before_add_to_cart_button', array(__CLASS__, 'render_fields_on_product_page'));
         add_filter('woocommerce_add_to_cart_validation', array(__CLASS__, 'validate_fields_on_product_page'), 10, 3);
         add_filter('woocommerce_add_cart_item_data', array(__CLASS__, 'add_cart_item_data'), 10, 4);
-        add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'before_calculate_totals'), 10, 1);
+        add_action('woocommerce_add_to_cart', array(__CLASS__, 'finish_cart_item_replacement'), 100, 6);
+        add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'before_calculate_totals'), 1000, 1);
+        add_action('woocommerce_check_cart_items', array(__CLASS__, 'check_cart_price_errors'));
+        add_action('woocommerce_store_api_cart_errors', array(__CLASS__, 'store_api_cart_price_errors'), 10, 2);
         add_filter('woocommerce_cart_item_name', array(__CLASS__, 'cart_item_name'), 10, 3);
         add_action('woocommerce_checkout_create_order_line_item', array(__CLASS__, 'checkout_create_order_line_item'), 10, 4);
+        add_action('woocommerce_after_checkout_validation', array(__CLASS__, 'validate_checkout_uploads'), 10, 2);
         /*
          * Removed from 1.5.4
          * add_action('woocommerce_before_add_to_cart_button', array(__CLASS__, 'price_block'));
          */
         add_filter('woocommerce_order_item_quantity', array(__CLASS__, 'reduce_inventory'), 10, 3);
+        add_filter('woocommerce_cart_item_required_stock_is_not_enough', array(__CLASS__, 'validate_cart_required_stock'), 10, 3);
+        add_action('woocommerce_after_cart_item_quantity_update', array(__CLASS__, 'refresh_stock_multiplier'), 10, 4);
+        add_filter('woocommerce_can_restock_refunded_items', array(__CLASS__, 'restock_refunded_items'), 10, 3);
         add_action('wp_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'));
         add_action('woocommerce_before_order_itemmeta', array(__CLASS__, 'display_itemmeta_for_admin'), 10, 3);
         add_filter('woocommerce_hidden_order_itemmeta', array(__CLASS__, 'hide_itemmeta'));
@@ -48,6 +60,178 @@ class Product
 
         //remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
         //add_filter('woocommerce_structured_data_product_offer', array(__CLASS__, 'override_structured_data'), 10, 2);
+    }
+
+    /** Return the stock units required for a customer quantity and multiplier. */
+    public static function required_stock_quantity($quantity, $multiplier)
+    {
+        if ((!is_int($quantity) && !is_float($quantity) && !is_numeric($quantity))
+            || (!is_int($multiplier) && !is_float($multiplier) && !is_numeric($multiplier))
+            || !is_finite((float) $quantity) || !is_finite((float) $multiplier)
+            || (float) $quantity <= 0 || (float) $multiplier <= 0
+            || (float) $quantity > 1000000 || (float) $multiplier > 1000000) {
+            return false;
+        }
+
+        $required = ceil((float) $quantity * (float) $multiplier);
+        return is_finite($required) && $required > 0 && $required <= 1000000000000
+            ? (int) $required
+            : false;
+    }
+
+    /** Check a prospective cart line against all lines sharing the stock pool. */
+    private static function has_enough_stock_for_add($product_id, $variation_id, $quantity, $multiplier)
+    {
+        $required = self::required_stock_quantity($quantity, $multiplier);
+        if ($required === false) {
+            return false;
+        }
+        $product = wc_get_product($variation_id ? $variation_id : $product_id);
+        if (!$product || !$product->managing_stock() || $product->backorders_allowed()) {
+            return true;
+        }
+        if (!$product->is_in_stock()) {
+            return false;
+        }
+
+        $managed_id = $product->get_stock_managed_by_id();
+        $already_required = 0;
+        $cart = function_exists('WC') && WC() ? WC()->cart : null;
+        if (is_object($cart) && method_exists($cart, 'get_cart')) {
+            $editing_key = isset($_POST['_wck_edit']) && is_scalar($_POST['_wck_edit'])
+                ? sanitize_text_field(wp_unslash((string) $_POST['_wck_edit']))
+                : '';
+            foreach ($cart->get_cart() as $cart_key => $cart_item) {
+                if ($editing_key !== '' && $cart_key === $editing_key) {
+                    continue;
+                }
+                if (empty($cart_item['data']) || !is_object($cart_item['data'])
+                    || !method_exists($cart_item['data'], 'get_stock_managed_by_id')
+                    || (int) $cart_item['data']->get_stock_managed_by_id() !== (int) $managed_id) {
+                    continue;
+                }
+                if (!empty($cart_item['wckalkulator_stock_error'])) {
+                    return false;
+                }
+                $line_multiplier = isset($cart_item['wckalkulator_stock_reduction_multiplier'])
+                    ? $cart_item['wckalkulator_stock_reduction_multiplier']
+                    : 1;
+                if (!isset($cart_item['quantity'])) {
+                    return false;
+                }
+                $line_required = self::required_stock_quantity($cart_item['quantity'], $line_multiplier);
+                if ($line_required === false) {
+                    return false;
+                }
+                $already_required += $line_required;
+            }
+        }
+
+        $held = self::held_stock_quantity($product);
+        return (float) $product->get_stock_quantity() >= $held + $already_required + $required;
+    }
+
+    /** Apply multiplier-adjusted quantities to WooCommerce cart stock checks. */
+    public static function validate_cart_required_stock($not_enough, $product, $cart_item)
+    {
+        if (!$product || !is_object($product) || !method_exists($product, 'get_stock_managed_by_id')) {
+            return $not_enough;
+        }
+        $cart = function_exists('WC') && WC() ? WC()->cart : null;
+        if (!is_object($cart) || !method_exists($cart, 'get_cart')) {
+            return $not_enough;
+        }
+
+        $required = 0;
+        $managed_id = $product->get_stock_managed_by_id();
+        foreach ($cart->get_cart() as $item) {
+            if (empty($item['data']) || !is_object($item['data'])
+                || !method_exists($item['data'], 'get_stock_managed_by_id')
+                || (int) $item['data']->get_stock_managed_by_id() !== (int) $managed_id) {
+                continue;
+            }
+            if (!empty($item['wckalkulator_stock_error'])) {
+                return true;
+            }
+            $multiplier = isset($item['wckalkulator_stock_reduction_multiplier'])
+                ? $item['wckalkulator_stock_reduction_multiplier']
+                : 1;
+            if (!isset($item['quantity'])) {
+                return true;
+            }
+            $line_required = self::required_stock_quantity($item['quantity'], $multiplier);
+            if ($line_required === false) {
+                return true;
+            }
+            $required += $line_required;
+        }
+
+        if (!method_exists($product, 'managing_stock') || !$product->managing_stock()
+            || (method_exists($product, 'backorders_allowed') && $product->backorders_allowed())) {
+            return $not_enough;
+        }
+        $held = self::held_stock_quantity($product);
+        return $not_enough || (float) $product->get_stock_quantity() < $held + $required;
+    }
+
+    /** Match WooCommerce's exclusion of the current classic/Store API checkout order. */
+    private static function held_stock_quantity($product)
+    {
+        if (!function_exists('wc_get_held_stock_quantity')) {
+            return 0;
+        }
+        $order_id = 0;
+        $woocommerce = function_exists('WC') ? WC() : null;
+        if (is_object($woocommerce) && isset($woocommerce->session) && is_object($woocommerce->session)
+            && method_exists($woocommerce->session, 'get')) {
+            $order_id = absint($woocommerce->session->get('order_awaiting_payment'));
+            if (!$order_id) {
+                $order_id = absint($woocommerce->session->get('store_api_draft_order', 0));
+            }
+        }
+        return (float) wc_get_held_stock_quantity($product, $order_id);
+    }
+
+    /** Re-evaluate quantity-dependent multiplier formulas when cart quantity changes. */
+    public static function refresh_stock_multiplier($cart_item_key, $quantity, $old_quantity, $cart)
+    {
+        if (!is_object($cart) || empty($cart->cart_contents[$cart_item_key])) {
+            return;
+        }
+        $item = $cart->cart_contents[$cart_item_key];
+        if (empty($item['wckalkulator_fields']) || !is_array($item['wckalkulator_fields'])
+            || empty($item['product_id']) || empty($item['data']) || !is_object($item['data'])
+            || !method_exists($item['data'], 'get_price')) {
+            return;
+        }
+        $fieldset = FieldsetProduct::getInstance();
+        $product_id = absint($item['product_id']);
+        $variation_id = isset($item['variation_id']) ? absint($item['variation_id']) : 0;
+        if (!$fieldset->has_fieldset($product_id)) {
+            $cart->cart_contents[$cart_item_key]['wckalkulator_stock_error'] = true;
+            return;
+        }
+        if (!self::init_fieldset_for_cart_item($fieldset, $item, $product_id, $variation_id)) {
+            $cart->cart_contents[$cart_item_key]['wckalkulator_stock_error'] = true;
+            return;
+        }
+        if (!$fieldset->set_cart_context($item['wckalkulator_fields'], array(
+            'quantity' => $quantity,
+            'product_price' => isset($item['wckalkulator_base_price']) ? $item['wckalkulator_base_price'] : $item['data']->get_price(),
+            'attributes' => isset($item['variation']) && is_array($item['variation']) ? $item['variation'] : array(),
+            'parameter_snapshot' => isset($item['wckalkulator_parameter_snapshot']) && is_array($item['wckalkulator_parameter_snapshot'])
+                ? $item['wckalkulator_parameter_snapshot'] : array()
+        ))) {
+            $cart->cart_contents[$cart_item_key]['wckalkulator_stock_error'] = true;
+            return;
+        }
+        $multiplier = $fieldset->stock_reduction_multiplier();
+        if ($multiplier === false || self::required_stock_quantity($quantity, $multiplier) === false) {
+            $cart->cart_contents[$cart_item_key]['wckalkulator_stock_error'] = true;
+            return;
+        }
+        $cart->cart_contents[$cart_item_key]['wckalkulator_stock_reduction_multiplier'] = $multiplier;
+        unset($cart->cart_contents[$cart_item_key]['wckalkulator_stock_error']);
     }
 
     /**
@@ -116,10 +300,12 @@ class Product
             wp_register_style('wckalkulator_product_css', Plugin::url() . '/assets/css/product.min.css');
             wp_enqueue_style('wckalkulator_product_css');
 
-            wp_enqueue_script('jquery-tiptip',
-                WC()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip.min.js',
-                array('jquery')
-            );
+            // WooCommerce registers these public handles. The prefixed one is
+            // current; retain the legacy handle for older WooCommerce releases.
+            $tiptip_handle = wp_script_is('wc-jquery-tiptip', 'registered')
+                ? 'wc-jquery-tiptip'
+                : 'jquery-tiptip';
+            wp_enqueue_script($tiptip_handle);
 
             /**
              * Enqueue scripts and styles from fields used in fieldset
@@ -193,7 +379,11 @@ class Product
              */
             foreach ($fieldset->fields() as $field) {
                 //Try to get value of the field from cart item
-                $value = isset($cart_fields[$field->data('name')]) ? $cart_fields[$field->data('name')] : '';
+                $field_name = $field->data('name');
+                $value = isset($cart_fields[$field_name]) ? $cart_fields[$field_name] : '';
+                if (isset($cart_fields['_files']) && is_array($cart_fields['_files']) && isset($cart_fields['_files'][$field_name])) {
+                    $value = $cart_fields['_files'][$field_name];
+                }
                 $html['fields'][] = array(
                     'html' => wp_kses($field->render_for_product($value), Sanitizer::allowed_html()) . "\n",
                     //colspan since 1.4.0
@@ -221,16 +411,27 @@ class Product
      */
     public static function validate_fields_on_product_page($validation, $product_id, $quantity)
     {
+        // Preserve a rejection made by an earlier WooCommerce validation filter.
+        if (!$validation) {
+            $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
+            unset(self::$validated_field_inputs[(int) $product_id . ':' . (int) $variation_id]);
+            return false;
+        }
+
         /*if (Ajax::is_doing()) {
             return false;
         }*/
         $fieldset = FieldsetProduct::getInstance();
         if ($fieldset->has_fieldset($product_id)) {
-            $variation_id = isset($_POST['variation_id']) ? absint($_POST['variation_id']) : 0;
+            if (isset($_POST['variation_id']) && !is_scalar($_POST['variation_id'])) {
+                wc_add_notice(__('Product options have an invalid format.', 'wc-kalkulator'), 'error');
+                return false;
+            }
+            $variation_id = isset($_POST['variation_id']) ? absint(wp_unslash($_POST['variation_id'])) : 0;
 
             $fieldset->init($product_id, $variation_id);
-            $fieldset->get_user_input();
-            $validation = $fieldset->validate();
+            $user_input = $fieldset->get_user_input();
+            $validation = $fieldset->validate(false, array('quantity' => $quantity));
             if (!$validation) {
                 foreach ($fieldset->validation_notices() as $notice) {
                     wc_add_notice($notice, 'error');
@@ -241,7 +442,7 @@ class Product
                 try {
                     $calc = $fieldset->calculate();
                     if ($calc['is_error']) {
-                        wc_add_notice(__("Cannot calculate the correct price!", "wc-kalkulator") . " " . $calc['value'], 'error');
+                        wc_add_notice(__('Cannot calculate the correct price. Please check your options or contact the store.', 'wc-kalkulator'), 'error');
                         $validation = false;
                     }
                 } catch (\Exception $e) {
@@ -251,6 +452,25 @@ class Product
                     error_log($e);
                     return false;
                 }
+            }
+
+            if ($validation) {
+                $multiplier = $fieldset->stock_reduction_multiplier();
+                if ($multiplier === false) {
+                    wc_add_notice(__('The inventory multiplier is invalid. Please contact the store.', 'wc-kalkulator'), 'error');
+                    $validation = false;
+                } elseif (!self::has_enough_stock_for_add($product_id, $variation_id, $quantity, $multiplier)) {
+                    wc_add_notice(__('There is not enough stock for the selected quantity.', 'wc-kalkulator'), 'error');
+                    $validation = false;
+                }
+            }
+
+            if ($validation && !$fieldset->handle_temp_upload()) {
+                wc_add_notice(__('The uploaded file could not be stored. Please try again.', 'wc-kalkulator'), 'error');
+                $validation = false;
+            }
+            if ($validation) {
+                self::$validated_field_inputs[(int) $product_id . ':' . (int) $variation_id] = $user_input;
             }
         }
 
@@ -270,7 +490,7 @@ class Product
     }
 
     /**
-     * Add item data to Cart. We add field for storing calculated price
+     * Add validated field data to the cart. The unit price is recalculated from cart context.
      * !Important - do not multiply by $quantity. Price for single product.
      *
      * @param $cart_item_data
@@ -287,63 +507,95 @@ class Product
             return false;
         }*/
 
-        if (FieldsetProduct::getInstance()->has_fieldset($product_id)) {
-
+        $input_key = (int) $product_id . ':' . (int) $variation_id;
+        $has_validated_input = isset(self::$validated_field_inputs[$input_key]);
+        if ($has_validated_input || FieldsetProduct::getInstance()->has_fieldset($product_id)) {
             $fieldset = FieldsetProduct::getInstance();
-            $fieldset->init($product_id, $variation_id);
-            $user_input = $fieldset->get_user_input();
-            if (!$fieldset->validate()) {
-                wp_die('Bad request (2)!');
-            }
-
-            $success = false;
-
-            if ($fieldset->has_expression()) {
-                try {
-                    $calc = $fieldset->calculate();
-                    if (!$calc['is_error']) {
-                        $cart_item_data['wckalkulator_price'] = $calc['value'];
-                        $success = true;
-                    } else {
-                        wp_die('Bad request (3)!');
-                    }
-                } catch (\Exception $e) {
-                    error_log($e);
-                    wp_die('Bad request (4)!');
-
-                } catch (\Throwable $e) {
-                    error_log($e);
-                    wp_die('Bad request (4)!');
-                }
+            if ($has_validated_input) {
+                $user_input = self::$validated_field_inputs[$input_key];
+                unset(self::$validated_field_inputs[$input_key]);
             } else {
-                /**
-                 * If there is no expression, then add only fields
-                 */
-                $success = true;
+                $fieldset->init($product_id, $variation_id);
+                $user_input = $fieldset->get_user_input();
             }
-            /*
-             * Remove old cart item
-             */
-            if (isset($_POST['_wck_edit'])) {
-                $old_key = sanitize_text_field($_POST['_wck_edit']);
-                if (!empty(WC()->cart->get_cart_item($old_key))) {
-                    WC()->cart->remove_cart_item($old_key);
+            $success = $has_validated_input;
+            if (!$has_validated_input) {
+                if (!$fieldset->validate(false, array('quantity' => $quantity))) {
+                    throw new \RuntimeException(__('Product has incorrect parameters. Please review the selected options.', 'wc-kalkulator'));
+                }
+
+                if ($fieldset->has_expression()) {
+                    try {
+                        $calc = $fieldset->calculate();
+                        if (!$calc['is_error']) {
+                            $success = true;
+                        } else {
+                            throw new \RuntimeException(__('The product price could not be calculated. Please review the selected options.', 'wc-kalkulator'));
+                        }
+                    } catch (\Exception $e) {
+                        error_log($e);
+                        throw $e;
+
+                    } catch (\Throwable $e) {
+                        error_log($e);
+                        throw new \RuntimeException(__('The product price could not be calculated. Please try again.', 'wc-kalkulator'));
+                    }
+                } else {
+                    $success = true;
                 }
             }
-
             /** If cart item key has been added, then save user input */
             if ($success) {
-                $fieldset->handle_temp_upload();
+                $multiplier = $fieldset->stock_reduction_multiplier();
+                if ($multiplier === false) {
+                    throw new \Exception(__('The inventory multiplier is invalid. Please contact the store.', 'wc-kalkulator'));
+                }
+                if (!self::has_enough_stock_for_add($product_id, $variation_id, $quantity, $multiplier)) {
+                    throw new \Exception(__('There is not enough stock for the selected quantity.', 'wc-kalkulator'));
+                }
+                if (!$has_validated_input && !$fieldset->handle_temp_upload()) {
+                    wc_add_notice(__('The uploaded file could not be stored. Please try again.', 'wc-kalkulator'), 'error');
+                    throw new \RuntimeException(__('The uploaded file could not be stored. Please try again.', 'wc-kalkulator'));
+                }
                 $cart_item_data['wckalkulator_fields'] = $user_input;
                 $cart_item_data['wckalkulator_fieldset_version_hash'] = $fieldset->version_hash();
                 $cart_item_data['wckalkulator_fieldset_id'] = $fieldset->id();
-                $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $fieldset->stock_reduction_multiplier();
-                $cart_item_data['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
+                $configuration_snapshot = $fieldset->configuration_snapshot();
+                if (!is_array($configuration_snapshot)) {
+                    throw new \RuntimeException(__('The product configuration could not be saved. Please try again.', 'wc-kalkulator'));
+                }
+                $cart_item_data['wckalkulator_fieldset_snapshot_version'] = 1;
+                $cart_item_data['wckalkulator_fieldset_snapshot'] = $configuration_snapshot;
+                $cart_item_data['wckalkulator_parameter_snapshot'] = $fieldset->calculation_parameter_snapshot();
+                $cart_item_data['wckalkulator_stock_reduction_multiplier'] = $multiplier;
+
+                // Replace an edited cart line only after the new input and uploads are ready.
+                if (isset($_POST['_wck_edit']) && is_scalar($_POST['_wck_edit'])) {
+                    $old_key = sanitize_text_field(wp_unslash((string) $_POST['_wck_edit']));
+                    if ($old_key !== '' && !empty(WC()->cart->get_cart_item($old_key))) {
+                        self::$pending_cart_replacements[$old_key] = true;
+                    }
+                }
             }
 
         }
 
         return $cart_item_data;
+    }
+
+    /** Remove an edited line only after the replacement line has been added. */
+    public static function finish_cart_item_replacement($new_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data)
+    {
+        if (!is_array(self::$pending_cart_replacements) || !self::$pending_cart_replacements) {
+            return;
+        }
+        foreach (array_keys(self::$pending_cart_replacements) as $old_item_key) {
+            unset(self::$pending_cart_replacements[$old_item_key]);
+            if ($old_item_key !== $new_item_key && function_exists('WC') && WC() && isset(WC()->cart)
+                && !empty(WC()->cart->get_cart_item($old_item_key))) {
+                WC()->cart->remove_cart_item($old_item_key);
+            }
+        }
     }
 
     /**
@@ -355,13 +607,255 @@ class Product
      */
     public static function before_calculate_totals($cart)
     {
-        /*if (Ajax::is_doing()) {
-            return false;
-        }*/
+        if (!is_object($cart) || !method_exists($cart, 'get_cart') || !isset($cart->cart_contents) || !is_array($cart->cart_contents)) {
+            return;
+        }
 
         foreach ($cart->get_cart() as $key => $value) {
-            if (isset($value['wckalkulator_price'])) {
-                $value['data']->set_price(($value['wckalkulator_price']));
+            if (!isset($value['wckalkulator_fields'], $value['data']) || !is_array($value['wckalkulator_fields']) || !is_object($value['data']) || !method_exists($value['data'], 'get_price')) {
+                continue;
+            }
+
+            $quantity = isset($value['quantity']) && is_numeric($value['quantity']) && is_finite((float) $value['quantity'])
+                ? (float) $value['quantity']
+                : 0;
+            $product_id = isset($value['product_id']) ? absint($value['product_id']) : 0;
+            $variation_id = isset($value['variation_id']) ? absint($value['variation_id']) : 0;
+            $current_price = $value['data']->get_price();
+
+            if ($quantity <= 0 || $product_id < 1) {
+                self::mark_cart_price_error($cart, $key);
+                continue;
+            }
+
+            $fieldset = FieldsetProduct::getInstance();
+            if (!self::init_fieldset_for_cart_item($fieldset, $value, $product_id, $variation_id)) {
+                self::mark_cart_price_error($cart, $key);
+                continue;
+            }
+
+            $has_expression = $fieldset->has_expression();
+            if ($has_expression && (!is_numeric($current_price) || !is_finite((float) $current_price))) {
+                self::mark_cart_price_error($cart, $key);
+                continue;
+            }
+
+            $base_price = is_numeric($current_price) && is_finite((float) $current_price) ? (float) $current_price : 0;
+            if ($has_expression && isset($value['wckalkulator_last_applied_price'], $value['wckalkulator_base_price']) && is_numeric($value['wckalkulator_last_applied_price']) && is_numeric($value['wckalkulator_base_price']) && abs($base_price - (float) $value['wckalkulator_last_applied_price']) < 0.0000001) {
+                $base_price = (float) $value['wckalkulator_base_price'];
+            }
+
+            $attributes = isset($value['variation']) && is_array($value['variation']) ? $value['variation'] : array();
+            if (!$fieldset->set_cart_context($value['wckalkulator_fields'], array(
+                'quantity' => $quantity,
+                'product_price' => $base_price,
+                'attributes' => $attributes,
+                'parameter_snapshot' => isset($value['wckalkulator_parameter_snapshot']) && is_array($value['wckalkulator_parameter_snapshot'])
+                    ? $value['wckalkulator_parameter_snapshot'] : array()
+            ))) {
+                self::mark_cart_price_error($cart, $key);
+                continue;
+            }
+
+            if (!$has_expression) {
+                $cart->cart_contents[$key]['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
+                unset($cart->cart_contents[$key]['wckalkulator_price_error']);
+                continue;
+            }
+
+            try {
+                $calculation = $fieldset->calculate();
+                if (!is_array($calculation) || !isset($calculation['is_error']) || $calculation['is_error'] || !isset($calculation['value']) || !is_numeric($calculation['value']) || !is_finite((float) $calculation['value']) || (float) $calculation['value'] < 0) {
+                    self::mark_cart_price_error($cart, $key);
+                    continue;
+                }
+
+                $price = (float) $calculation['value'];
+                if (!method_exists($value['data'], 'set_price')) {
+                    self::mark_cart_price_error($cart, $key);
+                    continue;
+                }
+                $value['data']->set_price($price);
+                $cart->cart_contents[$key]['wckalkulator_price'] = $price;
+                $cart->cart_contents[$key]['wckalkulator_base_price'] = $base_price;
+                $cart->cart_contents[$key]['wckalkulator_last_applied_price'] = $price;
+                $cart->cart_contents[$key]['wckalkulator_formula_fields'] = $fieldset->calculate_formula_fields();
+                unset($cart->cart_contents[$key]['wckalkulator_price_error']);
+            } catch (\Exception $e) {
+                self::mark_cart_price_error($cart, $key);
+            } catch (\Throwable $e) {
+                self::mark_cart_price_error($cart, $key);
+            }
+        }
+    }
+
+    /** Load the configuration captured by a cart line, or validate a legacy line. */
+    private static function init_fieldset_for_cart_item($fieldset, $cart_item, $product_id, $variation_id)
+    {
+        $fieldset_id = isset($cart_item['wckalkulator_fieldset_id']) ? (int) $cart_item['wckalkulator_fieldset_id'] : 0;
+        if (isset($cart_item['wckalkulator_fieldset_snapshot_version'], $cart_item['wckalkulator_fieldset_snapshot'])) {
+            if ((int) $cart_item['wckalkulator_fieldset_snapshot_version'] !== 1
+                || !is_array($cart_item['wckalkulator_fieldset_snapshot'])
+                || !isset($cart_item['wckalkulator_fieldset_snapshot']['id'])
+                || (int) $cart_item['wckalkulator_fieldset_snapshot']['id'] !== $fieldset_id
+                || !$fieldset->init_from_snapshot($cart_item['wckalkulator_fieldset_snapshot'], $product_id, $variation_id)
+                || !$fieldset->configuration_is_valid()) {
+                return false;
+            }
+            return (int) $fieldset->id() === $fieldset_id;
+        }
+
+        if ($fieldset_id < 1 || FieldsetAssignment::match($product_id) !== $fieldset_id) {
+            return false;
+        }
+        $fieldset->init($product_id, $variation_id);
+        if ((int) $fieldset->id() !== $fieldset_id || !$fieldset->configuration_is_valid()) {
+            return false;
+        }
+        return !isset($cart_item['wckalkulator_fieldset_version_hash'])
+            || (string) $cart_item['wckalkulator_fieldset_version_hash'] === (string) $fieldset->version_hash();
+    }
+
+    /** Validate a persisted snapshot before retaining the cart line after session load. */
+    public static function cart_item_snapshot_is_valid($cart_item)
+    {
+        if (!is_array($cart_item) || !isset($cart_item['product_id'], $cart_item['wckalkulator_fieldset_id'])) {
+            return false;
+        }
+        $fieldset = FieldsetProduct::getInstance();
+        return self::init_fieldset_for_cart_item(
+            $fieldset,
+            $cart_item,
+            absint($cart_item['product_id']),
+            isset($cart_item['variation_id']) ? absint($cart_item['variation_id']) : 0
+        );
+    }
+
+    /**
+     * Mark a cart line when its current price cannot be recalculated safely.
+     *
+     * @param object $cart
+     * @param string $key
+     * @return void
+     */
+    private static function mark_cart_price_error($cart, $key)
+    {
+        if (isset($cart->cart_contents) && is_array($cart->cart_contents) && isset($cart->cart_contents[$key])) {
+            $cart->cart_contents[$key]['wckalkulator_price_error'] = true;
+        }
+    }
+
+    /**
+     * Prevent checkout when a cart line could not be repriced.
+     *
+     * @return void
+     */
+    public static function check_cart_price_errors()
+    {
+        if (!function_exists('WC')) {
+            return;
+        }
+
+        $woocommerce = WC();
+        if (!$woocommerce || !isset($woocommerce->cart) || !is_object($woocommerce->cart)) {
+            return;
+        }
+
+        foreach ($woocommerce->cart->get_cart() as $value) {
+            if (!empty($value['wckalkulator_price_error'])) {
+                wc_add_notice(__('A product price could not be recalculated. Please remove it from the cart and add it again.', 'wc-kalkulator'), 'error');
+                return;
+            }
+        }
+    }
+
+    /**
+     * Prevent Store API checkout when a cart line could not be repriced.
+     *
+     * @param object $errors
+     * @param object $cart
+     * @return void
+     */
+    public static function store_api_cart_price_errors($errors, $cart)
+    {
+        if (!is_object($errors) || !method_exists($errors, 'add') || !is_object($cart) || !method_exists($cart, 'get_cart')) {
+            return;
+        }
+
+        foreach ($cart->get_cart() as $value) {
+            if (!empty($value['wckalkulator_price_error'])) {
+                $errors->add('wckalkulator_price_recalculation_failed', __('A product price could not be recalculated. Please remove it from the cart and add it again.', 'wc-kalkulator'));
+                return;
+            }
+        }
+        $checked_stock = array();
+        foreach ($cart->get_cart() as $value) {
+            if (empty($value['data']) || !is_object($value['data']) || !method_exists($value['data'], 'get_stock_managed_by_id')) {
+                continue;
+            }
+            $managed_id = (int) $value['data']->get_stock_managed_by_id();
+            if (isset($checked_stock[$managed_id])) {
+                continue;
+            }
+            $checked_stock[$managed_id] = true;
+            if (self::validate_cart_required_stock(false, $value['data'], $value)) {
+                $errors->add('wckalkulator_stock_quantity_unavailable', __('There is not enough stock for the selected quantity.', 'wc-kalkulator'));
+                return;
+            }
+        }
+        self::check_cart_uploads($cart, $errors);
+    }
+
+    /** Ensure every cart upload can be finalized before checkout creates an order. */
+    public static function validate_checkout_uploads($data, $errors)
+    {
+        if (!function_exists('WC') || !WC() || !isset(WC()->cart) || !is_object(WC()->cart)) {
+            return;
+        }
+        self::check_cart_uploads(WC()->cart, $errors);
+    }
+
+    private static function check_cart_uploads($cart, $errors)
+    {
+        if (!is_object($cart) || !method_exists($cart, 'get_cart') || !is_object($errors) || !method_exists($errors, 'add')) {
+            return;
+        }
+        foreach ($cart->get_cart() as $cart_item) {
+            $product_id = isset($cart_item['product_id']) ? absint($cart_item['product_id']) : 0;
+            $variation_id = isset($cart_item['variation_id']) ? absint($cart_item['variation_id']) : 0;
+            if (!$product_id || !isset($cart_item['wckalkulator_fields']) || !is_array($cart_item['wckalkulator_fields'])) {
+                continue;
+            }
+            $fieldset = FieldsetProduct::getInstance();
+            if (!self::init_fieldset_for_cart_item($fieldset, $cart_item, $product_id, $variation_id)) {
+                $errors->add('wck_fieldset_snapshot_invalid', __('A product configuration in the cart is no longer valid. Please remove and add the item again.', 'wc-kalkulator'));
+                continue;
+            }
+            $visibility_error = null;
+            $visibility = $fieldset->evaluate_visibility($cart_item['wckalkulator_fields'], $visibility_error);
+            if ($visibility === false) {
+                $errors->add('wck_field_visibility_invalid', __('Product field visibility rules are invalid. Please contact the store.', 'wc-kalkulator'));
+                continue;
+            }
+            $upload_data = isset($cart_item['wckalkulator_fields']['_files']) && is_array($cart_item['wckalkulator_fields']['_files'])
+                ? $cart_item['wckalkulator_fields']['_files']
+                : array();
+            foreach ($fieldset->fields() as $name => $field) {
+                if (isset($visibility[$name]) && !$visibility[$name]) {
+                    continue;
+                }
+                if (!method_exists($field, 'upload')) {
+                    continue;
+                }
+                if (!isset($upload_data[$name])) {
+                    if ($field->is_required()) {
+                        $errors->add('wck_required_upload_missing', sprintf(__('A required file for “%s” is missing. Please upload it again.', 'wc-kalkulator'), $field->data('title')));
+                    }
+                    continue;
+                }
+                if (!$field->upload($upload_data[$name])) {
+                    $errors->add('wck_upload_finalize_failed', sprintf(__('The file for “%s” could not be stored. Please try again.', 'wc-kalkulator'), $field->data('title')));
+                }
             }
         }
     }
@@ -384,13 +878,25 @@ class Product
         $product_id = absint($cart_item["product_id"]);
         $variation_id = isset($cart_item['variation_id']) ? absint($cart_item['variation_id']) : 0;
 
-        if (FieldsetProduct::getInstance()->has_fieldset($product_id)) {
-
+        if (isset($cart_item['wckalkulator_fields']) && is_array($cart_item['wckalkulator_fields'])) {
             $fieldset = FieldsetProduct::getInstance();
-            $fieldset->init($product_id, $variation_id);
+            if (!self::init_fieldset_for_cart_item($fieldset, $cart_item, $product_id, $variation_id)) {
+                return $item_name;
+            }
+
+            $visibility_error = null;
+            $visibility = isset($cart_item['wckalkulator_fields']) && is_array($cart_item['wckalkulator_fields'])
+                ? $fieldset->evaluate_visibility($cart_item['wckalkulator_fields'], $visibility_error)
+                : false;
+            if ($visibility === false) {
+                return $item_name;
+            }
 
             $html = '';
             foreach ($fieldset->fields() as $name => $field) {
+                if (isset($visibility[$name]) && !$visibility[$name]) {
+                    continue;
+                }
 
                 if (isset($cart_item['wckalkulator_fields'][$name])) {
                     $value = isset($cart_item['wckalkulator_fields']['_files'][$name]) ? $cart_item['wckalkulator_fields']['_files'][$name] : $cart_item['wckalkulator_fields'][$name];
@@ -433,23 +939,45 @@ class Product
         /*if (Ajax::is_doing()) {
             return;
         }*/
-        $values = $item->legacy_values;
+        $values = is_array($values) ? $values : array();
+        if (!array_key_exists('wckalkulator_fields', $values)) {
+            return;
+        }
         $product_id = absint($values["product_id"]);
         $variation_id = isset($values['variation_id']) ? absint($values['variation_id']) : 0;
 
-        if (FieldsetProduct::getInstance()->has_fieldset($product_id)) {
-            if (array_key_exists("wckalkulator_fields", $values)) {
+        if (array_key_exists("wckalkulator_fields", $values)) {
+            $fieldset = FieldsetProduct::getInstance();
+            if (!self::init_fieldset_for_cart_item($fieldset, $values, $product_id, $variation_id)) {
+                throw new \RuntimeException(__('The saved product configuration is no longer valid. Please remove the item and add it again.', 'wc-kalkulator'));
+            }
 
-                $order_fields = $values["wckalkulator_fields"];
-                $fieldset = FieldsetProduct::getInstance();
+            $order_fields = $values["wckalkulator_fields"];
+            $visibility_error = null;
+            $visibility = $fieldset->evaluate_visibility($order_fields, $visibility_error);
+            if ($visibility === false) {
+                wc_add_notice(__('Product field visibility rules are invalid. Please contact the store.', 'wc-kalkulator'), 'error');
+                throw new \RuntimeException('WC Kalkulator field visibility rules are invalid.');
+            }
 
-                $fieldset->init($product_id, $variation_id);
+            $item->add_meta_data('_wck_stock_reduction_multiplier', $values['wckalkulator_stock_reduction_multiplier']);
+            $item->add_meta_data('_wck_formula_fields', $values['wckalkulator_formula_fields']);
+            if (isset($values['wckalkulator_fieldset_snapshot']) && is_array($values['wckalkulator_fieldset_snapshot'])) {
+                $item->add_meta_data('_wck_fieldset_snapshot_version', (int) $values['wckalkulator_fieldset_snapshot_version']);
+                $item->add_meta_data('_wck_fieldset_snapshot', $values['wckalkulator_fieldset_snapshot']);
+                $item->add_meta_data('_wck_parameter_snapshot', isset($values['wckalkulator_parameter_snapshot'])
+                    && is_array($values['wckalkulator_parameter_snapshot']) ? $values['wckalkulator_parameter_snapshot'] : array());
+            }
+            $private_file_ids = array();
 
-                $item->add_meta_data('_wck_fields', $order_fields);
-                $item->add_meta_data('_wck_stock_reduction_multiplier', $values['wckalkulator_stock_reduction_multiplier']);
-                $item->add_meta_data('_wck_formula_fields', $values['wckalkulator_formula_fields']);
-
-                foreach ($fieldset->fields() as $name => $field) {
+            foreach ($fieldset->fields() as $name => $field) {
+                    if (isset($visibility[$name]) && !$visibility[$name]) {
+                        unset($order_fields[$name]);
+                        if (isset($order_fields['_files'][$name])) {
+                            unset($order_fields['_files'][$name]);
+                        }
+                        continue;
+                    }
 
                     if (isset($order_fields[$name])) {
                         $field_value = $field->order_item_value($order_fields[$name]);
@@ -457,26 +985,35 @@ class Product
                             if ($field->upload($order_fields['_files'][$name])) {
                                 $item->add_meta_data($field->data('title') . __(' (original name)', 'wc-kalkulator'), esc_html($order_fields['_files'][$name]['original_name']), true);
                                 $item->add_meta_data($field->data('title') . __(' (size)', 'wc-kalkulator'), round($field_value / 1000000, 2) . ' MB', true);
-                                $item->add_meta_data($field->data('title') . __(' (url)', 'wc-kalkulator'), $order_fields['_files'][$name]['upload_url'], true);
+                                $file_id = $order_fields['_files'][$name]['file_id'];
+                                $private_file_ids[] = $file_id;
+                                $download_url = PrivateUploads::download_url($order->get_id(), $file_id, $order->get_order_key());
+                                $item->add_meta_data($field->data('title') . __(' (download)', 'wc-kalkulator'), $download_url, true);
+                            } else {
+                                wc_add_notice(sprintf(__('The file for “%s” could not be stored. The order was not completed.', 'wc-kalkulator'), $field->data('title')), 'error');
+                                throw new \RuntimeException('WC Kalkulator could not finalize a customer upload.');
                             }
                         } else {
                             $item->add_meta_data($field->data('title'), $field_value, true);
                         }
                     } else {
                         if ($field->is_required()) {
-                            wp_send_json(array(
-                                'result' => 'failure',
-                                'messages' => '<div class="woocommerce-error">' . __('Product has incorrect parameters! Missing field ', 'wc-kalkulator') . '[' . $field->data("title") . '] in product #' . absint($product_id) . '</div>'
+                            throw new \RuntimeException(sprintf(
+                                __('A required product option is missing: %s.', 'wc-kalkulator'),
+                                $field->data('title')
                             ));
                         }
                     }
                 }
-            } else {
-                wp_send_json(array(
-                    'result' => 'failure',
-                    'messages' => '<div class="woocommerce-error">' . __('Corrupted data! You cannot checkout.', 'wc-kalkulator') . '</div>'
-                ));
+            foreach (isset($order_fields['_files']) ? $order_fields['_files'] : array() as $file_name => $file_data) {
+                unset($order_fields['_files'][$file_name]['tmp_name'], $order_fields['_files'][$file_name]['upload_tmp'], $order_fields['_files'][$file_name]['legacy_upload_tmp']);
             }
+            $item->add_meta_data('_wck_fields', $order_fields);
+            if ($private_file_ids) {
+                $item->add_meta_data('_wck_private_files', $private_file_ids);
+            }
+        } else {
+            throw new \RuntimeException(__('Product options are missing or invalid. Please remove the item and add it again.', 'wc-kalkulator'));
         }
 
     }
@@ -492,26 +1029,22 @@ class Product
      */
     public static function get_id()
     {
-        /**
-         * Read cached value and return if exists
-         */
-        $cached_id = Cache::get('Product_get_id');
-        if ($cached_id)
-            return $cached_id;
+        global $post, $product;
 
-        global $post;
-        $product_id = 0;
-        if (is_product()) {
-            $product_id = $post->ID;
-        } else if (!empty($post->post_content) && strpos($post->post_content, '[product_page') !== false) {
-            $product_id = absint(Helper::get_id_from_shortcode_tag($post->post_content, 'product_page'));
+        if (function_exists('is_product') && is_product() && is_object($post) && isset($post->ID)) {
+            return absint($post->ID);
         }
 
-        /**
-         * Store value to class cache
-         */
-        Cache::store('Product_get_id', $product_id);
-        return $product_id;
+        // WooCommerce shortcodes set the active product while rendering each product.
+        if (is_object($product) && is_a($product, '\WC_Product') && method_exists($product, 'get_id')) {
+            return absint($product->get_id());
+        }
+
+        if (is_object($post) && !empty($post->post_content) && strpos($post->post_content, '[product_page') !== false) {
+            return absint(Helper::get_id_from_shortcode_tag($post->post_content, 'product_page'));
+        }
+
+        return 0;
     }
 
     /**
@@ -548,6 +1081,10 @@ class Product
         $order_items[] = '_wck_stock_reduction_multiplier';
         $order_items[] = '_wck_formula_fields';
         $order_items[] = '_wck_fields';
+        $order_items[] = '_wck_fieldset_snapshot_version';
+        $order_items[] = '_wck_fieldset_snapshot';
+        $order_items[] = '_wck_parameter_snapshot';
+        $order_items[] = '_wck_private_files';
         return $order_items;
     }
 
@@ -563,10 +1100,79 @@ class Product
     public static function reduce_inventory($quantity, $order, $item)
     {
         if ($item->meta_exists('_wck_stock_reduction_multiplier')) {
-            $multiplier = floatval($item->get_meta('_wck_stock_reduction_multiplier', true));
-            return ceil($multiplier * $quantity);
+            $multiplier = $item->get_meta('_wck_stock_reduction_multiplier', true);
+            $required = self::required_stock_quantity($quantity, $multiplier);
+            if ($required === false) {
+                error_log('WC Kalkulator: invalid stock multiplier for order item ' . (method_exists($item, 'get_id') ? $item->get_id() : 'unknown'));
+                return 0;
+            }
+            return $required;
         }
         return $quantity;
+    }
+
+    /**
+     * Apply the same effective stock-unit calculation to refunded quantities.
+     * Returning false prevents WooCommerce from restocking the unscaled customer quantity.
+     */
+    public static function restock_refunded_items($can_restock, $order, $refunded_line_items)
+    {
+        if (!$can_restock || !is_object($order) || !method_exists($order, 'get_items') || !is_array($refunded_line_items)) {
+            return $can_restock;
+        }
+
+        foreach ($order->get_items() as $item_id => $item) {
+            if (!isset($refunded_line_items[$item_id]['qty'])) {
+                continue;
+            }
+            $product = $item->get_product();
+            $reduced = $item->get_meta('_reduced_stock', true);
+            $refund_quantity = $refunded_line_items[$item_id]['qty'];
+            if (!$product || !$product->managing_stock() || !is_numeric($reduced) || (float) $reduced <= 0
+                || !is_numeric($refund_quantity) || (float) $refund_quantity <= 0) {
+                continue;
+            }
+
+            if ($item->meta_exists('_wck_stock_reduction_multiplier')) {
+                $multiplier = $item->get_meta('_wck_stock_reduction_multiplier', true);
+                $restock_quantity = self::required_stock_quantity($refund_quantity, $multiplier);
+                if ($restock_quantity === false) {
+                    error_log('WC Kalkulator: invalid stock multiplier while restocking refund for order item ' . $item_id);
+                    $order->add_order_note(__('Stock could not be restored for a refunded item because its saved stock multiplier is invalid.', 'wc-kalkulator'));
+                    continue;
+                }
+            } else {
+                $restock_quantity = (float) $refund_quantity;
+            }
+            $restock_quantity = min((float) $restock_quantity, (float) $reduced);
+            if ($restock_quantity <= 0) {
+                continue;
+            }
+
+            $old_stock = $product->get_stock_quantity();
+            $new_stock = wc_update_product_stock($product, $restock_quantity, 'increase');
+            if (is_wp_error($new_stock)) {
+                $order->add_order_note(sprintf(__('Unable to restore stock for item %s.', 'woocommerce'), $product->get_name()));
+                error_log('WC Kalkulator: stock restoration failed for refunded order item ' . $item_id);
+                continue;
+            }
+
+            $item->update_meta_data('_reduced_stock', (float) $reduced - $restock_quantity);
+            $item->update_meta_data(
+                '_restock_refunded_items',
+                (float) $item->get_meta('_restock_refunded_items', true) + $restock_quantity
+            );
+            $item->save();
+            $order->add_order_note(sprintf(
+                __('Item #%1$s stock increased from %2$s to %3$s.', 'woocommerce'),
+                $product->get_id(),
+                $old_stock,
+                $new_stock
+            ));
+            do_action('woocommerce_restock_refunded_item', $product->get_id(), $old_stock, $new_stock, $order, $product);
+        }
+
+        return false;
     }
 
 }

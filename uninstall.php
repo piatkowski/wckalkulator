@@ -1,11 +1,8 @@
 <?php
 
 if (!defined('WP_UNINSTALL_PLUGIN')) {
-    die();
+    exit;
 }
 
-include 'wc-kalkulator.php';
-
-use WCKalkulator\Plugin;
-
-Plugin::uninstall();
+require_once __DIR__ . '/src/Uninstall.php';
+\WCKalkulator\Uninstall::run();

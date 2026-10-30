@@ -36,13 +36,15 @@ class FieldsetPostType
         '_wck_filter_price_sufix' => 'text',
         '_wck_fieldset' => 'json', //will be stored as array
         '_wck_expression' => 'json', //will be stored as array
+        '_wck_schema_version' => 'int',
         '_wck_choose_expression_type' => array('oneline', 'conditional', 'off', 'addon'),
         '_wck_version_hash' => 'text',
         '_wck_priority' => 'int',
         '_wck_stock_reduction_multiplier' => 'text',
         '_wck_variation_prices_visible' => 'bool',
         '_wck_price_block_action' => 'absint',
-        '_wck_javascript' => 'textarea'
+        // Custom JavaScript is handled separately because publishing code requires
+        // the unfiltered_html capability.
     );
 
     /**
@@ -59,7 +61,7 @@ class FieldsetPostType
         add_action('init', array(__CLASS__, 'register_post_type'));
         add_filter('manage_' . self::POST_TYPE . '_posts_columns', array(__CLASS__, 'manage_posts_columns'));
         add_action('manage_' . self::POST_TYPE . '_posts_custom_column', array(__CLASS__, 'manage_posts_custom_column'), 10, 2);
-        add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'));
+        add_action('save_post_' . self::POST_TYPE, array(__CLASS__, 'save_post'), 10, 2);
         add_filter('woocommerce_screen_ids', array(__CLASS__, 'add_screen_to_woocommerce'));
         add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_scripts'), 11);
         add_filter('get_user_option_meta-box-order_' . self::POST_TYPE, array(__CLASS__, 'metabox_order'));
@@ -108,7 +110,7 @@ class FieldsetPostType
      */
     public static function register_post_type()
     {
-        if (!current_user_can('manage_woocommerce') || post_type_exists(self::POST_TYPE)) {
+        if (post_type_exists(self::POST_TYPE)) {
             return;
         }
 
@@ -134,8 +136,20 @@ class FieldsetPostType
                 'show_ui' => true,
                 'has_archive' => false,
                 'map_meta_cap' => true,
-                'capability_type' => 'post',
-                'capabilities' => array(),
+                'capability_type' => 'wck_fieldset',
+                'capabilities' => array(
+                    'edit_posts' => 'manage_woocommerce',
+                    'edit_others_posts' => 'manage_woocommerce',
+                    'delete_posts' => 'manage_woocommerce',
+                    'publish_posts' => 'manage_woocommerce',
+                    'read_private_posts' => 'manage_woocommerce',
+                    'delete_private_posts' => 'manage_woocommerce',
+                    'delete_published_posts' => 'manage_woocommerce',
+                    'delete_others_posts' => 'manage_woocommerce',
+                    'edit_private_posts' => 'manage_woocommerce',
+                    'edit_published_posts' => 'manage_woocommerce',
+                    'read' => 'manage_woocommerce'
+                ),
                 'publicly_queryable' => false,
                 'exclude_from_search' => true,
                 'query_var' => true,
@@ -276,15 +290,18 @@ class FieldsetPostType
                 'title' => __('Inventory & Stock Management', 'wc-kalkulator'),
                 'position' => 'advanced'
             ),
-            'javascript' => array(
-                'title' => __('Custom JavaScript', 'wc-kalkulator'),
-                'position' => 'advanced'
-            ),
             'pricefilter' => array(
                 'title' => __('Price Filtering', 'wc-kalkulator'),
                 'position' => 'side'
             )
         );
+
+        if (current_user_can('unfiltered_html')) {
+            $metaboxes['javascript'] = array(
+                'title' => __('Custom JavaScript', 'wc-kalkulator'),
+                'position' => 'advanced'
+            );
+        }
 
         foreach ($metaboxes as $id => $metabox) {
             add_meta_box(
@@ -323,23 +340,82 @@ class FieldsetPostType
      * @param $post
      * @since 1.1.0
      */
-    public static function save_post($post)
+    public static function save_post($post_id, $post = null)
     {
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+        if (!is_scalar($post_id)) {
             return;
+        }
+        $post_id = absint($post_id);
+        if (!is_object($post) && function_exists('get_post')) {
+            $post = get_post($post_id);
+        }
+        if ($post_id <= 0 || !is_object($post) || $post->post_type !== self::POST_TYPE
+            || (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            || wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)
+            || !current_user_can('edit_post', $post_id)
+            || !isset($_POST['_wck_nonce']) || !is_scalar($_POST['_wck_nonce'])
+            || !wp_verify_nonce(wp_unslash((string) $_POST['_wck_nonce']), self::POST_TYPE)) {
+            return;
+        }
 
-        global $post;
+        if ($post_id > 0) {
 
-        if (isset($_POST['_wck_nonce']) && wp_verify_nonce($_POST['_wck_nonce'], self::POST_TYPE)) {
+            $configuration = array();
+            foreach (array('_wck_fieldset', '_wck_expression') as $configuration_key) {
+                if (!isset($_POST[$configuration_key])) {
+                    continue;
+                }
+                $decoded = Sanitizer::sanitize(wp_unslash($_POST[$configuration_key]), 'json');
+                $valid = $configuration_key === '_wck_fieldset'
+                    ? self::validate_fieldset_schema($decoded)
+                    : self::validate_expression_schema($decoded, self::fieldset_reference_schema(isset($configuration['_wck_fieldset'])
+                        ? $configuration['_wck_fieldset']
+                        : get_post_meta($post_id, '_wck_fieldset', true)));
+                if ($decoded === false || !$valid) {
+                    return;
+                }
+                $configuration[$configuration_key] = $decoded;
+            }
+            if (isset($_POST['_wck_choose_expression_type'])) {
+                $mode = Sanitizer::sanitize(wp_unslash($_POST['_wck_choose_expression_type']), self::$meta_keys['_wck_choose_expression_type']);
+                if ($mode === false) {
+                    return;
+                }
+                if (isset($configuration['_wck_expression']) && isset($configuration['_wck_expression']['mode'])
+                    && $mode !== $configuration['_wck_expression']['mode']) {
+                    return;
+                }
+            }
 
-            $post_id = $post->ID;
+            $effective_fieldset = isset($configuration['_wck_fieldset'])
+                ? $configuration['_wck_fieldset'] : get_post_meta($post_id, '_wck_fieldset', true);
+            $effective_expression = isset($configuration['_wck_expression'])
+                ? $configuration['_wck_expression'] : get_post_meta($post_id, '_wck_expression', true);
+            $effective_mode = isset($mode) ? $mode : get_post_meta($post_id, '_wck_choose_expression_type', true);
+            if ($effective_mode !== 'off' && $effective_expression !== ''
+                && !self::validate_expression_schema($effective_expression, self::fieldset_reference_schema($effective_fieldset))) {
+                return;
+            }
+
+            if (isset($configuration['_wck_fieldset'])) {
+                foreach ($configuration['_wck_fieldset'] as &$configured_field) {
+                    if (isset($configured_field['required'])) {
+                        $configured_field['required'] = $configured_field['required'] === true || $configured_field['required'] === 1 || $configured_field['required'] === '1'
+                            ? '1' : ($configured_field['required'] === '2' ? '2' : '0');
+                    }
+                    if (isset($configured_field['use_expression'])) {
+                        $configured_field['use_expression'] = $configured_field['use_expression'] === true || $configured_field['use_expression'] === 1 || $configured_field['use_expression'] === '1'
+                            ? '1' : '0';
+                    }
+                }
+                unset($configured_field);
+            }
 
             $can_empty = array(
                 '_wck_assign_products',
                 '_wck_assign_categories',
                 '_wck_assign_tags',
-                '_wck_assign_attributes',
-                '_wck_javascript'
+                '_wck_assign_attributes'
             );
 
             /**
@@ -347,17 +423,260 @@ class FieldsetPostType
              * If $_POST[key] does not exist then clear only specified meta data (defined in $can_empty)
              */
             foreach (self::$meta_keys as $key => $data_type) {
+                if (array_key_exists($key, $configuration)) {
+                    update_post_meta($post_id, $key, $configuration[$key]);
+                    continue;
+                }
                 if (isset($_POST[$key])) {
-                    $value = Sanitizer::sanitize($_POST[$key], $data_type);
+                    $value = Sanitizer::sanitize(wp_unslash($_POST[$key]), $data_type);
+                    if ($value === false) {
+                        continue;
+                    }
                     update_post_meta($post_id, $key, $value);
-                } elseif (in_array($key, $can_empty)) {
-                    update_post_meta($post_id, $key, "");
+                } elseif (in_array($key, $can_empty, true) && isset($_POST[$key . '_submitted'])
+                    && is_scalar($_POST[$key . '_submitted']) && wp_unslash($_POST[$key . '_submitted']) === '1') {
+                    update_post_meta($post_id, $key, array());
+                }
+            }
+
+            if ($configuration) {
+                update_post_meta($post_id, '_wck_schema_version', 1);
+            }
+
+            // Treat code publication as a separate privilege. WordPress removes
+            // unfiltered_html from ordinary site users on multisite; super admins
+            // retain it according to core's capability mapping.
+            if (current_user_can('unfiltered_html')) {
+                if (isset($_POST['_wck_javascript']) && is_scalar($_POST['_wck_javascript'])) {
+                    $javascript = sanitize_textarea_field(wp_unslash((string) $_POST['_wck_javascript']));
+                    update_post_meta($post_id, '_wck_javascript', $javascript);
+                    update_post_meta($post_id, '_wck_javascript_enabled', $javascript === '' ? '0' : '1');
                 }
             }
 
             update_post_meta($post_id, '_wck_version_hash', wp_generate_password(32, false, false));
 
         }
+    }
+
+    /** Validate a fieldset document before replacing the stored configuration. */
+    public static function validate_fieldset_schema($fieldset)
+    {
+        if (!is_array($fieldset) || count($fieldset) > 200) {
+            return false;
+        }
+        $allowed_types = array();
+        foreach (Plugin::$defined_fields as $field_class) {
+            $class_parts = explode('\\', $field_class);
+            $class_name = end($class_parts);
+            $type = strtolower(substr($class_name, 0, -5));
+            $allowed_types[$type] = true;
+        }
+        $reserved_names = array('quantity', 'product_price', 'product_weight', 'product_width', 'product_height', 'product_length', 'product_regular_price', 'product_is_on_sale', 'is_user_logged', 'current_month', 'day_of_month', 'day_of_week', 'current_hour', '_files');
+        $names = array();
+        foreach ($fieldset as $key => $field) {
+            if (!is_array($field) || !isset($field['type'], $field['name'])
+                || !is_string($field['type']) || !isset($allowed_types[$field['type']])
+                || !is_string($field['name']) || !preg_match('/^[A-Za-z][A-Za-z0-9_-]{0,63}$/', $field['name'])
+                || in_array(strtolower($field['name']), $reserved_names, true)
+                || isset($names[$field['name']]) || (string) $key !== $field['name']) {
+                return false;
+            }
+            if (isset($field['required']) && !in_array($field['required'], array(true, false, 0, 1, '0', '1', '2'), true)) {
+                return false;
+            }
+            if (isset($field['use_expression']) && !in_array($field['use_expression'], array(true, false, 0, 1, '0', '1'), true)) {
+                return false;
+            }
+            if (isset($field['price']) && $field['price'] !== ''
+                && (!is_scalar($field['price']) || !is_numeric($field['price']) || !is_finite((float) $field['price']))) {
+                return false;
+            }
+            if ($field['type'] === 'number') {
+                foreach (array('min', 'max') as $bound) {
+                    if (!isset($field[$bound]) || !is_numeric($field[$bound]) || !is_finite((float) $field[$bound])) {
+                        return false;
+                    }
+                }
+                if ((float) $field['min'] > (float) $field['max']) {
+                    return false;
+                }
+            }
+            if (in_array($field['type'], array('text', 'textarea', 'email'), true)) {
+                foreach (array('min', 'max') as $bound) {
+                    if (isset($field[$bound]) && (!is_numeric($field[$bound]) || (int) $field[$bound] < 0 || (string) (int) $field[$bound] !== (string) $field[$bound])) {
+                        return false;
+                    }
+                }
+                if (isset($field['pattern']) && (!is_string($field['pattern']) || strlen($field['pattern']) > 512
+                    || @preg_match('~\\A(?:' . str_replace('~', '\\~', $field['pattern']) . ')\\z~u', '') === false)) {
+                    return false;
+                }
+            }
+            $names[$field['name']] = true;
+            $option_type = in_array($field['type'], array('select', 'dropdown', 'checkboxgroup', 'radio', 'imageselect', 'imageswatches', 'colorswatches'), true);
+            if ($option_type) {
+                // Legacy dropdown values are their displayed titles.
+                if ($field['type'] === 'dropdown' && !isset($field['options_name'])
+                    && isset($field['options_title']) && is_array($field['options_title'])) {
+                    $field['options_name'] = $field['options_title'];
+                }
+                if (!isset($field['options_name'], $field['options_title']) || !is_array($field['options_name']) || !is_array($field['options_title'])
+                    || count($field['options_name']) !== count($field['options_title']) || count($field['options_name']) > 500
+                    || array_keys($field['options_name']) !== array_keys($field['options_title'])) {
+                    return false;
+                }
+                $option_values = array();
+                foreach ($field['options_name'] as $option) {
+                    if (!is_scalar($option) || in_array((string) $option, $option_values, true)) {
+                        return false;
+                    }
+                    $option_values[] = (string) $option;
+                }
+                foreach ($field['options_title'] as $option_title) {
+                    if (!is_scalar($option_title)) {
+                        return false;
+                    }
+                }
+                if (isset($field['default_value']) && $field['default_value'] !== '') {
+                    $default_value = (string) $field['default_value'];
+                    $default_option = explode(':', $default_value, 2);
+                    $option_titles = array_map('strval', array_values($field['options_title']));
+                    if (!in_array($default_value, $option_values, true)
+                        && !in_array($default_option[0], $option_values, true)
+                        && !in_array($default_value, $option_titles, true)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /** Validate the persisted expression document's shape. */
+    public static function validate_expression_schema($expression, $fieldset_schema = array())
+    {
+        if (!is_array($expression) || count($expression) > 100) {
+            return false;
+        }
+        if (!isset($expression['mode']) || !in_array($expression['mode'], array('oneline', 'conditional', 'addon', 'off'), true)) {
+            return false;
+        }
+        if (!array_key_exists('expr', $expression)) {
+            return isset($expression['mode']) && $expression['mode'] === 'off';
+        }
+        $strings = array();
+        if (is_string($expression['expr'])) {
+            if (strlen($expression['expr']) > 20000 || ($expression['expr'] === '' && (!isset($expression['mode']) || $expression['mode'] !== 'off'))) {
+                return false;
+            }
+            $strings[] = $expression['expr'];
+        } else {
+            if (!is_array($expression['expr']) || count($expression['expr']) > 100
+                || (!$expression['expr'] && (!isset($expression['mode']) || $expression['mode'] !== 'off'))) {
+                return false;
+            }
+            foreach ($expression['expr'] as $row) {
+                if (!is_array($row)) {
+                    return false;
+                }
+                if (!isset($row['type'], $row['if'], $row['then'])) {
+                    return false;
+                }
+                foreach (array('type', 'if', 'then') as $key) {
+                    if (!is_string($row[$key]) || strlen($row[$key]) > 20000) {
+                        return false;
+                    }
+                }
+                if (!isset($row['type']) || !in_array($row['type'], array('condition', 'else'), true)) {
+                    return false;
+                }
+                $strings[] = $row['if'];
+                $strings[] = $row['then'];
+            }
+        }
+        $reference_schema = self::fieldset_reference_schema($fieldset_schema);
+        foreach ($strings as $source) {
+            foreach (self::expression_references($source) as $reference) {
+                    $parts = explode(':', $reference, 2);
+                    $name = $parts[0];
+                    $suffix = isset($parts[1]) ? $parts[1] : '';
+                    $external_parameter = strpos($reference, 'global:') === 0 || strpos($reference, 'pa:') === 0;
+                    if (!isset($reference_schema[$name]) && !in_array($name, array('quantity', 'product_price', 'product_weight', 'product_width', 'product_height', 'product_length', 'product_regular_price', 'product_is_on_sale', 'is_user_logged', 'current_month', 'day_of_month', 'day_of_week', 'current_hour'), true)
+                        && !$external_parameter && strpos($name, 'product_') !== 0) {
+                        return false;
+                    }
+                    if ($external_parameter) {
+                        continue;
+                    }
+                    if ($suffix !== '' && isset($reference_schema[$name])) {
+                        $type = $reference_schema[$name];
+                        $supported = array(
+                            'text' => array('text', 'textarea', 'email'),
+                            'sum' => array('checkboxgroup'), 'min' => array('checkboxgroup'), 'max' => array('checkboxgroup'),
+                            'date' => array('datepicker'), 'date_from' => array('rangedatepicker'), 'date_to' => array('rangedatepicker'), 'days' => array('rangedatepicker'),
+                            'size' => array('fileupload', 'imageupload')
+                        );
+                        if (!isset($supported[$suffix]) || !in_array($type, $supported[$suffix], true)) {
+                            return false;
+                        }
+                    }
+            }
+        }
+        return true;
+    }
+
+    /** Build the lookup used to check expression references and derived parameter types. */
+    private static function fieldset_reference_schema($fieldset)
+    {
+        $schema = array();
+        if (!is_array($fieldset)) {
+            return $schema;
+        }
+        foreach ($fieldset as $key => $field) {
+            if (is_array($field) && isset($field['name'], $field['type']) && is_string($field['name']) && is_string($field['type'])) {
+                $schema[$field['name']] = $field['type'];
+            } elseif (is_string($field) && is_string($key)) {
+                $schema[$key] = $field;
+            }
+        }
+        return $schema;
+    }
+
+    /** Extract {name} references while ignoring quoted literals. */
+    private static function expression_references($source)
+    {
+        $references = array();
+        $quote = '';
+        $length = strlen($source);
+        for ($index = 0; $index < $length; $index++) {
+            $char = $source[$index];
+            if ($quote !== '') {
+                if ($char === '\\') {
+                    $index++;
+                } elseif ($char === $quote) {
+                    $quote = '';
+                }
+                continue;
+            }
+            if ($char === "'" || $char === '"') {
+                $quote = $char;
+                continue;
+            }
+            if ($char !== '{') {
+                continue;
+            }
+            $end = strpos($source, '}', $index + 1);
+            if ($end === false) {
+                continue;
+            }
+            $reference = substr($source, $index + 1, $end - $index - 1);
+            if ($reference !== '' && strpos($reference, '{') === false) {
+                $references[] = $reference;
+            }
+            $index = $end;
+        }
+        return $references;
     }
 
     /**
@@ -430,7 +749,7 @@ class FieldsetPostType
                 'var wck_ajax_fieldset = ' . wp_json_encode(
                     array(
                         'ajax_url' => admin_url('admin-ajax.php'),
-                        '_wck_ajax_nonce' => wp_create_nonce(Ajax::NONCE)
+                        '_wck_ajax_nonce' => wp_create_nonce(Ajax::FIELDSET_PUBLISH_NONCE)
                     )
                 ) . ';'
             );
@@ -510,7 +829,7 @@ class FieldsetPostType
             if (is_array($meta)) {
                 wp_add_inline_script(
                     'wck-fieldset-script',
-                    'var ' . $const . ' = ' . wp_json_encode(self::decode_array($meta)) . ';'
+                    'var ' . $const . ' = ' . wp_json_encode($meta) . ';'
                 );
             }
         }
@@ -591,12 +910,10 @@ class FieldsetPostType
      */
     public static function duplicate_post()
     {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_die(__('This action is restriced!', 'wc-kalkulator'));
-        }
-
-        $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
-        $is_valid_nonce = isset($_GET['wck_duplicate_nonce']) ? wp_verify_nonce($_GET['wck_duplicate_nonce'], 'wck_duplicate_nonce') : false;
+        $post_id = isset($_GET['post']) && is_scalar($_GET['post']) ? absint($_GET['post']) : 0;
+        $nonce = isset($_GET['wck_duplicate_nonce']) && is_scalar($_GET['wck_duplicate_nonce'])
+            ? wp_unslash($_GET['wck_duplicate_nonce']) : '';
+        $is_valid_nonce = $nonce !== '' && wp_verify_nonce($nonce, 'wck_duplicate_nonce');
 
         if ($post_id === 0 || !$is_valid_nonce) {
             $link = ' <a href="' . admin_url() . 'edit.php?post_type=' . self::POST_TYPE . '">' . __('Go back to the Fieldset list', 'wc-kalkulator') . '</a>';
@@ -604,6 +921,12 @@ class FieldsetPostType
         }
 
         $post = get_post($post_id);
+        $post_type = get_post_type_object(self::POST_TYPE);
+        if (!$post || $post->post_type !== self::POST_TYPE || !current_user_can('manage_woocommerce')
+            || !current_user_can('edit_post', $post_id) || !$post_type
+            || !current_user_can($post_type->cap->create_posts)) {
+            wp_die(__('You cannot duplicate this Fieldset!', 'wc-kalkulator'));
+        }
         $user = wp_get_current_user();
 
         if (isset($post) && $post !== null) {
@@ -613,8 +936,12 @@ class FieldsetPostType
                 'post_name' => $post->post_name,
                 'post_status' => 'draft',
                 'post_title' => $post->post_title,
-                'post_type' => $post->post_type
-            ));
+                'post_type' => self::POST_TYPE
+            ), true);
+
+            if (is_wp_error($new_id) || !$new_id) {
+                wp_die(__('The Fieldset could not be duplicated.', 'wc-kalkulator'));
+            }
 
             foreach (array_keys(self::$meta_keys) as $key) {
                 $meta_value = get_post_meta($post_id, $key, true);
@@ -637,7 +964,10 @@ class FieldsetPostType
      */
     public static function duplicate_post_link($actions, $post)
     {
-        if (current_user_can('manage_woocommerce') && $post->post_type === self::POST_TYPE) {
+        $post_type = get_post_type_object(self::POST_TYPE);
+        if (is_object($post) && $post->post_type === self::POST_TYPE && $post_type
+            && current_user_can('manage_woocommerce') && current_user_can('edit_post', $post->ID)
+            && current_user_can($post_type->cap->create_posts)) {
             $link = '<a href="';
             $link .= wp_nonce_url('admin.php?action=wck_duplicate_post&post=' . $post->ID, 'wck_duplicate_nonce', 'wck_duplicate_nonce');
             $link .= '" rel="permalink">';
@@ -658,17 +988,17 @@ class FieldsetPostType
      */
     public static function delete_all_posts()
     {
-        $args = array(
-            'numberposts' => -1,
-            'post_type' => self::POST_TYPE,
-            'post_status' => 'any'
-        );
-        $posts = get_posts($args);
-        if ($posts) {
-            foreach ($posts as $item) {
-                wp_delete_post($item->ID, true);
+        do {
+            $post_ids = get_posts(array(
+                'numberposts' => 100,
+                'post_type' => self::POST_TYPE,
+                'post_status' => array_keys(get_post_stati()),
+                'fields' => 'ids'
+            ));
+            foreach ($post_ids as $post_id) {
+                wp_delete_post($post_id, true);
             }
-        }
+        } while (count($post_ids) === 100);
     }
 
     /**
@@ -681,20 +1011,6 @@ class FieldsetPostType
     {
         $classes .= ' wc-kalkulator-wrapper ';
         return $classes;
-    }
-
-    /**
-     * Decode Html entities in multidimesional array
-     *
-     * @param $data
-     * @return array|string
-     */
-    private static function decode_array($data)
-    {
-        if (is_array($data)) {
-            return array_map(array(__CLASS__, 'decode_array'), $data);
-        }
-        return html_entity_decode($data);
     }
 
 }

@@ -12,6 +12,7 @@ global $post;
  */
 $name = get_post_meta($post->ID, '_wck_param_name', true);
 $value = get_post_meta($post->ID, '_wck_param_value', true);
+$is_public = get_post_meta($post->ID, '_wck_param_public', true) === '1';
 
 ?>
 <p class="post-attributes-label-wrapper">
@@ -28,6 +29,13 @@ $value = get_post_meta($post->ID, '_wck_param_value', true);
 </p>
 <input type="text" name="_wck_param_value" id="param_value"
        value="<?php echo esc_html($value); ?>" style="width:100%" autocomplete="off" required>
+
+<p>
+    <label for="param_public">
+        <input type="checkbox" name="_wck_param_public" id="param_public" value="1" <?php checked($is_public); ?>>
+        <?php _e('Expose this value to the product page for dynamic presentation', 'wc-kalkulator'); ?>
+    </label>
+</p>
 
 <p>
     <?php _e('Example values:', 'wc-kalkulator'); ?><br/>

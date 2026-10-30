@@ -26,8 +26,9 @@ if (isset($view->size) && absint($view->size) > 0) {
                 <input type="radio" name="<?php echo esc_html($view->name); ?>"
                        id="<?php echo esc_html($id); ?>" <?php echo esc_html($view->required); ?>
                        class="attached enabled"
+                       aria-label="<?php echo esc_attr(sprintf(__('%1$s: %2$s', 'wc-kalkulator'), $view->title, $view->options_title[$i])); ?>"
                        value="<?php echo esc_html($opt_name); ?>" <?php checked(is_array($view->value) ? in_array($opt_name, $view->value) : ($view->value === $opt_name)); ?>>
-                <span class="colorswatch" style="background-color:<?php echo esc_html($view->options_title[$i] . $style); ?>"></span>
+                <span class="colorswatch" aria-hidden="true" style="background-color:<?php echo esc_html($view->options_title[$i] . $style); ?>"></span>
             </label>
         <?php endforeach; ?>
     </td>

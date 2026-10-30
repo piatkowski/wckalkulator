@@ -48,7 +48,6 @@ final class Sanitizer
                 'title' => true,
                 'data-extension' => true,
                 'accept' => true,
-                'onchange' => true,
                 'data-maxfilesize' => true,
             ),
             'textarea' => array(
@@ -94,7 +93,15 @@ final class Sanitizer
                 'data-expr' => true
             )
         );
-        return array_merge($allowed, wp_kses_allowed_html('post'));
+        $post_allowed = wp_kses_allowed_html('post');
+        foreach ($allowed as $tag => $attributes) {
+            if (!isset($post_allowed[$tag]) || !is_array($post_allowed[$tag])) {
+                $post_allowed[$tag] = array();
+            }
+            $post_allowed[$tag] = array_merge($post_allowed[$tag], $attributes);
+        }
+
+        return $post_allowed;
     }
     
     /**
@@ -112,36 +119,36 @@ final class Sanitizer
      */
     public static function sanitize($var, $data_type)
     {
-        if (is_array($data_type) && in_array($var, $data_type)) {
-            return $var;
+        if (is_array($data_type)) {
+            return is_scalar($var) && in_array((string) $var, array_map('strval', $data_type), true) ? $var : false;
         }
         switch ($data_type) {
             case 'text':
-                return sanitize_text_field($var);
+                return is_scalar($var) ? sanitize_text_field((string) $var) : false;
             case 'textarea':
-                return sanitize_textarea_field($var);
+                return is_scalar($var) ? sanitize_textarea_field((string) $var) : false;
             case 'price':
-                return self::sanitize_price($var);
+                return is_scalar($var) ? self::sanitize_price($var) : false;
             case 'json':
-                return self::is_json_valid($var) ? self::sanitize_json($var) : "{}";
+                return self::sanitize_json($var);
             case 'array':
-                return self::sanitize_array($var);
+                return is_array($var) ? self::sanitize_array($var) : false;
             case 'text_array':
-                return self::sanitize_single_array_text($var);
+                return is_array($var) ? self::sanitize_single_array_text($var) : false;
             case 'absint_array':
-                return self::sanitize_single_array_absint($var);
+                return is_array($var) ? self::sanitize_single_array_absint($var) : false;
             case 'email':
-                return sanitize_email($var);
+                return is_scalar($var) ? sanitize_email((string) $var) : false;
             case 'absint':
-                return absint($var);
+                return is_scalar($var) ? absint($var) : false;
             case 'int':
-                return intval($var);
+                return is_scalar($var) ? intval($var) : false;
             case 'float':
-                return floatval($var);
+                return is_scalar($var) ? floatval($var) : false;
             case 'bool':
                 return ($var === true || $var === 1 || $var === '1');
         }
-        return sanitize_text_field($var);
+        return is_scalar($var) ? sanitize_text_field((string) $var) : '';
     }
     
     /**
@@ -164,8 +171,11 @@ final class Sanitizer
      */
     private static function is_json_valid($json)
     {
-        json_decode(stripslashes($json), true);
-        return json_last_error() === JSON_ERROR_NONE;
+        if (!is_string($json) || strlen($json) > 1048576) {
+            return false;
+        }
+        json_decode($json, true, 64);
+        return json_last_error() === JSON_ERROR_NONE && is_array(json_decode($json, true, 64));
     }
     
     /**
@@ -177,17 +187,11 @@ final class Sanitizer
      */
     private static function sanitize_json($json)
     {
-        $array = json_decode(stripslashes($json), true);
-        
-        $return = array();
-        foreach ($array as $key => $value) {
-            if (!is_array($value)) {
-                $return[sanitize_text_field($key)] = sanitize_text_field($value);
-            } else {
-                $return[sanitize_text_field($key)] = self::sanitize_array($value);
-            }
+        if (!self::is_json_valid($json)) {
+            return false;
         }
-        return $return;
+        $array = json_decode($json, true, 64);
+        return self::sanitize_array($array);
     }
     
     /**
@@ -199,18 +203,26 @@ final class Sanitizer
      */
     private static function sanitize_array($array, $depth = 1)
     {
+        if (!is_array($array) || $depth > 64) {
+            return array();
+        }
         $return = array();
         foreach ($array as $key => $value) {
+            $clean_key = is_int($key) ? $key : sanitize_text_field((string) $key);
             if (!is_array($value)) {
-                if ($key === 'content') { //allowed HTML content
-                    $return[sanitize_text_field($key)] = wp_kses_post($value);
+                if ($key === 'content' && is_string($value)) { //allowed HTML content
+                    $return[$clean_key] = wp_kses_post($value);
                 } else {
-                    $return[sanitize_text_field($key)] = sanitize_text_field($value);
+                    if (is_string($value)) {
+                        $return[$clean_key] = sanitize_text_field($value);
+                    } elseif (is_scalar($value) || $value === null) {
+                        $return[$clean_key] = $value;
+                    } else {
+                        $return[$clean_key] = '';
+                    }
                 }
             } else {
-                if ($depth < self::MAX_DEPTH) {
-                    $return[sanitize_text_field($key)] = self::sanitize_array($value, ++$depth);
-                }
+                $return[$clean_key] = self::sanitize_array($value, $depth + 1);
             }
         }
         return $return;

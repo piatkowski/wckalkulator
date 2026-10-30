@@ -69,6 +69,9 @@ class ExpressionParser
      */
     private $expression = null;
 
+    /** @var string Result contract: price, formula, or stock_multiplier. */
+    private $result_type = 'price';
+
     /**
      * ExpressionParser constructor.
      *
@@ -76,8 +79,15 @@ class ExpressionParser
      * @param array $vars - variables used in the expression
      * @since 1.0.0
      */
-    function __construct($expr, $vars)
+    function __construct($expr, $vars, $result_type = 'price')
     {
+        $this->error = '';
+        if (in_array($result_type, array('price', 'formula', 'stock_multiplier'), true)) {
+            $this->result_type = $result_type;
+        }
+        if (!is_array($vars)) {
+            $vars = array();
+        }
         foreach ($vars as $key => $val) {
             $var_name = str_replace(':', '__p__', $key);
             if (substr($key, -5) === ':text') {
@@ -93,20 +103,13 @@ class ExpressionParser
             $this->var_names = array_keys($this->vars);
         }
 
-        /*
-         * Fixed issue: https://wordpress.org/support/topic/conditional-expression-expressionparser-error/#post-15814485
-         * str_replace on array in PHP8+ throws PHP Warning:  Array to string conversion
-         */
         $this->expr = $expr;
-        array_walk_recursive(
-            $this->expr,
-            function (&$value) {
-                $value = str_replace(':', '__p__', $value);
-            }
-        );
-        /*
-         * End Fix
-         */
+        if (!is_array($expr) || !isset($expr['mode']) || !is_string($expr['mode']) || !array_key_exists('expr', $expr)) {
+            $this->error = __('ExpressionParser: Invalid expression data.', 'wc-kalkulator');
+            $this->expression = new ExpressionLanguage();
+            $this->register_functions();
+            return;
+        }
         $this->base_expr = $this->expr;
 
         $this->detect_mode();
@@ -133,6 +136,19 @@ class ExpressionParser
         //Create ExpressionLanguage instance
         $this->expression = new ExpressionLanguage();
         $this->register_functions();
+        if ($this->is_valid) {
+            try {
+                foreach ($this->prepared_expression_strings() as $prepared_expression) {
+                    $this->expression->lint($prepared_expression, $this->var_names);
+                }
+            } catch (SyntaxError $e) {
+                $this->is_valid = false;
+                $this->error .= $e->getMessage();
+            } catch (\Throwable $e) {
+                $this->is_valid = false;
+                $this->error .= __('ExpressionParser: Expression is not valid.', 'wc-kalkulator');
+            }
+        }
 
     }
 
@@ -223,12 +239,54 @@ class ExpressionParser
      */
     private function str_clean($str)
     {
-        return
-            str_replace(
-                array('{', '}', ',', 'constant(', ';', ':', 'acf('),
-                array('', '', '.', '(', ',', '__p__', 'wck_integration_acf_get_field('),
-                html_entity_decode($str)
-            );
+        $str = html_entity_decode((string) $str, ENT_QUOTES, 'UTF-8');
+        $result = '';
+        $quote = '';
+        $length = strlen($str);
+        for ($index = 0; $index < $length; $index++) {
+            $char = $str[$index];
+            if ($quote !== '') {
+                $result .= $char;
+                if ($char === '\\' && $index + 1 < $length) {
+                    $result .= $str[++$index];
+                } elseif ($char === $quote) {
+                    $quote = '';
+                }
+                continue;
+            }
+            if ($char === "'" || $char === '"') {
+                $quote = $char;
+                $result .= $char;
+                continue;
+            }
+            if (substr($str, $index, 9) === 'constant(') {
+                $result .= '(';
+                $index += 8;
+                continue;
+            }
+            if (substr($str, $index, 4) === 'acf(') {
+                $result .= 'wck_integration_acf_get_field(';
+                $index += 3;
+                continue;
+            }
+            if ($char === '{' || $char === '}') {
+                continue;
+            }
+            if ($char === ',') {
+                $result .= '.';
+                continue;
+            }
+            if ($char === ';') {
+                $result .= ',';
+                continue;
+            }
+            if ($char === ':') {
+                $result .= '__p__';
+                continue;
+            }
+            $result .= $char;
+        }
+        return $result;
     }
 
     /**
@@ -278,35 +336,88 @@ class ExpressionParser
      */
     private function check_required_variables()
     {
-        $expr_string = "";
-
-        if ($this->mode === self::MODE_ONELINE) {
-            $expr_string = $this->base_expr["expr"];
-        }
-
-        if ($this->mode === self::MODE_CONDITIONAL || $this->mode === self::MODE_ADDON) {
-            foreach ($this->expr as $expr) {
-                $expr_string .= $expr["if"] . $expr["then"];
+        $strings = array();
+        $this->collect_expression_strings($this->base_expr, $strings);
+        foreach ($strings as $source) {
+            foreach ($this->extract_placeholders($source) as $variable) {
+                $variable = str_replace(':', '__p__', $variable);
+                if (!in_array($variable, $this->var_names, true)) {
+                    return false;
+                }
             }
         }
+        return count($strings) > 0;
+    }
 
-        preg_match_all('/{([^}]+)}/m', $expr_string, $matched_vars);
-
-        if (count($matched_vars) === 2) {
-            $matched_vars = array_unique($matched_vars[1]);
-            if (count($matched_vars) > 0) {
-                foreach ($matched_vars as $var) {
-                    if (!in_array($var, $this->var_names)) {
-                        return false;
+    /** Return the exact strings that will be evaluated by ExpressionLanguage. */
+    private function prepared_expression_strings()
+    {
+        if ($this->mode === self::MODE_ONELINE) {
+            return isset($this->expr['eq']) && is_string($this->expr['eq']) ? array($this->expr['eq']) : array();
+        }
+        $strings = array();
+        if (is_array($this->expr)) {
+            foreach ($this->expr as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                foreach (array('if', 'then') as $key) {
+                    if (isset($row[$key]) && is_string($row[$key])) {
+                        $strings[] = $row[$key];
                     }
                 }
-                return true;
-            } else {
-                //return true if there's no variables in expression
-                return true;
             }
         }
-        return false;
+        return $strings;
+    }
+
+    /** Collect scalar expression strings from either expression mode. */
+    private function collect_expression_strings($value, &$strings)
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $this->collect_expression_strings($item, $strings);
+            }
+        } elseif (is_string($value)) {
+            $strings[] = $value;
+        }
+    }
+
+    /** Read {variable} references outside quoted string literals. */
+    private function extract_placeholders($source)
+    {
+        $variables = array();
+        $quote = '';
+        $length = strlen($source);
+        for ($index = 0; $index < $length; $index++) {
+            $char = $source[$index];
+            if ($quote !== '') {
+                if ($char === '\\') {
+                    $index++;
+                } elseif ($char === $quote) {
+                    $quote = '';
+                }
+                continue;
+            }
+            if ($char === "'" || $char === '"') {
+                $quote = $char;
+                continue;
+            }
+            if ($char !== '{') {
+                continue;
+            }
+            $end = strpos($source, '}', $index + 1);
+            if ($end === false) {
+                return array();
+            }
+            $variable = substr($source, $index + 1, $end - $index - 1);
+            if ($variable === '' || strpos($variable, '{') !== false) {
+                return array();
+            }
+            $variables[] = $variable;
+            $index = $end;
+        }
+        return $variables;
     }
 
     /**
@@ -386,30 +497,41 @@ class ExpressionParser
          * 3. Evaluate price addons and return the sum of addons
          */
         if ($this->mode === self::MODE_ADDON) {
-            $addons_price = $this->expression->evaluate('product_price', $this->vars);
             try {
+                $addons_price = $this->expression->evaluate('product_price', $this->vars);
+                if (!$this->is_numeric_result($addons_price)) {
+                    return $this->calc_error(__('ExpressionParser: Invalid price result.', 'wc-kalkulator'));
+                }
                 foreach ($this->expr as $expr) {
                     $condition_value = $this->expression->evaluate($expr['if'], $this->vars);
                     if ($condition_value === true) {
-                        $addons_price += $this->expression->evaluate($expr['then'], $this->vars);
+                        $addon = $this->expression->evaluate($expr['then'], $this->vars);
+                        if (!$this->is_numeric_result($addon)) {
+                            return $this->calc_error(__('ExpressionParser: Invalid price result.', 'wc-kalkulator'));
+                        }
+                        $addons_price += $addon;
+                        if (!$this->is_numeric_result($addons_price)) {
+                            return $this->calc_error(__('ExpressionParser: Invalid price result.', 'wc-kalkulator'));
+                        }
                     }
                 }
             } catch (SyntaxError $e) {
                 return $this->calc_error($e->getMessage());
             } catch (\DivisionByZeroError $e) {
                 return $this->calc_error(__("ExpressionParser: Division by zero", "wc-kalkulator"));
+            } catch (\Throwable $e) {
+                return $this->calc_error(__('ExpressionParser: Invalid calculation result.', 'wc-kalkulator'));
             }
 
             /*
              * Return calculated addons price
              */
-            if ($addons_price < 0) {
-                return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $addons_price);
-            } elseif ($addons_price === 0) {
-                return $this->calc_error(__('The price is equal zero.', "wc-kalkulator"));
+            $validated_price = $this->validate_result($addons_price);
+            if ($validated_price === false) {
+                return $this->calc_error(__('ExpressionParser: Invalid price result.', 'wc-kalkulator'));
             }
 
-            return Ajax::response('success', $addons_price);
+            return Ajax::response('success', $validated_price);
         }
 
         /*
@@ -441,17 +563,62 @@ class ExpressionParser
     {
         try {
             $value = $this->expression->evaluate($expr, $this->vars);
-            if ($value < 0) {
-                return $this->calc_error(__('The price is less than zero.', "wc-kalkulator") . ' =' . $value);
-            } elseif ($value === 0) {
-                return $this->calc_error(__('The price is equal zero.', "wc-kalkulator"));
+            $validated_value = $this->validate_result($value);
+            if ($validated_value === false) {
+                return $this->calc_error(__('ExpressionParser: Invalid calculation result.', 'wc-kalkulator'));
             }
-            return Ajax::response('success', $value);
+            return Ajax::response('success', $validated_value);
         } catch (SyntaxError $e) {
             return $this->calc_error($e->getMessage());
         } catch (\DivisionByZeroError $e) {
             return $this->calc_error(__("Division by zero.", "wc-kalkulator"));
+        } catch (\Throwable $e) {
+            return $this->calc_error(__('ExpressionParser: Invalid calculation result.', 'wc-kalkulator'));
         }
+    }
+
+    /**
+     * Validate and normalize evaluator output for the requested result contract.
+     *
+     * @param mixed $value
+     * @return float|int|false
+     */
+    private function validate_result($value)
+    {
+        if (!$this->is_numeric_result($value)) {
+            return false;
+        }
+
+        if ($this->result_type === 'price') {
+            if ((float) $value <= 0) {
+                return false;
+            }
+            $decimals = function_exists('wc_get_price_decimals') ? absint(wc_get_price_decimals()) : 2;
+            $normalized = round((float) $value, min($decimals, 8));
+            return $normalized > 0 ? $normalized : false;
+        }
+
+        if ($this->result_type === 'stock_multiplier') {
+            if ((float) $value <= 0 || (float) $value > 1000000) {
+                return false;
+            }
+            return (float) $value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Check a raw evaluator result before it is used in further arithmetic.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function is_numeric_result($value)
+    {
+        return (is_int($value) || is_float($value))
+            && is_finite((float) $value)
+            && abs((float) $value) <= 1000000000000;
     }
 
     /**

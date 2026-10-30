@@ -88,11 +88,21 @@ class TextField extends AbstractField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( ! is_string( $value ) && ! is_numeric( $value ) ) {
+			return false;
+		}
+		$value = (string) $value;
+		if ( ! $this->is_required() && $value === '' ) {
 			return true;
 		}
 
-		$length = strlen( esc_html( $value ) );
+		if ( function_exists( 'mb_strlen' ) ) {
+			$length = mb_strlen( $value, 'UTF-8' );
+		} elseif ( preg_match_all( '/./us', $value, $characters ) !== false ) {
+			$length = count( $characters[0] );
+		} else {
+			$length = strlen( $value );
+		}
 
 		if ( intval( $this->data["min"] ) > 0 ) {
 			$is_longer_than_min = $length >= $this->data["min"];
@@ -108,9 +118,19 @@ class TextField extends AbstractField {
 
 
 		$is_required_and_nonempty = true;
-		if ( $this->data['required'] ) {
-			if ( empty( $value ) || $value === "" ) {
+		if ( $this->is_required() || $this->is_required_when_visible() ) {
+			if ( $value === '' ) {
 				$is_required_and_nonempty = false;
+			}
+		}
+
+		$pattern = isset( $this->data['pattern'] ) && is_string( $this->data['pattern'] ) ? $this->data['pattern'] : '';
+		if ( $pattern !== '' ) {
+			$delimiter = '~';
+			$escaped_pattern = str_replace( $delimiter, '\\' . $delimiter, $pattern );
+			if (@preg_match( $delimiter . '\\A(?:' . $escaped_pattern . ')\\z' . $delimiter . 'u', '') === false
+				|| preg_match( $delimiter . '\\A(?:' . $escaped_pattern . ')\\z' . $delimiter . 'u', $value ) !== 1) {
+				return false;
 			}
 		}
 

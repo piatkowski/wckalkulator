@@ -11,9 +11,9 @@ When the plugin is deactivated, it is possible to uninstall it. During the unins
 
 **If you want to save all data for later, please export to the XML file**.
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.buymeacoffee.com/piatkowski)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!

@@ -16,6 +16,7 @@ use WCKalkulator\Woocommerce\Product;
 class Ajax
 {
     public const NONCE = "wckalkulator-ajax-nonce";
+    public const FIELDSET_PUBLISH_NONCE = "wckalkulator-fieldset-publish-nonce";
 
     /**
      * Private actions
@@ -77,6 +78,7 @@ class Ajax
                         '_wck_has_expression' => $fieldset->has_expression('current') ? '1' : '0',
                         '_wck_i18n_required' => __('You should check at least one option.', 'wc-kalkulator'),
                         '_wck_i18n_maxfilesize' => __('This file is too big!', 'wc-kalkulator'),
+                        '_wck_i18n_price_error' => __('Price could not be updated. Please try again.', 'wc-kalkulator'),
                         'form' => Settings::get('form_css_selector'),
                         '_wck_visibility_rules' => $fieldset->visibility_rules(),
                         '_wck_additional_parameters' => ($formula_parameters)
@@ -96,19 +98,31 @@ class Ajax
      */
     public static function wckalkulator_calculate_price()
     {
-        if (!wp_verify_nonce($_POST['_wck_ajax_nonce'], Ajax::NONCE) || !isset($_POST["_wck_product_id"]) || !isset($_POST["_wck_hash"])) {
+        $nonce = isset($_POST['_wck_ajax_nonce']) && is_scalar($_POST['_wck_ajax_nonce'])
+            ? (string) wp_unslash($_POST['_wck_ajax_nonce']) : '';
+        $raw_product_id = isset($_POST['_wck_product_id']) && is_scalar($_POST['_wck_product_id'])
+            ? (string) wp_unslash($_POST['_wck_product_id']) : '';
+        $hash = isset($_POST['_wck_hash']) && is_scalar($_POST['_wck_hash'])
+            ? (string) wp_unslash($_POST['_wck_hash']) : '';
+        $raw_quantity = isset($_POST['quantity']) && is_scalar($_POST['quantity'])
+            ? (string) wp_unslash($_POST['quantity']) : '';
+        if (!wp_verify_nonce($nonce, self::NONCE) || $raw_product_id === '' || $hash === '' || $raw_quantity === '') {
             wp_die('Bad request!');
         }
-        if (wp_hash($_POST["_wck_product_id"]) !== $_POST["_wck_hash"]) {
+        if (!hash_equals((string) wp_hash($raw_product_id), $hash)) {
             wp_die('Bad hash!');
         }
 
         /**
          * Get user input
          */
-        $product_id = absint($_POST["_wck_product_id"]);
-        $variation_id = isset($_POST["variation_id"]) ? absint($_POST["variation_id"]) : 0;
-        $quantity = absint($_POST["quantity"]);
+        if (isset($_POST['variation_id']) && !is_scalar($_POST['variation_id'])) {
+            wp_die('Bad request!');
+        }
+        $product_id = absint($raw_product_id);
+        $variation_id = isset($_POST["variation_id"])
+            ? absint(wp_unslash($_POST["variation_id"])) : 0;
+        $quantity = absint($raw_quantity);
 
 
         if ($product_id === 0 || $quantity === 0) {
@@ -120,18 +134,24 @@ class Ajax
         $fieldset->init($product_id, $variation_id);
         $fieldset->get_user_input();
 
-        if (!$fieldset->validate(true)) {
+        if (!$fieldset->validate(true, array('quantity' => $quantity))) {
             Helper::message_for_manager("Data is invalid");
             wp_die("");
         }
         try {
             $calc = $fieldset->calculate();
             if (!$calc['is_error']) {
+                $price_product = wc_get_product($variation_id > 0 ? $variation_id : $product_id);
+                if (!$price_product || !is_numeric($calc['value']) || !is_finite((float) $calc['value'])) {
+                    Helper::message_for_manager(__('The product price could not be displayed.', 'wc-kalkulator'));
+                    wp_die('');
+                }
+                $display_unit_price = wc_get_price_to_display($price_product, array('price' => (float) $calc['value']));
                 $response = "";
-                $price_current = $calc['value'] * $quantity;
+                $price_current = $display_unit_price * $quantity;
                 $price_regular = $price_current;
                 if (isset($calc['regular_value']) && $calc['regular_value'] > 0) {
-                    $price_regular = $calc['regular_value'] * $quantity;
+                    $price_regular = wc_get_price_to_display($price_product, array('price' => (float) $calc['regular_value'])) * $quantity;
                     $response .= '<del>' . str_replace('woocommerce-Price-amount', '', wc_price($price_regular)) . '</del>&nbsp;';
                 }
 
@@ -231,20 +251,37 @@ class Ajax
     public static function wckalkulator_fieldset_post_type_toggle_publish()
     {
         $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
-        if (!wp_verify_nonce($_POST['_wck_ajax_nonce'], Ajax::NONCE) || $post_id <= 0) {
+        $nonce = isset($_POST['_wck_ajax_nonce']) && is_scalar($_POST['_wck_ajax_nonce'])
+            ? (string) $_POST['_wck_ajax_nonce']
+            : '';
+        if (!wp_verify_nonce($nonce, self::FIELDSET_PUBLISH_NONCE) || $post_id <= 0) {
             wp_send_json(array('status' => 'error'));
         }
         if (get_post_type($post_id) !== FieldsetPostType::POST_TYPE) {
             wp_send_json(array('status' => 'error'));
         }
+
+        if (!current_user_can('manage_woocommerce') || !current_user_can('edit_post', $post_id)) {
+            wp_send_json(array('status' => 'error'));
+        }
+
         $status = get_post_status($post_id);
+        if ($status !== 'publish' && $status !== 'draft') {
+            wp_send_json(array('status' => 'error'));
+        }
+
         $new_status = $status === 'publish' ? 'draft' : 'publish';
+        if ($new_status === 'publish' && !current_user_can('publish_posts')) {
+            wp_send_json(array('status' => 'error'));
+        }
+
         $new_state = $new_status === 'publish' ? 'enabled' : 'disabled';
         $update_post = array(
             'ID' => $post_id,
             'post_status' => $new_status
         );
-        if (wp_update_post($update_post) === $post_id) {
+        $updated_post_id = wp_update_post($update_post, true);
+        if (!is_wp_error($updated_post_id) && $updated_post_id === $post_id) {
             wp_send_json(array('status' => 'success', 'state' => $new_state));
         }
         wp_send_json(array('status' => 'error'));

@@ -71,6 +71,9 @@
 .single-product div.product table.variations td.value .wck-range-date-picker.date_from, table.variations td.value .wck-range-date-picker.date_from {
   margin-right: 2%;
 }
+.single-product div.product table.variations td.value .wck-range-date-picker input, table.variations td.value .wck-range-date-picker input {
+  float: left;
+}
 .single-product div.product table.variations tr.wck-colorswatches td.value label, table.variations tr.wck-colorswatches td.value label {
   display: inline-block;
   width: auto;
@@ -83,9 +86,15 @@
 /* Style for image swatches and color swatches */
 .wck-imageswatches [type=radio], .wck-colorswatches [type=radio] {
   position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .wck-imageswatches [type=radio] + img {
@@ -105,6 +114,11 @@
 
 .wck-imageswatches [type=radio]:checked + img, .wck-colorswatches [type=radio]:checked + span.colorswatch {
   outline: 2px solid #222;
+}
+
+.wck-imageswatches [type=radio]:focus-visible + img, .wck-colorswatches [type=radio]:focus-visible + span.colorswatch {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
 }
 
 .wck-imageswatches .caption {
@@ -181,5 +195,4 @@ p.wckalkulator-price {
   font-size: 20px;
   padding-top: 20px;
 }
-
 /*# sourceMappingURL=product.css.map */

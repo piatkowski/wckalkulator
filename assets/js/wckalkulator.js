@@ -1,8 +1,12 @@
 (function ($) {
     "use strict";
     $(document).ready(function ($) {
+        $("html").addClass("wck-js");
         var userTimeout, updateTimeout;
         var _form = wck_ajax_object.form;
+        var $form = $(_form);
+        var priceRequest = null;
+        var priceRequestVersion = 0;
 
         var shouldCalculatePrice = wck_ajax_object._wck_has_expression === "1";
         var CV = {};
@@ -14,42 +18,201 @@
             });
         }
 
+        var visibilityConfigurationInvalid = false;
+
+        function fieldInputs(fieldName) {
+            var expectedName = "wck[" + fieldName + "]";
+            return $form.find("[name]").filter(function () {
+                return this.name === expectedName || this.name === expectedName + "[]";
+            });
+        }
+
         function findFieldAndToggle(fieldName, show) {
-            var inputField = $("[name*='wck[" + fieldName + "]']");
-            if(inputField.length > 0) {
-                if(show) {
+            var inputField = fieldInputs(fieldName);
+            if (inputField.length > 0) {
+                if (show) {
                     inputField.prop("disabled", false).show().closest('tr').show();
                 } else {
                     inputField.prop("disabled", true).hide().closest('tr').hide();
                 }
             } else {
-                var staticField = $("[data-wck-static-name='" + fieldName + "']");
-                if(staticField.length > 0) {
+                var staticField = $form.find("[data-wck-static-name]").filter(function () {
+                    return String($(this).data("wckStaticName")) === String(fieldName);
+                });
+                if (staticField.length > 0) {
                     staticField.toggle(show);
                 }
             }
         }
 
+        function fieldValues(fieldName) {
+            var inputs = fieldInputs(fieldName);
+            if (!inputs.length) {
+                return null;
+            }
+            var type = String(inputs.first().prop("type") || "").toLowerCase();
+            var values = [];
+            if (type === "checkbox" || type === "radio") {
+                inputs.filter(":checked").each(function () { values.push($(this).val()); });
+                return values;
+            }
+            if (type === "file") {
+                inputs.each(function () {
+                    if (this.files && this.files.length === 1) {
+                        values.push(Math.round((this.files[0].size / 1000000 + Number.EPSILON) * 100) / 100);
+                    }
+                });
+                return values;
+            }
+            inputs.each(function () {
+                var value = $(this).val();
+                if (Array.isArray(value)) {
+                    values = values.concat(value);
+                } else if (value !== null && value !== undefined) {
+                    values.push(value);
+                }
+            });
+            return values;
+        }
+
+        function compareVisibility(values, comp, target) {
+            var nonempty = values.filter(function (value) {
+                return value !== null && value !== undefined && String(value) !== "";
+            });
+            if (comp === "1") { return nonempty.length === 0; }
+            if (comp === "2") { return nonempty.length > 0; }
+            if (comp === "3") {
+                return nonempty.some(function (value) { return String(value) === String(target); });
+            }
+            if (comp === "4") {
+                return nonempty.length > 0 && nonempty.every(function (value) { return String(value) !== String(target); });
+            }
+            if (comp === "9") {
+                return nonempty.some(function (value) { return String(value).indexOf(String(target)) !== -1; });
+            }
+            var targetNumber = Number(String(target).replace(",", "."));
+            if (!isFinite(targetNumber)) { return false; }
+            targetNumber = Math.floor(targetNumber * 1000 + 0.5) / 1000;
+            return nonempty.some(function (value) {
+                var number = Number(String(value).replace(",", "."));
+                if (!isFinite(number)) { return false; }
+                number = Math.floor(number * 1000 + 0.5) / 1000;
+                switch (comp) {
+                    case "5": return number < targetNumber;
+                    case "6": return number <= targetNumber;
+                    case "7": return number > targetNumber;
+                    case "8": return number >= targetNumber;
+                }
+                return false;
+            });
+        }
+
+        function resolveVisibility(fieldName, states, visiting) {
+            if (Object.prototype.hasOwnProperty.call(states, fieldName)) {
+                return states[fieldName];
+            }
+            if (visiting[fieldName]) {
+                visibilityConfigurationInvalid = true;
+                return false;
+            }
+            if (!Object.prototype.hasOwnProperty.call(CV, fieldName)) {
+                if (fieldValues(fieldName) === null) {
+                    visibilityConfigurationInvalid = true;
+                    return false;
+                }
+                return true;
+            }
+            var rules = CV[fieldName];
+            if (!Array.isArray(rules) || rules.length === 0) {
+                visibilityConfigurationInvalid = true;
+                return false;
+            }
+            visiting[fieldName] = true;
+            var visible = false;
+            $.each(rules, function (_, andGroup) {
+                if (!Array.isArray(andGroup) || andGroup.length === 0) {
+                    visibilityConfigurationInvalid = true;
+                    return false;
+                }
+                var matches = true;
+                $.each(andGroup, function (_, condition) {
+                    var allowedComparisons = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+                    var comparison = condition && condition.comp !== undefined ? String(condition.comp) : "";
+                    if (!condition || typeof condition !== "object" || !condition.field ||
+                        allowedComparisons.indexOf(comparison) === -1 ||
+                        (comparison !== "1" && comparison !== "2" &&
+                            (condition.value === undefined || condition.value === null || typeof condition.value === "object"))) {
+                        visibilityConfigurationInvalid = true;
+                        matches = false;
+                        return false;
+                    }
+                    var controller = String(condition.field);
+                    var controllerVisible = resolveVisibility(controller, states, visiting);
+                    var values = controllerVisible ? fieldValues(controller) : [];
+                    if (values === null) {
+                        visibilityConfigurationInvalid = true;
+                        matches = false;
+                        return false;
+                    }
+                    if (!compareVisibility(values, comparison, condition.value === undefined ? "" : condition.value)) {
+                        matches = false;
+                        return false;
+                    }
+                });
+                if (visibilityConfigurationInvalid) { return false; }
+                if (matches) {
+                    visible = true;
+                    return false;
+                }
+            });
+            delete visiting[fieldName];
+            states[fieldName] = visible && !visibilityConfigurationInvalid;
+            return states[fieldName];
+        }
+
+        function applyVisibilityRules() {
+            visibilityConfigurationInvalid = false;
+            var states = {};
+            var visiting = {};
+            $.each(Object.keys(CV), function (_, fieldName) {
+                resolveVisibility(fieldName, states, visiting);
+            });
+            if (visibilityConfigurationInvalid) {
+                $.each(Object.keys(CV), function (_, fieldName) { states[fieldName] = false; });
+            }
+            $.each(states, function (fieldName, visible) {
+                findFieldAndToggle(fieldName, visible);
+            });
+        }
+
         function updateUI() {
             //wck-dynamic support, conditional visibility support
+            applyVisibilityRules();
             var formFields = {};
-            jQuery(_form + " [data-wck-static-name] , " + _form + " [name^=wck").each(function () {
+            $form.find("[data-wck-static-name], [name^='wck[']").each(function () {
                 var fieldName = false;
-                if($(this)[0].hasAttribute("name")) {
-                    var fieldName = $(this).attr("name").replace("wck[", "").replace("]", "").replace("[]", "");
-                    formFields["{" + fieldName + "}"] = $(this).val();
-                    var type = $(this).prop("type");
-                    switch(type) {
-                        case 'file':
-                            formFields["{" + fieldName + ":size}"] = (($(this)[0].files.length === 1) ? Math.round(($(this)[0].files[0].size / 1000000 + Number.EPSILON) * 100) / 100 : 0 );
-                            break;
+                if ($(this)[0].hasAttribute("name")) {
+                    fieldName = $(this).attr("name").replace("wck[", "").replace("]", "").replace("[]", "");
+                    var input = $(this);
+                    var type = String(input.prop("type") || "").toLowerCase();
+                    var value = "";
+                    if (!input.prop("disabled")) {
+                        if (type === "radio" || type === "checkbox") {
+                            var selected = fieldInputs(fieldName).filter(":checked");
+                            value = selected.length ? selected.last().val() : "";
+                        } else {
+                            value = input.val();
+                        }
+                        if (typeof value === "string" && /^-?(?:\d+\.?\d*|\.\d+):/.test(value)) {
+                            value = value.substring(0, value.indexOf(":"));
+                        }
+                    }
+                    formFields["{" + fieldName + "}"] = value;
+                    if (type === 'file') {
+                        formFields["{" + fieldName + ":size}"] = ((!$(this).prop("disabled") && $(this)[0].files.length === 1) ? Math.round(($(this)[0].files[0].size / 1000000 + Number.EPSILON) * 100) / 100 : 0);
                     }
                 } else {
                     fieldName = $(this).data("wckStaticName");
-                }
-
-                if (fieldName && CV.hasOwnProperty(fieldName)) {
-                    toggleField(fieldName, CV[fieldName]);
                 }
             });
 
@@ -57,120 +220,72 @@
                 formFields["{" + name + "}"] = value;
             });
 
-            $("span.wck-dynamic").each(function () {
-                var expr = $(this).data('expr');
-                var vars = expr.match(/{[^}]+}/gm);
-                vars.forEach(function (v, i) {
-                    expr = expr.replaceAll(v, formFields[v]);
-                });
+            $form.find("span.wck-dynamic").each(function () {
                 try {
+                    var expr = String($(this).attr('data-expr') || '');
+                    expr = expr.replace(/{[^}]+}/g, function (variable) {
+                        return formFields[variable] === undefined ? "" : formFields[variable];
+                    });
                     $(this).text(Math.round((Mexp.eval(expr) + Number.EPSILON) * 100) / 100);
                 } catch (error) {
-                    console.log("[Mexp]", error);
+                    $(this).text("");
                 }
             });
         }
 
-        function getFieldValue(field) {
-            if (field.prop("type") === "checkbox" || field.prop("type") === "radio") {
-                var value = field.is(":checked") ? field.val() : "";
-                var n = value.indexOf(':');
-                if (n !== -1) {
-                    value = value.substring(0, n);
-                }
-                return value;
-            } else if(field.prop("type") === "file") {
-                return  ((field[0].files.length === 1) ? (Math.round((field[0].files[0].size / 1000000 + Number.EPSILON) * 100) / 100) : 0);
-            }
-            return field.val();
-        }
-
-        function toggleField(fieldName, rules) {
-            var state = null;
-            $.each(rules, function (i, or_rule) {
-                $.each(or_rule, function (j, and_rule) {
-                    var fields = $("[name*='wck[" + and_rule.field + "]']");
-                    if (fields.length) {
-                        fields.each(function () {
-                            var s = compare(getFieldValue($(this)), and_rule.comp, and_rule.value);
-                            if (s === true) {
-                                state = true;
-                            }
-                            return state !== false;
-                        });
-                    }
-                    return state !== false;
-                });
-                if (state === true) {
-                    findFieldAndToggle(fieldName, true);
-                    return false;
-                }
+        function checkboxGroup(group) {
+            return $form.find("input[type='checkbox'][data-type='checkboxgroup']").filter(function () {
+                return String($(this).data("group")) === String(group);
             });
-            if (state !== true) {
-                findFieldAndToggle(fieldName, false);
-                return false;
-            }
-        }
-
-        function compare(valueA, comp, valueB) {
-            var numA, numB;
-            if(["5", "6", "7", "8"].includes(comp)) {
-                numA = Math.round(parseFloat(valueA) * 1000) / 1000;
-                numB = Math.round(parseFloat(valueB) * 1000) / 1000;
-            }
-            try {
-                switch (comp) {
-                    case "1":
-                        return valueA === "";
-                    case "2":
-                        return valueA !== "";
-                    case "3":
-                        return valueA === valueB;
-                    case "4":
-                        return valueA !== valueB;
-                    case "5":
-                        return numA < numB;
-                    case "6":
-                        return numA <= numB;
-                    case "7":
-                        return numA > numB;
-                    case "8":
-                        return numA >= numB;
-                    case "9":
-                        return valueA.includes(valueB);
-                }
-            } catch (e) {
-                return false;
-            }
-            return false;
         }
 
         function calculatePrice() {
             if (shouldCalculatePrice) {
-                var data = $(_form).serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + wck_ajax_object._wck_ajax_nonce;
-                $.each($(_form + " input[type=file].wck_imageupload:enabled"), function () {
+                var version = ++priceRequestVersion;
+                if (priceRequest && priceRequest.readyState !== 4) {
+                    priceRequest.abort();
+                }
+                var data = $form.serialize().replace('add-to-cart', 'atc') + '&action=wckalkulator_calculate_price' + '&_wck_ajax_nonce=' + wck_ajax_object._wck_ajax_nonce;
+                $.each($form.find("input[type=file].wck_imageupload:enabled"), function () {
                     data += "&" + $(this).attr("name") + "=" + (($(this)[0].files.length === 1) ? $(this)[0].files[0].size : 0);
                 });
-                $("form.cart [name^=wck]:disabled").each(function(){
+                $form.find("[name^='wck[']:disabled").each(function(){
                     data += "&" + $(this).attr("name") + "=0";
                 });
-                $.post(wck_ajax_object.ajax_url, data, function (response) {
-                    if (response) {
-                        $("#wckalkulator-price").html(response);
-                    }
-                });
+                var $price = $("#wckalkulator-price");
+                $price.attr({"aria-busy": "true", "data-state": "pending"}).removeClass("wck-price-error").empty();
+                priceRequest = $.ajax({url: wck_ajax_object.ajax_url, method: "POST", data: data})
+                    .done(function (response) {
+                        if (version !== priceRequestVersion) { return; }
+                        if (typeof response === "string" && $.trim(response) !== "") {
+                            $price.html(response).attr({"aria-busy": "false", "data-state": "valid"});
+                        } else {
+                            $price.text(wck_ajax_object._wck_i18n_price_error).attr({"aria-busy": "false", "data-state": "error"}).addClass("wck-price-error");
+                        }
+                    })
+                    .fail(function (_, status) {
+                        if (version !== priceRequestVersion || status === "abort") { return; }
+                        $price.text(wck_ajax_object._wck_i18n_price_error).attr({"aria-busy": "false", "data-state": "error"}).addClass("wck-price-error");
+                    });
             }
         }
 
-        $('input.wck_imageupload').on('change', function (e) {
-            var size = $(this)[0].files[0].size;
+        $form.find('input.wck_imageupload').on('change', function (e) {
+            var files = this.files;
+            if (!files || !files.length) { return; }
+            var size = files[0].size;
             if (size > $(this).data("maxfilesize") * 1000000) {
                 alert(wck_ajax_object._wck_i18n_maxfilesize + " Max. " + $(this).data("maxfilesize") + "MB");
                 $(this).val('');
             }
         });
 
-        $(document).on('change keyup', _form + ' input, ' + _form + ' select, ' + _form + ' textarea', function () {
+        $form.on('change keyup', 'input, select, textarea', function () {
+            priceRequestVersion++;
+            if (priceRequest && priceRequest.readyState !== 4) { priceRequest.abort(); }
+            if (shouldCalculatePrice) {
+                $("#wckalkulator-price").empty().attr({"aria-busy": "true", "data-state": "pending"}).removeClass("wck-price-error");
+            }
             clearTimeout(userTimeout);
             clearTimeout(updateTimeout);
             userTimeout = setTimeout(function () {
@@ -185,16 +300,18 @@
         updateUI();
         calculatePrice();
 
-        $("span.wck-field-tip").tipTip({
+        $form.find("span.wck-field-tip").tipTip({
             attribute: 'title',
             defaultPosition: 'left'
         });
 
-        $("input[type=checkbox][data-type='checkboxgroup']").change(function (e) {
+        $form.find("input[type=checkbox][data-type='checkboxgroup']").change(function (e) {
             var group = $(this).data("group");
-            var required = $(this).data("required") === 1;
+            var requiredFields = checkboxGroup(group).filter(":enabled");
+            var required = requiredFields.length > 0 && requiredFields.first().data("required") === 1;
             var limit = $(this).data("limit");
-            var checked_count = $("input[type=checkbox][data-group='" + group + "']:checked").length;
+            var fieldsInGroup = checkboxGroup(group);
+            var checked_count = fieldsInGroup.filter(":enabled:checked").length;
 
             if (limit > 0) {
                 if (checked_count > limit) {
@@ -205,30 +322,31 @@
             if (required && checked_count === 0) {
                 $(this).prop("checked", true);
             }
-            checked_count = $("input[type=checkbox][data-group='" + group + "']:checked").length;
+            checked_count = fieldsInGroup.filter(":enabled:checked").length;
             if (checked_count > 0) {
-                $("input[type=checkbox][data-group=" + group + "]").get(0).setCustomValidity("");
+                fieldsInGroup.get(0).setCustomValidity("");
             }
         });
 
-        $(_form).submit(function (e) {
+        $form.submit(function (e) {
             var lastGroup = "";
-            var _form = $(this).get(0);
-            $("input[type=checkbox][data-type='checkboxgroup']").each(function () {
+            var form = $(this).get(0);
+            $form.find("input[type=checkbox][data-type='checkboxgroup']:enabled").each(function () {
                 var group = $(this).data("group");
                 if (group !== lastGroup) {
-                    if ($(this).data("required") === 1 && $("input[type=checkbox][data-group=" + group + "]:checked").length === 0) {
-                        $("input[type=checkbox][data-group=" + group + "]").get(0).setCustomValidity(wck_ajax_object._wck_i18n_required);
-                        _form.reportValidity();
+                    var fieldsInGroup = checkboxGroup(group).filter(":enabled");
+                    if ($(this).data("required") === 1 && fieldsInGroup.filter(":checked").length === 0) {
+                        fieldsInGroup.get(0).setCustomValidity(wck_ajax_object._wck_i18n_required);
+                        form.reportValidity();
                         e.preventDefault();
                         return false;
                     }
                 }
                 lastGroup = group;
             });
-            $("form.cart [name^=wck]:disabled").each(function(){
+            $form.find("[name^='wck[']:disabled").each(function(){
                 var input = $("<input>").attr("type", "hidden").attr("name", $(this).attr("name")).val("");
-                $(_form).append($(input));
+                $form.append($(input));
             });
         });
 

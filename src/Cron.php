@@ -59,9 +59,17 @@ class Cron
      */
     public static function deactivate()
     {
-        foreach(self::$jobs as $job) {
-            wp_unschedule_event(wp_next_scheduled($job), $job);
+        foreach (self::job_names() as $job) {
+            wp_clear_scheduled_hook($job);
         }
+    }
+
+    private static function job_names()
+    {
+        return array(
+            self::PREFIX . 'delete_customer_uploads',
+            self::PREFIX . 'delete_cart_uploads'
+        );
     }
 
     /**
@@ -110,25 +118,10 @@ class Cron
     public static function delete_customer_uploads()
     {
 
-        //Since v.1.3.1 upload path is defined in WCK Settings
-        //$customer_dir = '/wc-kalkulator/customer-data/';
-        //$upload_path = wp_upload_dir()['basedir'] . $customer_dir;
-        $upload_path = Settings::get('upload_customer_data_dir');
-
-        if(!file_exists($upload_path)) {
-            return;
-        }
-
-        $ext = array('jpg', 'jpeg', 'png', 'gif');
-        $dir = new \RecursiveDirectoryIterator($upload_path);
-        $files = new \RecursiveIteratorIterator($dir);
         $time_keep = time() - ((int)Settings::get('upload_retain_time') * 24 * 60 * 60);
-
-        foreach($files as $file){
-            if ($file->isFile() && in_array($file->getExtension(), $ext)) {
-                if($file->getMTime() < $time_keep) {
-                    unlink($file->getPathname());
-                }
+        foreach (PrivateUploads::registered_uploads() as $upload) {
+            if (isset($upload['record']['created']) && $upload['record']['created'] < $time_keep) {
+                PrivateUploads::delete_registered($upload['record'], $upload['path'], $time_keep);
             }
         }
     }
@@ -142,12 +135,23 @@ class Cron
     {
         $time_keep = time() - ((int)Settings::get('upload_temp_retain_time') * 24 * 60 * 60);
 
-        foreach (new \DirectoryIterator(get_temp_dir()) as $file) {
-            if($file->isFile() && substr($file->getFilename(), 0 ,17) === 'wckalkulator_tmp_') {
-                if($file->getMTime() < $time_keep) {
-                    unlink($file->getPathname());
-                }
+        foreach (glob(rtrim(get_temp_dir(), '/\\') . DIRECTORY_SEPARATOR . 'wckalkulator_tmp_*') as $path) {
+            if (is_link($path) || !is_file($path) || !preg_match('/^wckalkulator_tmp_[a-f0-9]{32}\.[a-z0-9]{1,10}$/i', basename($path))) {
+                continue;
             }
+            $handle = @fopen($path, 'rb');
+            if (!$handle || !flock($handle, LOCK_EX)) {
+                if ($handle) {
+                    fclose($handle);
+                }
+                continue;
+            }
+            clearstatcache(true, $path);
+            if (file_exists($path) && filemtime($path) < $time_keep) {
+                @unlink($path);
+            }
+            flock($handle, LOCK_UN);
+            fclose($handle);
         }
     }
 

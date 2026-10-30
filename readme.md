@@ -2,10 +2,10 @@
 Tags: woocommerce custom fields,  woocommerce product price, woocommerce product fields, woocommerce custom price field, woocommerce personalized product, woocommerce custom product fields, product fields, custom product price, price calculation, price formula
 Requires at least: 5.0
 Tested up to: 6.0.1
-Stable tag: 1.6.1
-Requires PHP: 5.6
+Stable tag: 2.0.0
+Requires PHP: 7.4
 License: GNU GPLv2
-Donate link: https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY
+Donate link: https://www.buymeacoffee.com/piatkowski
 
 WooCommerce product fields, product addons and formula price calculator. Absolutely FREE - 23 different field types on your product and order page.
 
@@ -18,7 +18,7 @@ Extra product fields can be used to calculate product price and save information
 *	**23 field types** to get customer input
 *	Price calculation based on **formula**, **conditional expression** or **price add-ons** (product addons).
 
-If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski)
 
 Sell products by anything. You are not limited to sell only by length, area, volume, etc. **You decide how the prices will be calculated.** WooCommerce Product Fields and Price Calculator plugin allows **full freedom** to define fields and formulas for calculating custom price. You can create a personalized product in your store.
 

@@ -35,6 +35,12 @@ class AdminNotice
         add_action(AdminNotice::TASK, array(__CLASS__, 'set_notice_option'));
     }
 
+    /** Clear the notice task for the current site during plugin deactivation. */
+    public static function deactivate()
+    {
+        wp_clear_scheduled_hook(self::TASK);
+    }
+
     /**
      * Schedula an event
      *
@@ -108,7 +114,10 @@ class AdminNotice
      */
     public static function dismiss()
     {
-        if (!wp_verify_nonce($_POST['_wck_ajax_nonce'], AdminNotice::NONCE) || !isset($_POST["_wck_notice_dismiss"])) {
+        if (!current_user_can('manage_woocommerce')
+            || !isset($_POST['_wck_ajax_nonce'], $_POST['_wck_notice_dismiss'])
+            || !is_scalar($_POST['_wck_ajax_nonce']) || !is_scalar($_POST['_wck_notice_dismiss'])
+            || !wp_verify_nonce(wp_unslash((string) $_POST['_wck_ajax_nonce']), AdminNotice::NONCE)) {
             wp_send_json(array(
                 'status' => 'bad request'
             ));
@@ -150,8 +159,8 @@ class AdminNotice
                     '</a>'
                 );
                 printf(
-                    __('It would be nice if you could <strong>donate</strong> via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
-                    '<a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY">',
+                    __('It would be nice if you could <strong>donate</strong> :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
+                    '<a href="https://www.buymeacoffee.com/piatkowski">',
                     '</a>'
                 );
                 ?>
@@ -173,8 +182,8 @@ class AdminNotice
             <p>
                 <?php
                 printf(
-                    __('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> via PayPal :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
-                    '<a href="https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY">',
+                    __('Hello ! Remember that <strong>WC Kalkulator</strong> will always be for free, so it would be nice if you could <strong>donate</strong> :) - %1$s<strong>Yes, I\'d like to support!</strong>%2$s', 'wc-kalkulator'),
+                    '<a href="https://www.buymeacoffee.com/piatkowski">',
                     '</a>'
                 );
                 ?>

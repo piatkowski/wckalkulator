@@ -25,6 +25,7 @@ class Settings
     {
         add_action('admin_init', array(__CLASS__, 'settings_init'));
         add_action('admin_menu', array(__CLASS__, 'add_menu_page'));
+        add_action('admin_post_wck_save_settings', array(__CLASS__, 'save_settings'));
         self::$fields = array(
             'form_css_selector' => array(
                 'label' => __('Form selector', 'wc-kalkulator'),
@@ -52,9 +53,9 @@ class Settings
             ),
             'upload_customer_data_dir' => array(
                 'label' => __('Upload path for Customer data', 'wc-kalkulator'),
-                'desc' => __('This path will be used to store files uploaded by customers on checkout. This setting is used by Image Upload field.'),
+                'desc' => __('Absolute filesystem directory outside the public WordPress root. The wck_private_upload_directory filter can override this path for custom storage.', 'wc-kalkulator'),
                 'type' => 'text',
-                'default' => wp_upload_dir()['basedir'] . '/wc-kalkulator/customer-data/'
+                'default' => dirname(rtrim(ABSPATH, '/\\')) . '/wc-kalkulator-private/customer-data/'
             ),
             'dismiss_notices' => array(
                 'label' => __('Do you supported this plugin?', 'wc-kalkulator'),
@@ -92,8 +93,6 @@ class Settings
     public static function settings_init()
     {
         if(!current_user_can('manage_woocommerce')) return;
-
-        register_setting(self::PAGE, self::OPTIONS, array(__CLASS__, 'validate'));
 
         /*
          * Section "General"
@@ -136,7 +135,7 @@ class Settings
             '',//'edit.php?post_type=product',
             'Settings',
             'Settings',
-            'manage_options',
+            'manage_woocommerce',
             self::PAGE,
             array(__CLASS__, 'html_page')
         );
@@ -150,7 +149,7 @@ class Settings
      */
     public static function html_page()
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can('manage_woocommerce')) {
             return;
         }
 
@@ -161,12 +160,13 @@ class Settings
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form action="options.php" method="post">
+            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
                 <?php
-                settings_fields(self::PAGE);
+                wp_nonce_field(self::PAGE . '-save', '_wck_settings_nonce');
                 do_settings_sections(self::PAGE);
                 submit_button(__('Save settings', 'wc-kalkulator'));
                 ?>
+                <input type="hidden" name="action" value="wck_save_settings" />
             </form>
         </div>
         <?php
@@ -234,11 +234,41 @@ class Settings
      */
     public static function validate($input)
     {
-        $input['form_css_selector'] = sanitize_text_field($input['form_css_selector']);
+        $input = is_array($input) ? $input : array();
+        $defaults = array();
+        foreach (self::$fields as $name => $field) {
+            $defaults[$name] = $field['default'];
+        }
+        $input = array_intersect_key(array_merge($defaults, $input), $defaults);
+        $input['form_css_selector'] = is_scalar($input['form_css_selector'])
+            ? sanitize_text_field((string) $input['form_css_selector']) : $defaults['form_css_selector'];
         $input['display_errors'] = $input['display_errors'] === 'yes' ? 'yes' : 'no';
-        $input['upload_customer_data_dir'] = rtrim($input['upload_customer_data_dir'], '/') . '/';
-        $input['upload_retain_time'] = max(1, absint($input['upload_retain_time']));
-        $input['upload_temp_retain_time'] = max(1, absint($input['upload_temp_retain_time']));
+        $default_upload_dir = dirname(rtrim(ABSPATH, '/\\')) . '/wc-kalkulator-private/customer-data';
+        $upload_dir = isset($input['upload_customer_data_dir']) && is_scalar($input['upload_customer_data_dir'])
+            ? trim(sanitize_text_field((string) $input['upload_customer_data_dir']))
+            : '';
+        $is_absolute = strpos($upload_dir, '/') === 0 || preg_match('/^[A-Za-z]:[\\\\\/]/', $upload_dir);
+        if ($upload_dir === '' || !$is_absolute || preg_match('/^[A-Za-z][A-Za-z0-9+.-]*:\\/\\//', $upload_dir)) {
+            $upload_dir = $default_upload_dir;
+        }
+        $input['upload_customer_data_dir'] = trailingslashit($upload_dir);
+        $input['upload_retain_time'] = max(1, absint(is_scalar($input['upload_retain_time']) ? $input['upload_retain_time'] : $defaults['upload_retain_time']));
+        $input['upload_temp_retain_time'] = max(1, absint(is_scalar($input['upload_temp_retain_time']) ? $input['upload_temp_retain_time'] : $defaults['upload_temp_retain_time']));
+        $input['dismiss_notices'] = $input['dismiss_notices'] === 'yes' ? 'yes' : 'no';
         return $input;
+    }
+
+    /** Save plugin settings through a capability-checked admin-post action. */
+    public static function save_settings()
+    {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(__('You are not allowed to change these settings.', 'wc-kalkulator'), '', array('response' => 403));
+        }
+        check_admin_referer(self::PAGE . '-save', '_wck_settings_nonce');
+        $input = isset($_POST[self::OPTIONS]) && is_array($_POST[self::OPTIONS])
+            ? wp_unslash($_POST[self::OPTIONS]) : array();
+        update_option(self::OPTIONS, self::validate($input));
+        wp_safe_redirect(add_query_arg('settings-updated', 'true', admin_url('admin.php?page=' . self::PAGE)));
+        exit;
     }
 }

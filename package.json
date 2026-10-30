@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-assets.js",
+    "check:js": "sh scripts/check-javascript.sh",
+    "test": "sh scripts/test-regressions.sh"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "sass": "^1.89.2",
+    "terser": "^5.43.1"
+  }
+}

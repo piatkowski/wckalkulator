@@ -3,7 +3,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$has_value = !empty($view->value);
+$has_value = isset($view->value) && $view->value !== '' && $view->value !== null;
 $has_image = !empty($view->image);
 $has_colorswatch = !empty($view->colorswatch);
 
@@ -16,7 +16,7 @@ if ($has_value || $has_image || $has_colorswatch): ?>
 } ?>
 
 <?php if ($has_image): ?>
-    <img src="<?php echo esc_html($view->image); ?>" width="64" alt=""/>
+    <img src="<?php echo esc_url($view->image); ?>" width="64" alt=""/>
 <?php endif; ?>
 
 <?php if ($has_colorswatch): ?>

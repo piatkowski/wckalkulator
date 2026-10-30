@@ -10,6 +10,9 @@ if (!defined('ABSPATH')) {
         <label for="<?php echo esc_html($view->id); ?>">
             <?php include '_label.php'; ?>
         </label>
+        <?php if (!empty($view->existing_file_name)): ?>
+            <span class="wck-existing-upload"><?php echo esc_html(sprintf(__('Current file: %s', 'wc-kalkulator'), $view->existing_file_name)); ?></span>
+        <?php endif; ?>
     </td>
     <?php echo wp_kses_post(apply_filters('wck_field_td', '<td class="value">', $view->field_type)); ?>
         <input type="file"

@@ -11,10 +11,10 @@ use WCKalkulator\Sanitizer;
     <span class="wck-price-prefix"><?php echo esc_html($view->prefix); ?></span>
 <?php endif; ?>
 
-<?php if ($view->value !== '') {
-    echo wc_price( Sanitizer::sanitize($view->value, 'price') );
+<?php if ($view->display_value !== '') {
+    echo wc_price( $view->display_value );
 } else {
-    echo esc_html($view->price);
+    echo wp_kses_post($view->price);
 } ?>
 
 <?php if ($view->sufix !== ''): ?>

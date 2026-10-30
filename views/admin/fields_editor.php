@@ -4,13 +4,13 @@ if (!defined('ABSPATH')) {
 }
 
 ?>
-<div id="wck-cv-builder">
+<div id="wck-cv-builder" role="dialog" aria-modal="true" aria-labelledby="wck-cv-title" aria-hidden="true" tabindex="-1">
     <div class="template">
         <div class="or-group">
             <div class="or-condition">
                 <div class="and-group">
                     <div class="and-condition">
-                        <a href="#" class="cv-remove"><span class="dashicons dashicons-trash"></span></a>
+                        <button type="button" class="cv-remove" aria-label="<?php esc_attr_e('Remove condition', 'wc-kalkulator'); ?>"><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>
                         <select class="p-field">
                             <option value="" selected disabled><?php _e('Choose field...', 'wc-kalkulator'); ?></option>
                         </select>
@@ -33,10 +33,10 @@ if (!defined('ABSPATH')) {
         </div>
         <button type="button" class="button cv-action-or"><?php _e('OR', 'wc-kalkulator'); ?></button>
     </div>
-    <h1>{<span class="self-name"></span>} <?php _e(' is visible if', 'wc-kalkulator'); ?> </h1>
+    <h1 id="wck-cv-title">{<span class="self-name"></span>} <?php _e(' is visible if', 'wc-kalkulator'); ?> </h1>
     <div class="builder" data-field=""></div>
     <p class="save">
-        <a href="#" class="button cv-close">Close without saving</a> <a href="#" class="button button-primary cv-save">Save & Close</a>
+        <button type="button" class="button cv-close"><?php _e('Close without saving', 'wc-kalkulator'); ?></button> <button type="button" class="button button-primary cv-save"><?php _e('Save & Close', 'wc-kalkulator'); ?></button>
     </p>
 </div>
 

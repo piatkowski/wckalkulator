@@ -98,25 +98,26 @@ class RangedatepickerField extends DatepickerField {
 	 * @throws \Exception
 	 */
 	public function validate( $value ) {
-		if ( ! isset( $value["from"] ) || ! isset( $value["to"] ) || count( $value ) != 2 ) {
+		if ( ! is_array( $value ) || count( $value ) !== 2 || ! array_key_exists( 'from', $value ) || ! array_key_exists( 'to', $value )
+			|| ! is_string( $value['from'] ) || ! is_string( $value['to'] ) ) {
 			error_log( $this->data( "name" ) . " does not exists or is not an array of 2 items" );
 
 			return false;
 		}
 
 		if ( $this->is_required() ) {
-			if ( empty( $value["from"] ) || empty( $value["to"] ) ) {
+			if ( $value["from"] === '' || $value["to"] === '' ) {
 				error_log( $this->data( "name" ) . " is required and has empty values" );
 
 				return false;
 			}
 		} else {
-			if ( empty( $value["from"] ) xor empty( $value["to"] ) ) {
+			if ( ( $value["from"] === '' ) xor ( $value["to"] === '' ) ) {
 				error_log( $this->data( "name" ) . " is not required, but has incorrect value" );
 
 				return false;
 			}
-			if ( empty( $value["from"] ) && empty( $value["to"] ) ) {
+			if ( $value["from"] === '' && $value["to"] === '' ) {
 				return true;
 			}
 		}
@@ -124,12 +125,17 @@ class RangedatepickerField extends DatepickerField {
 		//1. Check correct date
 		$count_valid = 0;
 		foreach ( $value as $date ) {
+			if ( ! is_string( $date ) ) {
+				continue;
+			}
 			$date_arr = explode( '-', $date );
 			if ( count( $date_arr ) === 3 ) {
 				$year        = $date_arr[0];
 				$month       = $date_arr[1];
 				$day         = $date_arr[2];
-				$count_valid += checkdate( $month, $day, $year ) ? 1 : 0;
+				$count_valid += ctype_digit( $year ) && ctype_digit( $month ) && ctype_digit( $day )
+					&& strlen( $year ) === 4 && strlen( $month ) === 2 && strlen( $day ) === 2
+					&& checkdate( (int) $month, (int) $day, (int) $year ) ? 1 : 0;
 			}
 		}
 		$is_valid = $count_valid === 2;

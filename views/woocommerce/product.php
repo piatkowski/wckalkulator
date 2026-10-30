@@ -9,9 +9,12 @@ use WCKalkulator\FieldsetProduct, WCKalkulator\Sanitizer;
 <table class="variations<?php echo $view->layout === 2 ? ' wck-layout-two-col' : '' ?>">
     <input type="hidden" name="_wck_product_id" value="<?php echo absint($view->product_id); ?>">
     <input type="hidden" name="_wck_hash" value="<?php echo wp_hash($view->product_id); ?>">
+    <?php echo isset($view->hidden) ? wp_kses($view->hidden, Sanitizer::allowed_html()) : ''; ?>
     <?php
     if ($view->layout === 1) {
-        echo isset($view->html) ? wp_kses($view->html, Sanitizer::allowed_html()) : '';
+        foreach ($view->fields as $field) {
+            echo wp_kses($field['html'], Sanitizer::allowed_html());
+        }
     } elseif ($view->layout === 2) {
         $col = 1;
         $row_opened = false;

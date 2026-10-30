@@ -1,0 +1,55 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+      - run: composer validate --no-check-publish
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer lint:php
+      - run: composer test
+
+  assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run check:js
+
+  package:
+    needs: [php, assets]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - run: sh scripts/package-release.sh "$RUNNER_TEMP/wc-kalkulator.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wc-kalkulator-plugin
+          path: ${{ runner.temp }}/wc-kalkulator.zip

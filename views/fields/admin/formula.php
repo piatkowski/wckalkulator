@@ -7,7 +7,7 @@ use WCKalkulator\Helper;
 
 ?>
 <label>* <?php _e('Formula', 'wc-kalkulator'); ?>
-    <?php echo Helper::html_help_tip(__('The result of the formula will be saved in order details.', 'wc-kalkulator')); ?></label>
+    <?php echo Helper::html_help_tip(__('This formula is calculated separately and saved in order details. Its result is not available as an input to the product price formula.', 'wc-kalkulator')); ?></label>
 <input type="text" class="param fst-content expression-editor-enabled show-total-price">
 <label><?php _e("Display field on user's cart", 'wc-kalkulator'); ?></label>
 <select class="param fst-display-on-user-cart">

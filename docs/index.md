@@ -15,10 +15,9 @@ Extra product fields can be used to calculate product price and save information
 * Price calculation based on formula, conditional expression or price add-ons.
 
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!
 
@@ -35,7 +34,7 @@ The plugin is designed to work with multisite mode. We encourage you to contact 
 
 [!embed](https://youtu.be/Jrc1dXof_pw)
 
-If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski)
 
 ## 22 Field Types (ALL FREE)
 
@@ -152,9 +151,9 @@ You can use `acf('field_name')` function to get ACF field value in custom price 
 * global parameters can be defined and used in formula
 * ability to edit product fields after from a cart
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.buymeacoffee.com/piatkowski)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!

@@ -85,12 +85,18 @@ class NumberField extends AbstractField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( ! is_scalar( $value ) ) {
+			return false;
+		}
+		if ( ! $this->is_required() && ( $value === '' || $value === null ) ) {
 			return true;
+		}
+		$is_numeric = is_numeric( $value ) && is_finite( (float) $value );
+		if ( ! $is_numeric ) {
+			return false;
 		}
 		$is_greater_than_min = $value >= $this->data["min"];
 		$is_less_than_max    = $value <= $this->data["max"];
-		$is_numeric          = is_numeric( $value );
 
 		return $is_greater_than_min && $is_less_than_max && $is_numeric;
 	}

@@ -77,7 +77,10 @@ class ColorpickerField extends TextField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		if ( ! $this->is_required() && empty( $value ) ) {
+		if ( ! is_string( $value ) ) {
+			return false;
+		}
+		if ( ! $this->is_required() && $value === '' ) {
 			return true;
 		}
 		if ( strlen( $value ) === 7 ) {

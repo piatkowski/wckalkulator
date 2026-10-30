@@ -39,7 +39,7 @@ Higher value have higher priority
 
 Fields can be added, deleted and reordered (drag&drop). Parameters of each field are described in the **Field Types** section.
 
-If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski) or [Donate via PayPal](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)
+If you appreciate my work - [Buy me a Coffee](https://www.buymeacoffee.com/piatkowski)
 
 
 ![](../images/add_fieldset_number_field.png)
@@ -95,10 +95,10 @@ When you type the formula, enter "{" sign and you see the list of available fiel
 First, we have to define two **Number** or **Select** fields named *width* and *height*.
 The price of the product can be 100 USD, 200 USD or (300+area*0.05) USD.
 
-!!! :zap: [Donate](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY) :zap:
+!!! :zap: [Donate](https://www.buymeacoffee.com/piatkowski) :zap:
 This plugin is absolutely FREE with PRO features. It will always be free, so please donate if you like it!
 
-[!button variant="light" icon=":heart:" text="I like it!"](https://www.paypal.com/donate/?hosted_button_id=5DNZK72H5YCBY)&nbsp;
+[!button variant="light" icon=":heart:" text="I like it!"](https://www.buymeacoffee.com/piatkowski)&nbsp;
 [!button variant="light" icon=":coffee:" text="Just coffee"](https://www.buymeacoffee.com/piatkowski)
 !!!
 

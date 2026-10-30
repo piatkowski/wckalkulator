@@ -3,13 +3,14 @@
 /**
  * Plugin Name: WC Kalkulator
  * Description: Description: Store Manager can add fieldsets to Products and Orders. WC Kalkulator allows to order and calculate the price of the product based on the values of the fields selected by the Customer.
- * Version: 1.6.1
+ * Version: 2.0.0
  * Author: Krzysztof Piątkowski
  * Author URI: https://wckalkulator.com
  * Text Domain: wc-kalkulator
  * Domain Path: /languages
  * License: GPLv2
- * Requires PHP: 5.6
+ * Requires PHP: 7.4
+ * Requires Plugins: woocommerce
  * Network: true
  */
 
@@ -22,7 +23,28 @@ if (!defined('ABSPATH')) {
     wp_die("No direct access!");
 }
 
-include __DIR__ . '/vendor/autoload.php';
+/**
+ * Report a missing runtime dependency without booting any integrations.
+ *
+ * @param string $message Notice text.
+ * @return void
+ */
+function dependency_admin_notice($message)
+{
+    add_action('admin_notices', function () use ($message) {
+        if (current_user_can('activate_plugins')) {
+            echo '<div class="notice notice-error"><p>' . esc_html($message) . '</p></div>';
+        }
+    });
+}
+
+$wck_autoloader = __DIR__ . '/vendor/autoload.php';
+if (!is_readable($wck_autoloader)) {
+    dependency_admin_notice(__('WC Kalkulator nie został uruchomiony: brakuje pliku vendor/autoload.php. Zainstaluj kompletną paczkę wtyczki.', 'wc-kalkulator'));
+    return;
+}
+
+include $wck_autoloader;
 
 if (!class_exists('WCKalkulator\Plugin')) {
 
@@ -32,7 +54,7 @@ if (!class_exists('WCKalkulator\Plugin')) {
      */
     class Plugin
     {
-        const VERSION = "1.6.1";
+        const VERSION = "2.0.0";
 
         const NAME = "wc-kalkulator";
 
@@ -92,19 +114,35 @@ if (!class_exists('WCKalkulator\Plugin')) {
             register_activation_hook(__FILE__, array(__CLASS__, 'activation'));
             register_deactivation_hook(__FILE__, array(__CLASS__, 'deactivation'));
 
+            add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'), 1);
+            add_action('plugins_loaded', array(__CLASS__, 'boot'), 20);
+        }
+
+        /**
+         * Initialize integrations after all plugins have loaded.
+         *
+         * @return void
+         */
+        public static function boot()
+        {
+            if (!class_exists('WooCommerce')) {
+                dependency_admin_notice(__('WC Kalkulator wymaga aktywnej wtyczki WooCommerce. Włącz WooCommerce, aby uruchomić integrację.', 'wc-kalkulator'));
+                return;
+            }
+
             self::$url = plugins_url('', __FILE__);
-            self::$path = WP_PLUGIN_DIR . '/' . Plugin::NAME;
+            self::$path = dirname(__FILE__);
 
             FieldsetPostType::init();
             GlobalParametersPostType::init();
             Ajax::init();
             Product::init();
             Settings::init();
+            PrivateUploads::init();
             AdminNotice::init();
             Cron::init();
             Attribute::init();
 
-            add_action('plugins_loaded', array(__CLASS__, 'load_text_domain'));
             add_action('current_screen', array(__CLASS__, 'current_screen'));
         }
 
@@ -186,24 +224,8 @@ if (!class_exists('WCKalkulator\Plugin')) {
          */
         public static function uninstall()
         {
-            global $wpdb;
-            delete_option('wck_version');
-            if (function_exists('is_multisite') && is_multisite()) {
-                $blog_sql = "SELECT blog_id FROM $wpdb->blogs WHERE archived = '0' AND spam = '0' AND deleted = '0'";
-                $blog_ids = $wpdb->get_col($blog_sql);
-
-                if ($blog_ids) {
-                    foreach ($blog_ids as $blog_id) {
-                        switch_to_blog($blog_id);
-                        FieldsetPostType::delete_all_posts();
-                        GlobalParametersPostType::delete_all_posts();
-                    }
-                    restore_current_blog();
-                }
-            } else {
-                FieldsetPostType::delete_all_posts();
-                GlobalParametersPostType::delete_all_posts();
-            }
+            require_once __DIR__ . '/src/Uninstall.php';
+            Uninstall::run();
         }
 
         /**
@@ -212,9 +234,11 @@ if (!class_exists('WCKalkulator\Plugin')) {
          * @return void
          * @since 1.0.0
          */
-        public static function activation()
+        public static function activation($network_wide = false)
         {
-            update_option('wck_version', self::VERSION);
+            self::for_each_site($network_wide, function () {
+                update_option('wck_version', self::VERSION);
+            });
         }
 
         /**
@@ -223,9 +247,39 @@ if (!class_exists('WCKalkulator\Plugin')) {
          * @return void
          * @since 1.3.0
          */
-        public static function deactivation()
+        public static function deactivation($network_wide = false)
         {
-            Cron::deactivate();
+            self::for_each_site($network_wide, function () {
+                Cron::deactivate();
+                AdminNotice::deactivate();
+            });
+        }
+
+        /** Run a lifecycle callback in each affected site context. */
+        private static function for_each_site($network_wide, $callback)
+        {
+            if (!$network_wide || !is_multisite()) {
+                call_user_func($callback);
+                return;
+            }
+
+            $offset = 0;
+            do {
+                $site_ids = get_sites(array(
+                    'fields' => 'ids',
+                    'number' => 100,
+                    'offset' => $offset
+                ));
+                foreach ($site_ids as $site_id) {
+                    switch_to_blog($site_id);
+                    try {
+                        call_user_func($callback);
+                    } finally {
+                        restore_current_blog();
+                    }
+                }
+                $offset += 100;
+            } while (count($site_ids) === 100);
         }
 
     }

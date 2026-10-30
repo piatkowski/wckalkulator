@@ -49,7 +49,11 @@ class EmailField extends TextField {
 	 * @return bool
 	 */
 	public function validate( $value ) {
-		$is_email_valid = empty( $value ) ? true : sanitize_email( $value );
+		if ( ! is_string( $value ) && ! is_numeric( $value ) ) {
+			return false;
+		}
+		$value = (string) $value;
+		$is_email_valid = $value === '' ? true : ( sanitize_email( $value ) === $value && is_email( $value ) );
 
 		return parent::validate( $value ) && $is_email_valid;
 	}

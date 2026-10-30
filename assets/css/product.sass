@@ -53,11 +53,11 @@
         font-size: 13px
     .wck-range-date-picker
       width: 49% !important
-      float: left
+      float:left
       &.date_from
         margin-right: 2%
       input
-        float:left
+        float: left
   tr.wck-colorswatches
     td.value
       label
@@ -72,9 +72,15 @@
 
 .wck-imageswatches [type=radio], .wck-colorswatches [type=radio]
   position: absolute
-  opacity: 0
-  width: 0
-  height: 0
+  width: 1px
+  height: 1px
+  margin: -1px
+  padding: 0
+  overflow: hidden
+  clip: rect(0, 0, 0, 0)
+  clip-path: inset(50%)
+  white-space: nowrap
+  border: 0
 
 .wck-imageswatches [type=radio] + img
   cursor: pointer
@@ -91,6 +97,10 @@
 
 .wck-imageswatches [type=radio]:checked + img, .wck-colorswatches [type=radio]:checked + span.colorswatch
   outline: 2px solid #222
+
+.wck-imageswatches [type=radio]:focus-visible + img, .wck-colorswatches [type=radio]:focus-visible + span.colorswatch
+  outline: 3px solid #005fcc
+  outline-offset: 2px
 
 .wck-imageswatches .caption
   display: none
