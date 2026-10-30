@@ -112,7 +112,7 @@ class DatepickerField extends TextField {
 			$year     = $date_arr[0];
 			$month    = $date_arr[1];
 			$day      = $date_arr[2];
-			$is_valid = ctype_digit( $year ) && ctype_digit( $month ) && ctype_digit( $day)
+			$is_valid = preg_match( '/\A[0-9]+\z/', $year ) === 1 && preg_match( '/\A[0-9]+\z/', $month ) === 1 && preg_match( '/\A[0-9]+\z/', $day ) === 1
 				&& strlen( $year ) === 4 && strlen( $month ) === 2 && strlen( $day ) === 2
 				&& checkdate( (int) $month, (int) $day, (int) $year );
 		}

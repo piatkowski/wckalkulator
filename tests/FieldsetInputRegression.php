@@ -17,13 +17,6 @@ namespace {
     function is_user_logged_in() { return false; }
     function current_time($format) { return '2026-10-30 12:00:00'; }
     function absint($value) { return abs((int) $value); }
-    if (!function_exists('ctype_digit')) {
-        function ctype_digit($value) { return is_string($value) && $value !== '' && preg_match('/\A[0-9]+\z/', $value) === 1; }
-    }
-    if (!function_exists('ctype_xdigit')) {
-        function ctype_xdigit($value) { return is_string($value) && $value !== '' && preg_match('/\A[0-9A-Fa-f]+\z/', $value) === 1; }
-    }
-
     require __DIR__ . '/../src/FieldsetProduct.php';
     require __DIR__ . '/../src/Sanitizer.php';
     require __DIR__ . '/../src/Fields/AbstractField.php';

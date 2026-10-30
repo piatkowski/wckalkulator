@@ -87,7 +87,7 @@ class ColorpickerField extends TextField {
 			if ( $value[0] === '#' ) {
 				$hex = substr( $value, 1 );
 
-				return ctype_xdigit( $hex );
+				return preg_match( '/\A[0-9A-Fa-f]+\z/', $hex ) === 1;
 			}
 		}
 

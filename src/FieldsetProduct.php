@@ -338,7 +338,7 @@ class FieldsetProduct
 
         if ($current === 'current') {
             $product_id = $this->product_id > 0 ? $this->product_id : Product::get_id();
-        } elseif (is_scalar($current) && ctype_digit((string) $current) && (int) $current > 0) {
+        } elseif (is_scalar($current) && preg_match('/\A[0-9]+\z/', (string) $current) === 1 && (int) $current > 0) {
             $product_id = (int) $current;
         } elseif ($current === '') {
             $product_id = $this->product_id > 0 ? $this->product_id : Product::get_id();
