@@ -34,9 +34,12 @@ namespace {
         private $name;
         private $valid;
         private $expression;
-        public function __construct($name, $valid, $expression = true) { $this->name = $name; $this->valid = $valid; $this->expression = $expression; }
+        private $group;
+        public function __construct($name, $valid, $expression = true, $group = 'input') { $this->name = $name; $this->valid = $valid; $this->expression = $expression; $this->group = $group; }
         public function data($key = '') { return $key === 'name' ? $this->name : ($key === 'title' ? $this->name : null); }
         public function use_expression() { return $this->expression; }
+        public function group() { return $this->group; }
+        public function is_required() { return false; }
         public function validate($value) { $validator = $this->valid; return $validator($value); }
     }
 
@@ -61,7 +64,7 @@ namespace {
     $check('preview accepts in-range fields and validates derived :sum field', $fieldset->validate_for_expression() === true);
     $set($fieldset, 'user_input', array('color' => array('red'), '_files' => array()));
     $check('preview leaves a not-yet-entered field pending', $fieldset->validate_for_expression() === true);
-    $set($fieldset, 'fields', array('attachment' => new RegressionField('attachment', function ($v) { return is_array($v) && isset($v['file_id']); })));
+    $set($fieldset, 'fields', array('attachment' => new RegressionField('attachment', function ($v) { return is_array($v) && isset($v['file_id']); }, true, 'upload')));
     $data->expression = array('mode' => 'oneline', 'expr' => '{attachment:size}');
     $set($fieldset, 'user_input', array('attachment' => 10, '_files' => array('attachment' => array('file_id' => 'safe-id'))));
     $check('preview validates a referenced upload field', $fieldset->validate_for_expression() === true);
