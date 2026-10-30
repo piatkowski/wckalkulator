@@ -43,6 +43,9 @@ namespace {
     $reflection = new \ReflectionClass('WCKalkulator\\FieldsetProduct');
     $fieldset = $reflection->newInstanceWithoutConstructor();
     $field = $reflection->getProperty('data');
+    if (PHP_VERSION_ID < 80100) {
+        $field->setAccessible(true);
+    }
     $field->setValue($fieldset, (object) array('id' => 77));
     \WCKalkulator\FieldsetAssignment::$assignments = array(123 => 77, 456 => 88);
 
@@ -58,6 +61,9 @@ namespace {
     unset($GLOBALS['post']);
 
     $product_id_property = $reflection->getProperty('product_id');
+    if (PHP_VERSION_ID < 80100) {
+        $product_id_property->setAccessible(true);
+    }
     $product_id_property->setValue($fieldset, 123);
     $GLOBALS['post'] = (object) array('ID' => 999);
     $fieldset->js_api();
