@@ -6,4 +6,5 @@ ROZWOJ.md
 REVIEW.md
 AGENTS.md
 node_modules/
-nierozwiazane.txt
+*.md
+*.txt
